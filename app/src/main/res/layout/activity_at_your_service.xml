@@ -6,4 +6,47 @@
     android:layout_height="match_parent"
     tools:context=".AtYourServiceActivity">
 
+
+    <EditText
+        android:id="@+id/search_bar"
+        android:layout_width="250dp"
+        android:layout_height="54dp"
+        android:layout_marginStart="9dp"
+        android:layout_marginTop="38dp"
+        android:layout_marginEnd="7dp"
+        android:layout_marginBottom="639dp"
+        android:hint="Enter Food"
+        android:textSize="20sp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/search_button"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <Button
+        android:id="@+id/search_button"
+        android:layout_width="141dp"
+        android:layout_height="54dp"
+        android:layout_marginStart="7dp"
+        android:layout_marginTop="38dp"
+        android:layout_marginEnd="4dp"
+        android:layout_marginBottom="639dp"
+        android:text="Search"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/search_bar"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/results"
+        android:layout_width="396dp"
+        android:layout_height="617dp"
+        android:layout_marginStart="6dp"
+        android:layout_marginEnd="9dp"
+        android:layout_marginBottom="21dp"
+        android:text="Results Display Here"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/search_bar" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>
