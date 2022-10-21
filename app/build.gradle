@@ -39,4 +39,7 @@ dependencies {
     // adding retrofit dependencies
     implementation 'com.squareup.retrofit2:retrofit:2.2.0'
     implementation 'com.squareup.retrofit2:converter-gson:2.2.0'
+
+    // dependency for image loading
+    implementation 'com.squareup.picasso:picasso:2.71828'
 }
