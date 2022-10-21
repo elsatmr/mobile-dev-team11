@@ -4,15 +4,91 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".MainActivity">
+    tools:context=".MainActivity"
+    android:padding="16dp">
 
-    <TextView
+    <ImageView
+        android:id="@+id/coverImageView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Hello World!"
-        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@drawable/cover"
+        app:layout_constraintBottom_toTopOf="@id/headerMainTextView" />
+
+    <TextView
+        android:id="@+id/headerMainTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Hello, we are Team 11! :)"
+        android:textSize="24dp"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/coverImageView"
+        app:layout_constraintBottom_toTopOf="@+id/secondHeaderMainTextView"/>
+
+    <TextView
+        android:id="@+id/secondHeaderMainTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Team members:"
+        android:textSize="18dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/headerMainTextView"
+        app:layout_constraintBottom_toTopOf="@+id/nameOneMainTextView"/>
+
+    <TextView
+        android:id="@+id/nameOneMainTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Ashley Cheung, Elsa Tamara"
+        android:textSize="18dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/secondHeaderMainTextView"
+        app:layout_constraintBottom_toTopOf="@+id/nameTwoMainTextView"/>
+
+    <TextView
+        android:id="@+id/nameTwoMainTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Michael Hart, Tomiris Kozhabekkyzy"
+        android:textSize="18dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/nameOneMainTextView"
+        app:layout_constraintBottom_toTopOf="@+id/atYourServiceMainButton"/>
+    <Button
+        android:id="@+id/atYourServiceMainButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="At Your Service"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/nameTwoMainTextView"
+        app:layout_constraintBottom_toTopOf="@+id/firebaseDbMainButton"
+        android:onClick="openAtYourServiceActivity"/>
+    <Button
+        android:id="@+id/firebaseDbMainButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Firebase DB"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/atYourServiceMainButton"
+        app:layout_constraintBottom_toTopOf="@+id/slurpMainButton"/>
+    <Button
+        android:id="@+id/slurpMainButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Slurp!"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/firebaseDbMainButton"
+        app:layout_constraintBottom_toBottomOf="parent"/>
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>
