@@ -7,6 +7,8 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
+import com.google.gson.Gson;
+
 import java.util.List;
 
 import retrofit2.Call;
@@ -41,13 +43,13 @@ public class AtYourServiceActivity extends AppCompatActivity {
 
                 // retrofit does implementation for this
                 // TODO: pass the correct parameters (i.e. category, food name etc)
-                Call<List<Food>> call = mealAPI.getFoods();
+                Call<List<Meals>> call = mealAPI.getMeals();
 
                 // execute network request on a different thread using enqueue() so that
                 // the main thread is not blocked
-                call.enqueue(new Callback<List<Food>>() {
+                call.enqueue(new Callback<List<Meals>>() {
                     @Override
-                    public void onResponse(Call<List<Food>> call, Response<List<Food>> response) {
+                    public void onResponse(Call<List<Meals>> call, Response<List<Meals>> response) {
                         // triggered when get a response back from the server, but it doesn't mean that the
                         // response was successful (code between 200-300). otherwise, print
                         // the response code
@@ -57,19 +59,29 @@ public class AtYourServiceActivity extends AppCompatActivity {
                         }
 
                         // the data you get from the webservice, then display in textview
-                        // TODO: edit content to include relevant information about the food item
-                        List<Food> foods = response.body();
-                        for (Food food : foods) {
-                            String content = "";
-                            content += "Meal: " + food.getMeals() + "\n";
+                        List<Meals> meals = response.body();
 
-                            // append so don't overwrite the current text
-                            result_tv.append(content);
-                        }
+
+                        // TODO: edit content to include relevant information about the food item (category, title etc)
+                       for (Meals meal : meals) {
+                           List<Food> foods = meal.getFoodsObjectList();
+                           for (Food food : foods) {
+                               String content = "";
+                               content += food.getmStrMeal();
+                               content += food.getmStrCategory();
+                               content += food.getmStrTags();
+
+                               // append so don't overwrite current text
+                               result_tv.append(content);
+                           }
+                       }
+
+//                        String content = meals.toString();
+//                        result_tv.append(content);
                     }
 
                     @Override
-                    public void onFailure(Call<List<Food>> call, Throwable t) {
+                    public void onFailure(Call<List<Meals>> call, Throwable t) {
                         // something when wrong in communication with the server
                         // when attempting to get a response back
                         result_tv.setText(t.getMessage());
