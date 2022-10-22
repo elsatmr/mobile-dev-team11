@@ -25,14 +25,14 @@ public class FoodAdapter extends RecyclerView.Adapter<FoodViewHolder> {
     @NonNull
     @Override
     public FoodViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        return new FoodViewHolder(LayoutInflater.from(context).inflate(R.layout.food_view, null));
+        return new FoodViewHolder(LayoutInflater.from(context).inflate(R.layout.food_view, parent, false));
     }
 
     @Override
     public void onBindViewHolder(@NonNull FoodViewHolder holder, int position) {
         holder.foodTitle.setText(foodList.get(position).getmStrMeal());
         String imageUri = foodList.get(position).getmStrMealThumb();
-        Picasso.get().load(imageUri).into(holder.foodPhoto);
+        Picasso.get().load(imageUri).resize(126, 126).into(holder.foodPhoto);
     }
 
     @Override
