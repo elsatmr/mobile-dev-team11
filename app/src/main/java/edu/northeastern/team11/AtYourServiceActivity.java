@@ -18,6 +18,7 @@ import android.widget.EditText;
 import android.widget.ImageButton;
 import android.util.Log;
 import android.widget.Button;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -58,6 +59,7 @@ public class AtYourServiceActivity extends AppCompatActivity {
     private List<Chip> chipList;
     private FloatingActionButton searchButton;
     private ChipGroup chipGroup;
+    private ProgressBar loadingSpinner;
     MealAPI mealAPI;
 
     @Override
@@ -72,6 +74,7 @@ public class AtYourServiceActivity extends AppCompatActivity {
         constLayout = findViewById(R.id.constLayoutView);
         searchButton = findViewById(R.id.searchButton);
         toolbar = findViewById(R.id.toolbar);
+        loadingSpinner = findViewById(R.id.loadingSpinner);
         // Instantiate variables
         foodList = new ArrayList<>();
         textInputContents = "";
@@ -80,6 +83,7 @@ public class AtYourServiceActivity extends AppCompatActivity {
         chipIDs = new ArrayList<Integer>();
         chipList = new ArrayList<Chip>();
         searchButton.setEnabled(false);
+        loadingSpinner.setVisibility(View.INVISIBLE);
         // Setup UI responsiveness
         handleTyping();
         // Create retrofit mealAPI object
@@ -243,6 +247,7 @@ public class AtYourServiceActivity extends AppCompatActivity {
 
     // GET request from API
     private void requestFoodFromAPI(String searchWord) {
+        loadingSpinner.setVisibility(View.VISIBLE);
         Call<JsonElement> call = mealAPI.getMeals(searchWord);
         call.enqueue(new Callback<JsonElement>() {
             @Override
@@ -274,5 +279,6 @@ public class AtYourServiceActivity extends AppCompatActivity {
                 result_tv.setText(t.getMessage());
             }
         });
+        loadingSpinner.setVisibility(View.INVISIBLE);
     }
 }
