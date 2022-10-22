@@ -3,7 +3,10 @@
   <component name="DesignSurface">
     <option name="filePathToZoomLevelMap">
       <map>
+        <entry key="app/src/main/res/drawable/ic_outline_access_time_24.xml" value="0.145" />
         <entry key="app/src/main/res/layout/activity_main.xml" value="0.33" />
+        <entry key="app/src/main/res/layout/activity_meal_collector.xml" value="0.24166666666666667" />
+        <entry key="app/src/main/res/layout/meal_view.xml" value="0.335" />
       </map>
     </option>
   </component>
