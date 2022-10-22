@@ -1,6 +1,8 @@
 package edu.northeastern.team11;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import android.os.Bundle;
 import android.util.Log;
@@ -33,16 +35,26 @@ public class AtYourServiceActivity extends AppCompatActivity {
     Button search_button;
     EditText searchBar;
     List<Food> foodList;
+    RecyclerView foodRecyclerView;
+    FoodAdapter adapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_at_your_service);
 
-        result_tv = findViewById(R.id.results);
+        //result_tv = findViewById(R.id.results);
         search_button = findViewById(R.id.search_button);
         searchBar = findViewById(R.id.search_bar);
         foodList = new ArrayList<>();
+
+        foodRecyclerView = findViewById(R.id.results);
+        foodRecyclerView.setHasFixedSize(true);
+        //This defines the way in which the RecyclerView is oriented
+        foodRecyclerView.setLayoutManager(new LinearLayoutManager(this));
+        //Associates the adapter with the RecyclerView
+        //adapter = new FoodAdapter(foodList, this);
+
 
 
         search_button.setOnClickListener(new View.OnClickListener() {
@@ -62,7 +74,7 @@ public class AtYourServiceActivity extends AppCompatActivity {
                     @Override
                     public void onResponse(Call<JsonElement> call, Response<JsonElement> response) {
                         if (!response.isSuccessful()) {
-                            result_tv.setText("Code: " + response.code());
+                            //result_tv.setText("Code: " + response.code());
                             return;
                         }
 
@@ -79,6 +91,8 @@ public class AtYourServiceActivity extends AppCompatActivity {
                             food.setmStrTags(String.valueOf(item.get("strTags")));
                             foodList.add(food);
                         }
+                        adapter = new FoodAdapter(foodList, getApplicationContext());
+                        foodRecyclerView.setAdapter(adapter);
                         for (Food food : foodList) {
                             Log.d("FOODNAME", food.getmStrMeal());
                         }
