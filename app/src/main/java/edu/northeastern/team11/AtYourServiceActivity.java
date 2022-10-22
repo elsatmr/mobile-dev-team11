@@ -4,6 +4,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.annotation.SuppressLint;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -53,8 +54,9 @@ public class AtYourServiceActivity extends AppCompatActivity {
         //This defines the way in which the RecyclerView is oriented
         foodRecyclerView.setLayoutManager(new LinearLayoutManager(this));
         //Associates the adapter with the RecyclerView
-        //adapter = new FoodAdapter(foodList, this);
-
+        adapter = new FoodAdapter(foodList, this);
+        //adapter = new FoodAdapter(foodList, getApplicationContext());
+        foodRecyclerView.setAdapter(adapter);
 
 
         search_button.setOnClickListener(new View.OnClickListener() {
@@ -71,6 +73,7 @@ public class AtYourServiceActivity extends AppCompatActivity {
                 Call<JsonElement> call = mealAPI.getMeals(searchBar.getText().toString());
 
                 call.enqueue(new Callback<JsonElement>() {
+                    @SuppressLint("NotifyDataSetChanged")
                     @Override
                     public void onResponse(Call<JsonElement> call, Response<JsonElement> response) {
                         if (!response.isSuccessful()) {
@@ -91,10 +94,12 @@ public class AtYourServiceActivity extends AppCompatActivity {
                             food.setmStrTags(String.valueOf(item.get("strTags")));
                             foodList.add(food);
                         }
-                        adapter = new FoodAdapter(foodList, getApplicationContext());
-                        foodRecyclerView.setAdapter(adapter);
+
+                        adapter.notifyDataSetChanged();
+
                         for (Food food : foodList) {
                             Log.d("FOODNAME", food.getmStrMeal());
+                            Log.d("FOODPHOTO", food.getmStrMealThumb());
                         }
                     }
 
