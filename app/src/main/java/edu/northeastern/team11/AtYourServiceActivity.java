@@ -45,9 +45,8 @@ import retrofit2.converter.gson.GsonConverterFactory;
 
 public class AtYourServiceActivity extends AppCompatActivity {
     TextView result_tv;
-    Button search_button;
-    EditText searchBar;
     List<Food> foodList;
+
     private ConstraintLayout constLayout;
     private Toolbar toolbar;
     private EditText searchInput;
@@ -59,35 +58,40 @@ public class AtYourServiceActivity extends AppCompatActivity {
     private List<Chip> chipList;
     private FloatingActionButton searchButton;
     private ChipGroup chipGroup;
+    MealAPI mealAPI;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_at_your_service);
 
+        // Get references to Views
         result_tv = findViewById(R.id.results);
-        search_button = findViewById(R.id.search_button);
-        searchBar = findViewById(R.id.search_bar);
-        foodList = new ArrayList<>();
-        addSearchButtonListener();
-
-        textInputContents = "";
-        searchList = new ArrayList<String>();
         searchInput = findViewById(R.id.searchInput);
         clearButton = findViewById(R.id.clearTextBtn);
         constLayout = findViewById(R.id.constLayoutView);
         searchButton = findViewById(R.id.searchButton);
         toolbar = findViewById(R.id.toolbar);
-        searchButton.setEnabled(false);
+        // Instantiate variables
+        foodList = new ArrayList<>();
+        textInputContents = "";
+        searchList = new ArrayList<String>();
         chipID = 0;
         chipIDs = new ArrayList<Integer>();
         chipList = new ArrayList<Chip>();
+        searchButton.setEnabled(false);
+        // Setup UI responsiveness
         handleTyping();
-
+        // Create retrofit mealAPI object
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl("https://www.themealdb.com/api/json/v1/1/")
+                .addConverterFactory(GsonConverterFactory.create())
+                .build();
+        mealAPI = retrofit.create(MealAPI.class);
     }
 
-    // When the user types in EditText store the string
-    // When the user deletes all test in the search input, add the hint back
+
+    // UI to update as user types
     private void handleTyping() {
         searchInput.addTextChangedListener(new TextWatcher() {
             @Override
@@ -96,7 +100,9 @@ public class AtYourServiceActivity extends AppCompatActivity {
 
             @Override
             public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+                // Capture the string and remove leading/trailing whitespaces
                 textInputContents = charSequence.toString().trim();
+                // Show/hide clearButton and enable/disable search Button
                 if (textInputContents.length() > 0) {
                     clearButton.setVisibility(View.VISIBLE);
                     searchButton.setEnabled(true);
@@ -110,25 +116,26 @@ public class AtYourServiceActivity extends AppCompatActivity {
             public void afterTextChanged(Editable editable) {
             }
         });
+        // Search if user presses "enter" on keyboard
         searchInput.setOnKeyListener(new View.OnKeyListener() {
             @Override
             public boolean onKey(View view, int i, KeyEvent keyEvent) {
                 if (keyEvent.getAction() == KeyEvent.KEYCODE_ENTER) {
-                    addChip();
+                    searchFood();
                 }
                 return false;
             }
         });
     }
 
-    // Clear the search EditText
+    // Helper function to clear the search EditText and remove focus
     public void clearSearchInput(View view) {
         searchInput.setText("");
         textInputContents = "";
         searchInput.requestFocus();
     }
 
-    // Add Chipgroup to hold the chips
+    // Add ChipGroup to hold the chips
     private void addChipGroup() {
         chipGroup = new ChipGroup(this);
         chipGroup.setId(R.id.chipGroup);
@@ -142,17 +149,19 @@ public class AtYourServiceActivity extends AppCompatActivity {
         chipGroupConstraint.applyTo(constLayout);
     }
 
-    // Add a chip
-    public void addChip(View view) {
+    // Search for food and add a chip to the UI
+    public void searchFood(View view) {
         if (textInputContents.length() > 0) {
             addChip(textInputContents);
+            requestFoodFromAPI(textInputContents);
         }
     }
 
-    // Add a chip
-    private void addChip() {
+    // Search for food and add a chip to the UI
+    private void searchFood() {
         if (textInputContents.length() > 0) {
             addChip(textInputContents);
+            requestFoodFromAPI(textInputContents);
         }
     }
 
@@ -232,53 +241,37 @@ public class AtYourServiceActivity extends AppCompatActivity {
         });
     }
 
-    // Set the listener on the search button so that we get a list of foods
-    private void addSearchButtonListener() {
-        search_button.setOnClickListener(new View.OnClickListener() {
+    // GET request from API
+    private void requestFoodFromAPI(String searchWord) {
+        Call<JsonElement> call = mealAPI.getMeals(searchWord);
+        call.enqueue(new Callback<JsonElement>() {
             @Override
-            public void onClick(View view) {
-                // create retrofit instance
-                Retrofit retrofit = new Retrofit.Builder()
-                        .baseUrl("https://www.themealdb.com/api/json/v1/1/")
-                        .addConverterFactory(GsonConverterFactory.create())
-                        .build();
+            public void onResponse(Call<JsonElement> call, Response<JsonElement> response) {
+                if (!response.isSuccessful()) {
+                    result_tv.setText("Code: " + response.code());
+                    return;
+                }
+                JsonElement jsonElement = response.body();
+                JsonObject jsonObject = jsonElement.getAsJsonObject();
+                JsonArray foods = (JsonArray) jsonObject.get("meals");
+                Log.d("FOOD", String.valueOf(foods.get(0).isJsonObject()));
+                for (int i = 0; i < foods.size(); i++) {
+                    JsonObject item = foods.get(i).getAsJsonObject();
+                    Food food = new Food();
+                    food.setMidMeal(String.valueOf(item.get("idMeal")));
+                    food.setmStrMeal(String.valueOf(item.get("strMeal")));
+                    food.setmStrMealThumb(String.valueOf(item.get("strMealThumb")));
+                    food.setmStrTags(String.valueOf(item.get("strTags")));
+                    foodList.add(food);
+                }
+                for (Food food : foodList) {
+                    Log.d("FOODNAME", food.getmStrMeal());
+                }
+            }
 
-                MealAPI mealAPI = retrofit.create(MealAPI.class);
-
-                Call<JsonElement> call = mealAPI.getMeals(searchBar.getText().toString());
-
-                call.enqueue(new Callback<JsonElement>() {
-                    @Override
-                    public void onResponse(Call<JsonElement> call, Response<JsonElement> response) {
-                        if (!response.isSuccessful()) {
-                            result_tv.setText("Code: " + response.code());
-                            return;
-                        }
-
-                        JsonElement jsonElement = response.body();
-                        JsonObject jsonObject = jsonElement.getAsJsonObject();
-                        JsonArray foods = (JsonArray) jsonObject.get("meals");
-                        Log.d("FOOD", String.valueOf(foods.get(0).isJsonObject()));
-                        for (int i = 0; i < foods.size(); i++) {
-                            JsonObject item = foods.get(i).getAsJsonObject();
-                            Food food = new Food();
-                            food.setMidMeal(String.valueOf(item.get("idMeal")));
-                            food.setmStrMeal(String.valueOf(item.get("strMeal")));
-                            food.setmStrMealThumb(String.valueOf(item.get("strMealThumb")));
-                            food.setmStrTags(String.valueOf(item.get("strTags")));
-                            foodList.add(food);
-                        }
-                        for (Food food : foodList) {
-                            Log.d("FOODNAME", food.getmStrMeal());
-                        }
-                    }
-
-                    @Override
-                    public void onFailure(Call<JsonElement> call, Throwable t) {
-                        result_tv.setText(t.getMessage());
-                    }
-                });
-
+            @Override
+            public void onFailure(Call<JsonElement> call, Throwable t) {
+                result_tv.setText(t.getMessage());
             }
         });
     }
