@@ -3,12 +3,23 @@ package edu.northeastern.team11;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.TextView;
 
-import com.google.gson.Gson;
+import org.json.JSONException;
+import org.json.JSONObject;
 
+import com.google.gson.Gson;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+
+import org.json.JSONArray;
+
+import java.util.ArrayList;
 import java.util.List;
 
 import retrofit2.Call;
@@ -20,6 +31,8 @@ import retrofit2.converter.gson.GsonConverterFactory;
 public class AtYourServiceActivity extends AppCompatActivity {
     TextView result_tv;
     Button search_button;
+    EditText searchBar;
+    List<Food> foodList;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -28,6 +41,8 @@ public class AtYourServiceActivity extends AppCompatActivity {
 
         result_tv = findViewById(R.id.results);
         search_button = findViewById(R.id.search_button);
+        searchBar = findViewById(R.id.search_bar);
+        foodList = new ArrayList<>();
 
 
         search_button.setOnClickListener(new View.OnClickListener() {
@@ -35,57 +50,43 @@ public class AtYourServiceActivity extends AppCompatActivity {
             public void onClick(View view) {
                 // create retrofit instance
                 Retrofit retrofit = new Retrofit.Builder()
-                        .baseUrl("https://www.themealdb.com/")
+                        .baseUrl("https://www.themealdb.com/api/json/v1/1/")
                         .addConverterFactory(GsonConverterFactory.create())
                         .build();
 
                 MealAPI mealAPI = retrofit.create(MealAPI.class);
 
-                // retrofit does implementation for this
-                // TODO: pass the correct parameters (i.e. category, food name etc)
-                Call<List<Meals>> call = mealAPI.getMeals();
+                Call<JsonElement> call = mealAPI.getMeals(searchBar.getText().toString());
 
-                // execute network request on a different thread using enqueue() so that
-                // the main thread is not blocked
-                call.enqueue(new Callback<List<Meals>>() {
+                call.enqueue(new Callback<JsonElement>() {
                     @Override
-                    public void onResponse(Call<List<Meals>> call, Response<List<Meals>> response) {
-                        // triggered when get a response back from the server, but it doesn't mean that the
-                        // response was successful (code between 200-300). otherwise, print
-                        // the response code
+                    public void onResponse(Call<JsonElement> call, Response<JsonElement> response) {
                         if (!response.isSuccessful()) {
                             result_tv.setText("Code: " + response.code());
                             return;
                         }
 
-                        // the data you get from the webservice, then display in textview
-                        List<Meals> meals = response.body();
-
-
-                        // TODO: edit content to include relevant information about the food item (category, title etc)
-                       for (Meals meal : meals) {
-                           List<Food> foods = meal.getFoodsObjectList();
-                           for (Food food : foods) {
-                               String content = "";
-                               content += food.getmStrMeal();
-                               content += food.getmStrCategory();
-                               content += food.getmStrTags();
-
-                               // append so don't overwrite current text
-                               result_tv.append(content);
-                           }
-                       }
-
-//                        String content = meals.toString();
-//                        result_tv.append(content);
+                        JsonElement jsonElement = response.body();
+                        JsonObject jsonObject = jsonElement.getAsJsonObject();
+                        JsonArray foods = (JsonArray) jsonObject.get("meals");
+                        Log.d("FOOD", String.valueOf(foods.get(0).isJsonObject()));
+                        for (int i = 0; i < foods.size(); i++) {
+                            JsonObject item = foods.get(i).getAsJsonObject();
+                            Food food = new Food();
+                            food.setMidMeal(String.valueOf(item.get("idMeal")));
+                            food.setmStrMeal(String.valueOf(item.get("strMeal")));
+                            food.setmStrMealThumb(String.valueOf(item.get("strMealThumb")));
+                            food.setmStrTags(String.valueOf(item.get("strTags")));
+                            foodList.add(food);
+                        }
+                        for (Food food : foodList) {
+                            Log.d("FOODNAME", food.getmStrMeal());
+                        }
                     }
 
                     @Override
-                    public void onFailure(Call<List<Meals>> call, Throwable t) {
-                        // something when wrong in communication with the server
-                        // when attempting to get a response back
+                    public void onFailure(Call<JsonElement> call, Throwable t) {
                         result_tv.setText(t.getMessage());
-
                     }
                 });
 
