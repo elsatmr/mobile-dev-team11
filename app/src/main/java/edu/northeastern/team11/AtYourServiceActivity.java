@@ -42,7 +42,7 @@ public class AtYourServiceActivity extends AppCompatActivity {
                 MealAPI mealAPI = retrofit.create(MealAPI.class);
 
                 // retrofit does implementation for this
-                // TODO: pass the correct parameters (i.e. category, food name etc)
+                // TODO: pass the correct parameters from the user
                 Call<List<Meals>> call = mealAPI.getMeals();
 
                 // execute network request on a different thread using enqueue() so that

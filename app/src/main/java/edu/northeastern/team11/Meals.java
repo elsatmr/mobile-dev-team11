@@ -30,7 +30,7 @@ public class Meals {
         return foodsObjectList;
     }
 
-    // iterate through the body (a list of meals) and parse json array to make Food java objects
+
     public List<Food> createFoods(String foodListString) throws JSONException {
         Gson gson = new Gson();
 
