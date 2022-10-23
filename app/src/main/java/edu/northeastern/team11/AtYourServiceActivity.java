@@ -1,9 +1,11 @@
 package edu.northeastern.team11;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+import android.annotation.SuppressLint;
 import androidx.appcompat.widget.Toolbar;
 import androidx.constraintlayout.widget.ConstraintLayout;
-
 import android.content.Context;
 import android.content.res.ColorStateList;
 import android.graphics.Color;
@@ -47,6 +49,8 @@ import retrofit2.converter.gson.GsonConverterFactory;
 public class AtYourServiceActivity extends AppCompatActivity {
 //    TextView result_tv;
     List<Food> foodList;
+    RecyclerView foodRecyclerView;
+    FoodAdapter adapter;
 
     private ConstraintLayout constLayout;
     private Toolbar toolbar;
@@ -75,6 +79,7 @@ public class AtYourServiceActivity extends AppCompatActivity {
         toolbar = findViewById(R.id.toolbar);
         loadingSpinner = findViewById(R.id.loadingSpinner);
         // Instantiate variables
+
         foodList = new ArrayList<>();
         textInputContents = "";
         searchList = new ArrayList<String>();
@@ -92,6 +97,15 @@ public class AtYourServiceActivity extends AppCompatActivity {
                 .build();
         mealAPI = retrofit.create(MealAPI.class);
     }
+
+        foodRecyclerView = findViewById(R.id.results);
+        foodRecyclerView.setHasFixedSize(true);
+        //This defines the way in which the RecyclerView is oriented
+        foodRecyclerView.setLayoutManager(new LinearLayoutManager(this));
+        //Associates the adapter with the RecyclerView
+        adapter = new FoodAdapter(foodList, this);
+        //adapter = new FoodAdapter(foodList, getApplicationContext());
+        foodRecyclerView.setAdapter(adapter);
 
 
     // UI to update as user types
@@ -192,9 +206,58 @@ public class AtYourServiceActivity extends AppCompatActivity {
         newChip.setOnCloseIconClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+
+                // create retrofit instance
+                Retrofit retrofit = new Retrofit.Builder()
+                        .baseUrl("https://www.themealdb.com/api/json/v1/1/")
+                        .addConverterFactory(GsonConverterFactory.create())
+                        .build();
+
+                MealAPI mealAPI = retrofit.create(MealAPI.class);
+
+                Call<JsonElement> call = mealAPI.getMeals(searchBar.getText().toString());
+
+                call.enqueue(new Callback<JsonElement>() {
+                    @SuppressLint("NotifyDataSetChanged")
+                    @Override
+                    public void onResponse(Call<JsonElement> call, Response<JsonElement> response) {
+                        if (!response.isSuccessful()) {
+                            //result_tv.setText("Code: " + response.code());
+                            return;
+                        }
+
+                        JsonElement jsonElement = response.body();
+                        JsonObject jsonObject = jsonElement.getAsJsonObject();
+                        JsonArray foods = (JsonArray) jsonObject.get("meals");
+                        Log.d("FOOD", String.valueOf(foods.get(0).isJsonObject()));
+                        for (int i = 0; i < foods.size(); i++) {
+                            JsonObject item = foods.get(i).getAsJsonObject();
+                            Food food = new Food();
+                            food.setMidMeal(String.valueOf(item.get("idMeal")));
+                            food.setmStrMeal(String.valueOf(item.get("strMeal")));
+                            food.setmStrMealThumb(String.valueOf(item.get("strMealThumb")));
+                            food.setmStrTags(String.valueOf(item.get("strTags")));
+                            foodList.add(food);
+                        }
+
+                        adapter.notifyDataSetChanged();
+
+                        for (Food food : foodList) {
+                            Log.d("FOODNAME", food.getmStrMeal());
+                            Log.d("FOODPHOTO", food.getmStrMealThumb());
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(Call<JsonElement> call, Throwable t) {
+                        result_tv.setText(t.getMessage());
+                    }
+                });
+
                 chipGroup.removeView(newChip);
                 searchList.remove(newChip.getText());
                 chipList.remove(newChip);
+
 
             }
         });
