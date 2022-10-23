@@ -1,38 +1,38 @@
 package edu.northeastern.team11;
 
 import android.content.Context;
-import android.content.Intent;
+import android.content.res.ColorStateList;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Color;
 import android.graphics.drawable.Drawable;
-import android.net.Uri;
+import android.os.Handler;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.bumptech.glide.Glide;
-import com.bumptech.glide.load.DataSource;
-import com.bumptech.glide.load.engine.GlideException;
-import com.bumptech.glide.request.RequestListener;
-import com.bumptech.glide.request.RequestOptions;
-import com.bumptech.glide.request.target.Target;
-import com.squareup.picasso.Callback;
-import com.squareup.picasso.OkHttp3Downloader;
-import com.squareup.picasso.Picasso;
+import com.google.android.material.chip.Chip;
+import com.google.android.material.chip.ChipGroup;
 
-import java.time.Instant;
-import java.util.Collections;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
-
-import okhttp3.OkHttpClient;
-import okhttp3.Protocol;
 
 
 public class FoodAdapter extends RecyclerView.Adapter<FoodViewHolder> {
     private final List<Food> foodList;
     private final Context context;
+    private int chipID;
 
     public FoodAdapter(List<Food> foodList, Context context) {
         this.foodList = foodList;
@@ -45,10 +45,30 @@ public class FoodAdapter extends RecyclerView.Adapter<FoodViewHolder> {
         return new FoodViewHolder(LayoutInflater.from(context).inflate(R.layout.food_view, parent, false));
     }
 
+    private void addChip(String tag, ChipGroup chipGroup){
+        Chip newChip = new Chip(context);
+        newChip.setId(chipID);
+        chipID++;
+        newChip.setText(tag);
+        newChip.setTextColor(Color.parseColor("#FFFFFF"));
+        newChip.setChipBackgroundColor(ColorStateList.valueOf(Color.parseColor("#FF8A74BC")));
+        chipGroup.addView(newChip);
+    }
+
     @Override
     public void onBindViewHolder(@NonNull FoodViewHolder holder, int position) {
-        holder.foodTitle.setText(foodList.get(position).getmStrMeal());
-        String imageUri = foodList.get(position).getmStrMealThumb().replace("http:", "https:");
+        holder.foodTitle.setText(foodList.get(position).getmStrMeal().replaceAll("\"", ""));
+        List<String> tags = new ArrayList<String>(Arrays.asList(foodList.get(position).getmStrTags().split(",")));
+        for (String tag: tags) {
+            if (!tag.equals("null")) {
+                addChip(tag.replaceAll("\"", ""), holder.mealTags);
+            }
+        }
+        System.out.println(foodList.get(position).getmStrTags());
+
+        String url = foodList.get(position).getmStrMealThumb().replaceAll("\"", "");
+        BackgroundThread thread = new BackgroundThread(holder, url);
+        thread.start();
 
         //Picasso.get().load(imageUri).resize(126, 126)
 
@@ -89,26 +109,65 @@ public class FoodAdapter extends RecyclerView.Adapter<FoodViewHolder> {
 //                .load(imageUri)
 //                .into(holder.foodPhoto);
 //
-        Glide.with(context)
-                .load("https://assets.pokemon.com/static2/_ui/img/og-default-image.jpeg")
-                .override(126, Target.SIZE_ORIGINAL)
-                .fitCenter()
-                .listener(new RequestListener<Drawable>() {
-                    @Override
-                    public boolean onLoadFailed(@Nullable GlideException e, Object model, Target<Drawable> target, boolean isFirstResource) {
-                        // log exception
-                        Log.e("TAG", "Error loading image", e);
-                        return false; // important to return false so the error placeholder can be placed
-                    }
-
-                    @Override
-                    public boolean onResourceReady(Drawable resource, Object model, Target<Drawable> target, DataSource dataSource, boolean isFirstResource) {
-                        return false;
-                    }
-                })
-                .into(holder.foodPhoto);
+//        Glide.with(context)
+//                .load("https://assets.pokemon.com/static2/_ui/img/og-default-image.jpeg")
+//                .override(126, Target.SIZE_ORIGINAL)
+//                .fitCenter()
+//                .listener(new RequestListener<Drawable>() {
+//                    @Override
+//                    public boolean onLoadFailed(@Nullable GlideException e, Object model, Target<Drawable> target, boolean isFirstResource) {
+//                        // log exception
+//                        Log.e("TAG", "Error loading image", e);
+//                        return false; // important to return false so the error placeholder can be placed
+//                    }
+//
+//                    @Override
+//                    public boolean onResourceReady(Drawable resource, Object model, Target<Drawable> target, DataSource dataSource, boolean isFirstResource) {
+//                        return false;
+//                    }
+//                })
+//                .into(holder.foodPhoto);
 
     }
+
+
+    class BackgroundThread extends Thread {
+        FoodViewHolder threadHolder;
+        String imageUri;
+
+        BackgroundThread(FoodViewHolder threadHolder, String url) {
+            this.threadHolder = threadHolder;
+            this.imageUri = url;
+        }
+
+        @Override
+        public void run() {
+            try
+            {
+                final Bitmap bitmap = BitmapFactory.decodeStream((InputStream) new URL(imageUri.toString()).getContent());
+                threadHolder.foodPhoto.post(new Runnable()
+                {
+                    public void run()
+                    {
+                        if(bitmap !=null)
+                        {
+                            Log.d("THREAD", "image not null");
+                            threadHolder.foodPhoto.setImageBitmap(bitmap);
+                        }
+                    }
+                });
+            } catch (MalformedURLException e)
+            {
+                Log.d("THREAD", e.getMessage());
+                System.out.println("The URL is not valid.");
+                System.out.println(e.getMessage());
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
 
     @Override
     public int getItemCount() {
