@@ -103,7 +103,6 @@ public class AtYourServiceActivity extends AppCompatActivity {
         foodRecyclerView.setLayoutManager(new LinearLayoutManager(this));
         //Associates the adapter with the RecyclerView
         adapter = new FoodAdapter(foodList, this);
-        //adapter = new FoodAdapter(foodList, getApplicationContext());
         foodRecyclerView.setAdapter(adapter);
     }
 
@@ -165,6 +164,9 @@ public class AtYourServiceActivity extends AppCompatActivity {
         chipGroupConstraint.connect(chipGroup.getId(), ConstraintSet.LEFT, ConstraintSet.PARENT_ID, ConstraintSet.LEFT);
         chipGroupConstraint.connect(chipGroup.getId(), ConstraintSet.RIGHT, ConstraintSet.PARENT_ID, ConstraintSet.RIGHT);
         chipGroupConstraint.connect(chipGroup.getId(), ConstraintSet.TOP, toolbar.getId(), ConstraintSet.BOTTOM);
+
+        chipGroupConstraint.clear(foodRecyclerView.getId(), ConstraintSet.TOP);
+        chipGroupConstraint.connect(foodRecyclerView.getId(), ConstraintSet.TOP, chipGroup.getId(), ConstraintSet.BOTTOM);
         chipGroupConstraint.applyTo(constLayout);
     }
 
