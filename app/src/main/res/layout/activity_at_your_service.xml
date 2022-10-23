@@ -2,32 +2,75 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/constLayoutView"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".AtYourServiceActivity">
 
-
-    <EditText
-        android:id="@+id/search_bar"
-        android:layout_width="250dp"
-        android:layout_height="54dp"
-        android:hint="Enter Food"
-        android:textSize="20sp"
-        app:layout_constraintBottom_toTopOf="@id/results"
-        app:layout_constraintEnd_toStartOf="@+id/search_button"
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="70dp"
+        android:background="#074239"
+        android:backgroundTint="#074239"
+        android:contextClickable="false"
+        android:minHeight="?attr/actionBarSize"
+        android:theme="?attr/actionBarTheme"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="1.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <Button
-        android:id="@+id/search_button"
+
+    <EditText
+        android:id="@+id/searchInput"
+        android:layout_width="0dp"
+        android:layout_height="55dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="5dp"
+        android:layout_marginEnd="8dp"
+        android:backgroundTint="#9AF8F8F8"
+        android:hint='Search foods here...'
+        android:inputType="text"
+        android:textColor="#F1F0F0"
+        android:textColorHint="#7EF3F3F3"
+        android:textStyle="normal"
+        app:layout_constraintEnd_toStartOf="@+id/searchButton"
+        app:layout_constraintStart_toStartOf="@+id/toolbar"
+        app:layout_constraintTop_toTopOf="parent" />
+
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/searchButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Search"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="8dp"
+        android:clickable="true"
+        android:onClick="searchFood"
+        app:backgroundTint="#082320"
+        app:ensureMinTouchTargetSize="false"
+        app:fabSize="auto"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/search_bar"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toTopOf="@id/results"
-        />
+        app:srcCompat="@android:drawable/ic_menu_search"
+        app:tint="#F8F8F8" />
+
+    <ImageButton
+        android:id="@+id/clearTextBtn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="8dp"
+        android:backgroundTint="#029F6A6A"
+        android:onClick="clearSearchInput"
+        android:scaleX=".8"
+        android:scaleY=".8"
+        android:visibility="invisible"
+        app:layout_constraintBottom_toBottomOf="@+id/searchInput"
+        app:layout_constraintEnd_toStartOf="@+id/searchButton"
+        app:layout_constraintTop_toTopOf="@+id/searchInput"
+        app:srcCompat="@android:drawable/ic_menu_close_clear_cancel" />
+
 
     <TextView
         android:id="@+id/results"
@@ -39,7 +82,17 @@
         android:text="Results Display Here"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/search_bar" />
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <ProgressBar
+        android:id="@+id/loadingSpinner"
+        style="?android:attr/progressBarStyleLarge"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:translationZ="5dp"
+        app:layout_constraintBottom_toBottomOf="@+id/results"
+        app:layout_constraintEnd_toEndOf="@+id/results"
+        app:layout_constraintStart_toStartOf="@+id/results"
+        app:layout_constraintTop_toTopOf="@+id/results" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
