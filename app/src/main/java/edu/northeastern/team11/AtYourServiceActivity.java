@@ -78,6 +78,7 @@ public class AtYourServiceActivity extends AppCompatActivity {
         searchButton = findViewById(R.id.searchButton);
         toolbar = findViewById(R.id.toolbar);
         loadingSpinner = findViewById(R.id.loadingSpinner);
+        chipGroup = findViewById(R.id.chipGroup);
         // Instantiate variables
 
         foodList = new ArrayList<>();
@@ -153,22 +154,6 @@ public class AtYourServiceActivity extends AppCompatActivity {
         searchInput.requestFocus();
     }
 
-    // Add ChipGroup to hold the chips
-    private void addChipGroup() {
-        chipGroup = new ChipGroup(this);
-        chipGroup.setId(R.id.chipGroup);
-        constLayout.addView(chipGroup);
-        ConstraintSet chipGroupConstraint = new ConstraintSet();
-        chipGroupConstraint.constrainHeight(chipGroup.getId(), ConstraintSet.WRAP_CONTENT);
-        chipGroupConstraint.constrainWidth(chipGroup.getId(), ConstraintSet.WRAP_CONTENT);
-        chipGroupConstraint.connect(chipGroup.getId(), ConstraintSet.LEFT, ConstraintSet.PARENT_ID, ConstraintSet.LEFT);
-        chipGroupConstraint.connect(chipGroup.getId(), ConstraintSet.RIGHT, ConstraintSet.PARENT_ID, ConstraintSet.RIGHT);
-        chipGroupConstraint.connect(chipGroup.getId(), ConstraintSet.TOP, toolbar.getId(), ConstraintSet.BOTTOM);
-
-        chipGroupConstraint.clear(foodRecyclerView.getId(), ConstraintSet.TOP);
-        chipGroupConstraint.connect(foodRecyclerView.getId(), ConstraintSet.TOP, chipGroup.getId(), ConstraintSet.BOTTOM);
-        chipGroupConstraint.applyTo(constLayout);
-    }
 
     // Search for food and add a chip to the UI
     public void searchFood(View view) {
@@ -189,9 +174,6 @@ public class AtYourServiceActivity extends AppCompatActivity {
     // Add a chip
     // THIS SHOULD TRIGGER THE GET REQUEST
     private void addChip(String searchString) {
-        if (chipGroup == null) {
-            addChipGroup();
-        }
         // Create the chip and give it an ID
         Chip newChip = new Chip(this);
         newChip.setId(chipID);
@@ -248,7 +230,6 @@ public class AtYourServiceActivity extends AppCompatActivity {
 //        chipIDs = (List<Integer>) savedInstanceState.getSerializable("chipIDs");
         searchList = (List<String>) savedInstanceState.getSerializable("searchList");
         chipList = (List<Chip>) savedInstanceState.getSerializable("chipList");
-        addChipGroup();
         chipList.forEach(x -> {
             chipGroup.addView(x);
             x.setOnCloseIconClickListener(new View.OnClickListener() {
