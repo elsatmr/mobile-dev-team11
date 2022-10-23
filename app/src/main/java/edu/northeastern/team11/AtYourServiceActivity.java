@@ -45,7 +45,7 @@ import retrofit2.converter.gson.GsonConverterFactory;
 
 
 public class AtYourServiceActivity extends AppCompatActivity {
-    TextView result_tv;
+//    TextView result_tv;
     List<Food> foodList;
 
     private ConstraintLayout constLayout;
@@ -68,7 +68,6 @@ public class AtYourServiceActivity extends AppCompatActivity {
         setContentView(R.layout.activity_at_your_service);
 
         // Get references to Views
-        result_tv = findViewById(R.id.results);
         searchInput = findViewById(R.id.searchInput);
         clearButton = findViewById(R.id.clearTextBtn);
         constLayout = findViewById(R.id.constLayoutView);
@@ -156,16 +155,16 @@ public class AtYourServiceActivity extends AppCompatActivity {
     // Search for food and add a chip to the UI
     public void searchFood(View view) {
         if (textInputContents.length() > 0) {
-            addChip(textInputContents);
             requestFoodFromAPI(textInputContents);
+            addChip(textInputContents);
         }
     }
 
     // Search for food and add a chip to the UI
     private void searchFood() {
         if (textInputContents.length() > 0) {
-            addChip(textInputContents);
             requestFoodFromAPI(textInputContents);
+            addChip(textInputContents);
         }
     }
 
@@ -253,7 +252,6 @@ public class AtYourServiceActivity extends AppCompatActivity {
             @Override
             public void onResponse(Call<JsonElement> call, Response<JsonElement> response) {
                 if (!response.isSuccessful()) {
-                    result_tv.setText("Code: " + response.code());
                     return;
                 }
                 JsonElement jsonElement = response.body();
@@ -276,7 +274,6 @@ public class AtYourServiceActivity extends AppCompatActivity {
 
             @Override
             public void onFailure(Call<JsonElement> call, Throwable t) {
-                result_tv.setText(t.getMessage());
             }
         });
         loadingSpinner.setVisibility(View.INVISIBLE);
