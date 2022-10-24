@@ -3,9 +3,10 @@ package edu.northeastern.team11;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-import android.annotation.SuppressLint;
 import androidx.appcompat.widget.Toolbar;
 import androidx.constraintlayout.widget.ConstraintLayout;
+
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.res.ColorStateList;
 import android.graphics.Color;
@@ -16,15 +17,13 @@ import android.text.TextWatcher;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.util.Log;
-import android.widget.Button;
 import android.widget.ProgressBar;
-import android.widget.TextView;
 
 import androidx.annotation.NonNull;
-import androidx.constraintlayout.widget.ConstraintSet;
 import androidx.core.content.ContextCompat;
 
 import com.google.android.material.chip.Chip;
@@ -34,10 +33,10 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicReference;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
-import com.google.gson.JsonNull;
 import com.google.gson.JsonObject;
 
 import retrofit2.Call;
@@ -66,6 +65,7 @@ public class AtYourServiceActivity extends AppCompatActivity {
     private ChipGroup chipGroup;
     private ProgressBar loadingSpinner;
     MealAPI mealAPI;
+    private Button clearSearchButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -80,6 +80,7 @@ public class AtYourServiceActivity extends AppCompatActivity {
         toolbar = findViewById(R.id.toolbar);
         loadingSpinner = findViewById(R.id.loadingSpinner);
         chipGroup = findViewById(R.id.chipGroup);
+        clearSearchButton = findViewById(R.id.clear_search_button);
         // Instantiate variables
 
         foodList = new ArrayList<>();
@@ -90,6 +91,7 @@ public class AtYourServiceActivity extends AppCompatActivity {
         chipList = new ArrayList<Chip>();
         searchButton.setEnabled(false);
         loadingSpinner.setVisibility(View.INVISIBLE);
+        clearSearchButton.setVisibility(View.INVISIBLE);
         // Setup UI responsiveness
         handleTyping();
         // Create retrofit mealAPI object
@@ -161,6 +163,7 @@ public class AtYourServiceActivity extends AppCompatActivity {
         if (textInputContents.length() > 0 && chipNotDuplicate(textInputContents)) {
             requestFoodFromAPI(textInputContents);
             addChip(textInputContents);
+            clearSearchButton.setVisibility(View.VISIBLE);
         }
     }
 
@@ -169,6 +172,7 @@ public class AtYourServiceActivity extends AppCompatActivity {
         if (textInputContents.length() > 0 && chipNotDuplicate(textInputContents)) {
             requestFoodFromAPI(textInputContents);
             addChip(textInputContents);
+            clearSearchButton.setVisibility(View.VISIBLE);
         }
     }
 
@@ -246,6 +250,9 @@ public class AtYourServiceActivity extends AppCompatActivity {
                 }
             });
         });
+        if (chipList.size() > 0) {
+            clearSearchButton.setVisibility(View.VISIBLE);
+        }
     }
 
     // GET request from API
@@ -279,6 +286,8 @@ public class AtYourServiceActivity extends AppCompatActivity {
                         Log.d("FOODNAME", food.getmStrMeal());
                     }
                 }
+            adapter.notifyDataSetChanged();
+            loadingSpinner.setVisibility(View.INVISIBLE);
             }
 
             // Check if a food exists in foodList based on the id received from the API
@@ -289,9 +298,9 @@ public class AtYourServiceActivity extends AppCompatActivity {
 
             @Override
             public void onFailure(Call<JsonElement> call, Throwable t) {
+                loadingSpinner.setVisibility(View.INVISIBLE);
             }
         });
-        loadingSpinner.setVisibility(View.INVISIBLE);
     }
 
     @SuppressLint("NotifyDataSetChanged")
@@ -299,5 +308,6 @@ public class AtYourServiceActivity extends AppCompatActivity {
         foodList.clear();
         chipGroup.removeAllViews();
         adapter.notifyDataSetChanged();
+        clearSearchButton.setVisibility(View.INVISIBLE);
     }
 }
