@@ -37,6 +37,7 @@ import java.util.List;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
+import com.google.gson.JsonNull;
 import com.google.gson.JsonObject;
 
 import retrofit2.Call;
@@ -255,20 +256,22 @@ public class AtYourServiceActivity extends AppCompatActivity {
                 }
                 JsonElement jsonElement = response.body();
                 JsonObject jsonObject = jsonElement.getAsJsonObject();
-                JsonArray foods = (JsonArray) jsonObject.get("meals");
-                Log.d("FOOD", String.valueOf(foods.get(0).isJsonObject()));
-                for (int i = 0; i < foods.size(); i++) {
-                    JsonObject item = foods.get(i).getAsJsonObject();
-                    Food food = new Food();
-                    food.setMidMeal(String.valueOf(item.get("idMeal")));
-                    food.setmStrMeal(String.valueOf(item.get("strMeal")));
-                    food.setmStrMealThumb(String.valueOf(item.get("strMealThumb")));
-                    food.setmStrTags(String.valueOf(item.get("strTags")));
-                    foodList.add(food);
-                }
-                adapter.notifyDataSetChanged();
-                for (Food food : foodList) {
-                    Log.d("FOODNAME", food.getmStrMeal());
+                if (!jsonObject.get("meals").isJsonNull()) {
+                    JsonArray foods = (JsonArray) jsonObject.get("meals");
+                    Log.d("FOOD", String.valueOf(foods.get(0).isJsonObject()));
+                    for (int i = 0; i < foods.size(); i++) {
+                        JsonObject item = foods.get(i).getAsJsonObject();
+                        Food food = new Food();
+                        food.setMidMeal(String.valueOf(item.get("idMeal")));
+                        food.setmStrMeal(String.valueOf(item.get("strMeal")));
+                        food.setmStrMealThumb(String.valueOf(item.get("strMealThumb")));
+                        food.setmStrTags(String.valueOf(item.get("strTags")));
+                        foodList.add(food);
+                    }
+                    adapter.notifyDataSetChanged();
+                    for (Food food : foodList) {
+                        Log.d("FOODNAME", food.getmStrMeal());
+                    }
                 }
             }
 
