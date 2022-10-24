@@ -22,20 +22,14 @@ public class Food {
     @SerializedName("strTags")
     private String mStrTags;
 
-    private List<String> mSearchTerms;
+    private String mSearchTerms;
 
-    public List<String> getmSearchTerms() {
+    public String getmSearchTerms() {
         return mSearchTerms;
     }
 
     public void setmSearchTerms(String mSearchTerms) {
-        if (this.mSearchTerms == null) {
-            List<String> search = new ArrayList<>();
-            search.add(mSearchTerms);
-            this.mSearchTerms = search;
-        } else {
-            this.mSearchTerms.add(mSearchTerms);
-        }
+        this.mSearchTerms = mSearchTerms;
     }
 
     public String getMidMeal() {
