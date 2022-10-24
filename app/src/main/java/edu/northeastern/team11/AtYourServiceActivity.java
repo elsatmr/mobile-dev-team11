@@ -293,4 +293,11 @@ public class AtYourServiceActivity extends AppCompatActivity {
         });
         loadingSpinner.setVisibility(View.INVISIBLE);
     }
+
+    @SuppressLint("NotifyDataSetChanged")
+    public void clear_results(View view) {
+        foodList.clear();
+        chipGroup.removeAllViews();
+        adapter.notifyDataSetChanged();
+    }
 }
