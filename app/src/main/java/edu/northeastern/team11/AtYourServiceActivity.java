@@ -272,11 +272,9 @@ public class AtYourServiceActivity extends AppCompatActivity {
                             food.setmStrMeal(String.valueOf(item.get("strMeal")));
                             food.setmStrMealThumb(String.valueOf(item.get("strMealThumb")));
                             food.setmStrTags(String.valueOf(item.get("strTags")));
-                            food.setmSearchTerms(searchWord);
                             foodList.add(food);
                         }
                     }
-                    adapter.notifyDataSetChanged();
                     for (Food food : foodList) {
                         Log.d("FOODNAME", food.getmStrMeal());
                     }

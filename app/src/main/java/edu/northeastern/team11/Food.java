@@ -22,16 +22,6 @@ public class Food {
     @SerializedName("strTags")
     private String mStrTags;
 
-    private String mSearchTerms;
-
-    public String getmSearchTerms() {
-        return mSearchTerms;
-    }
-
-    public void setmSearchTerms(String mSearchTerms) {
-        this.mSearchTerms = mSearchTerms;
-    }
-
     public String getMidMeal() {
         return midMeal;
     }
