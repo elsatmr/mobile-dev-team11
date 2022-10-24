@@ -59,6 +59,7 @@ public class FoodAdapter extends RecyclerView.Adapter<FoodViewHolder> {
     public void onBindViewHolder(@NonNull FoodViewHolder holder, int position) {
         holder.foodTitle.setText(foodList.get(position).getmStrMeal().replaceAll("\"", ""));
         List<String> tags = new ArrayList<String>(Arrays.asList(foodList.get(position).getmStrTags().split(",")));
+        holder.mealTags.removeAllViews();
         for (String tag: tags) {
             if (!tag.equals("null")) {
                 addChip(tag.replaceAll("\"", ""), holder.mealTags);

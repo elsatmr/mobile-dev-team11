@@ -201,7 +201,6 @@ public class AtYourServiceActivity extends AppCompatActivity {
                 chipGroup.removeView(newChip);
                 searchList.remove(newChip.getText());
                 chipList.remove(newChip);
-
             }
         });
         chipList.add(newChip);
@@ -276,7 +275,6 @@ public class AtYourServiceActivity extends AppCompatActivity {
                             foodList.add(food);
                         }
                     }
-                    adapter.notifyDataSetChanged();
                     for (Food food : foodList) {
                         Log.d("FOODNAME", food.getmStrMeal());
                     }
