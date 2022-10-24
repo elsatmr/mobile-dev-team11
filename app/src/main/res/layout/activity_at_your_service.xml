@@ -56,6 +56,19 @@
          app:srcCompat="@android:drawable/ic_menu_search"
         app:tint="#F8F8F8" />
 
+
+    <Button
+        android:id="@+id/clear_search_button"
+        android:layout_width="193dp"
+        android:layout_height="36dp"
+        android:onClick="clear_results"
+        android:text="Clear Search"
+        app:backgroundTint="#082320"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/chipGroup"
+        app:tint="#F8F8F8" />
+
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/results"
         android:layout_width="0dp"
@@ -65,9 +78,10 @@
         android:layout_marginBottom="16dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="1.0"
+        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/chipGroup" />
+        app:layout_constraintTop_toBottomOf="@+id/chipGroup"
+        app:layout_constraintVertical_bias="1.0" />
 
     <ImageButton
         android:id="@+id/clearTextBtn"
