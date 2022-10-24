@@ -178,7 +178,6 @@ public class AtYourServiceActivity extends AppCompatActivity {
     }
 
     // Add a chip
-    // THIS SHOULD TRIGGER THE GET REQUEST
     private void addChip(String searchString) {
         // Create the chip and give it an ID
         Chip newChip = new Chip(this);
@@ -223,9 +222,9 @@ public class AtYourServiceActivity extends AppCompatActivity {
     protected void onSaveInstanceState(@NonNull Bundle outState) {
         super.onSaveInstanceState(outState);
         outState.putInt("chipID", chipID);
-//        outState.putSerializable("chipIDs", (Serializable) chipIDs);
         outState.putSerializable("searchList", (Serializable) searchList);
         outState.putSerializable("chipList", (Serializable) chipList);
+        outState.putSerializable("foodList", (Serializable) foodList);
         chipGroup.removeAllViews();
     }
 
@@ -236,6 +235,9 @@ public class AtYourServiceActivity extends AppCompatActivity {
 //        chipIDs = (List<Integer>) savedInstanceState.getSerializable("chipIDs");
         searchList = (List<String>) savedInstanceState.getSerializable("searchList");
         chipList = (List<Chip>) savedInstanceState.getSerializable("chipList");
+        foodList = (List<Food>) savedInstanceState.getSerializable("foodList");
+        adapter = new FoodAdapter(foodList, this);
+        foodRecyclerView.setAdapter(adapter);
         chipList.forEach(x -> {
             chipGroup.addView(x);
             x.setOnCloseIconClickListener(new View.OnClickListener() {
