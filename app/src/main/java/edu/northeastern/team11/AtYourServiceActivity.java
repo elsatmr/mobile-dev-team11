@@ -158,7 +158,7 @@ public class AtYourServiceActivity extends AppCompatActivity {
 
     // Search for food and add a chip to the UI
     public void searchFood(View view) {
-        if (textInputContents.length() > 0) {
+        if (textInputContents.length() > 0 && chipNotDuplicate(textInputContents)) {
             requestFoodFromAPI(textInputContents);
             addChip(textInputContents);
         }
@@ -166,10 +166,15 @@ public class AtYourServiceActivity extends AppCompatActivity {
 
     // Search for food and add a chip to the UI
     private void searchFood() {
-        if (textInputContents.length() > 0) {
+        if (textInputContents.length() > 0 && chipNotDuplicate(textInputContents)) {
             requestFoodFromAPI(textInputContents);
             addChip(textInputContents);
         }
+    }
+
+    // return true if searchTerm is not already a chip
+    private boolean chipNotDuplicate(String searchTerm) {
+        return !searchList.stream().anyMatch(x -> x.equals(searchTerm));
     }
 
     // Add a chip
@@ -261,18 +266,27 @@ public class AtYourServiceActivity extends AppCompatActivity {
                     Log.d("FOOD", String.valueOf(foods.get(0).isJsonObject()));
                     for (int i = 0; i < foods.size(); i++) {
                         JsonObject item = foods.get(i).getAsJsonObject();
-                        Food food = new Food();
-                        food.setMidMeal(String.valueOf(item.get("idMeal")));
-                        food.setmStrMeal(String.valueOf(item.get("strMeal")));
-                        food.setmStrMealThumb(String.valueOf(item.get("strMealThumb")));
-                        food.setmStrTags(String.valueOf(item.get("strTags")));
-                        foodList.add(food);
+                        // if food isn't a duplicate
+                        if (foodNotDuplicate(String.valueOf(item.get("idMeal")))) {
+                            Food food = new Food();
+                            food.setMidMeal(String.valueOf(item.get("idMeal")));
+                            food.setmStrMeal(String.valueOf(item.get("strMeal")));
+                            food.setmStrMealThumb(String.valueOf(item.get("strMealThumb")));
+                            food.setmStrTags(String.valueOf(item.get("strTags")));
+                            foodList.add(food);
+                        }
                     }
                     adapter.notifyDataSetChanged();
                     for (Food food : foodList) {
                         Log.d("FOODNAME", food.getmStrMeal());
                     }
                 }
+            }
+
+            // Check if a food exists in foodList based on the id received from the API
+            // Return true if the idMeal parameter is not already in foodList
+            private boolean foodNotDuplicate(String idMeal) {
+                return !foodList.stream().anyMatch(x -> idMeal.equals(x.getMidMeal()));
             }
 
             @Override
