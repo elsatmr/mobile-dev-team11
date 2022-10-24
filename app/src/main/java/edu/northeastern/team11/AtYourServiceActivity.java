@@ -201,7 +201,16 @@ public class AtYourServiceActivity extends AppCompatActivity {
                 chipGroup.removeView(newChip);
                 searchList.remove(newChip.getText());
                 chipList.remove(newChip);
-
+                for (Food food : foodList) {
+                    List<String> searchTerms = food.getmSearchTerms();
+                    if (searchTerms.contains(searchString)) {
+                        searchTerms.remove(searchString);
+                    }
+                    if (searchTerms.size() == 0) {
+                        foodList.remove(food);
+                    }
+                }
+                adapter.notifyDataSetChanged();
             }
         });
         chipList.add(newChip);
@@ -273,6 +282,7 @@ public class AtYourServiceActivity extends AppCompatActivity {
                             food.setmStrMeal(String.valueOf(item.get("strMeal")));
                             food.setmStrMealThumb(String.valueOf(item.get("strMealThumb")));
                             food.setmStrTags(String.valueOf(item.get("strTags")));
+                            food.setmSearchTerms(searchWord);
                             foodList.add(food);
                         }
                     }

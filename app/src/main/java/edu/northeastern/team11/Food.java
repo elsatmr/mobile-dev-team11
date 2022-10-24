@@ -5,6 +5,7 @@ import com.google.gson.annotations.JsonAdapter;
 import com.google.gson.annotations.SerializedName;
 
 import java.util.ArrayList;
+import java.util.List;
 
 
 public class Food {
@@ -20,6 +21,22 @@ public class Food {
 
     @SerializedName("strTags")
     private String mStrTags;
+
+    private List<String> mSearchTerms;
+
+    public List<String> getmSearchTerms() {
+        return mSearchTerms;
+    }
+
+    public void setmSearchTerms(String mSearchTerms) {
+        if (this.mSearchTerms == null) {
+            List<String> search = new ArrayList<>();
+            search.add(mSearchTerms);
+            this.mSearchTerms = search;
+        } else {
+            this.mSearchTerms.add(mSearchTerms);
+        }
+    }
 
     public String getMidMeal() {
         return midMeal;
