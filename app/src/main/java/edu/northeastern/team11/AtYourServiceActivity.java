@@ -37,6 +37,7 @@ import java.util.List;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
+import com.google.gson.JsonNull;
 import com.google.gson.JsonObject;
 
 import retrofit2.Call;
@@ -47,7 +48,7 @@ import retrofit2.converter.gson.GsonConverterFactory;
 
 
 public class AtYourServiceActivity extends AppCompatActivity {
-//    TextView result_tv;
+
     List<Food> foodList;
     RecyclerView foodRecyclerView;
     FoodAdapter adapter;
@@ -78,6 +79,7 @@ public class AtYourServiceActivity extends AppCompatActivity {
         searchButton = findViewById(R.id.searchButton);
         toolbar = findViewById(R.id.toolbar);
         loadingSpinner = findViewById(R.id.loadingSpinner);
+        chipGroup = findViewById(R.id.chipGroup);
         // Instantiate variables
 
         foodList = new ArrayList<>();
@@ -96,7 +98,6 @@ public class AtYourServiceActivity extends AppCompatActivity {
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
         mealAPI = retrofit.create(MealAPI.class);
-    }
 
         foodRecyclerView = findViewById(R.id.results);
         foodRecyclerView.setHasFixedSize(true);
@@ -104,8 +105,10 @@ public class AtYourServiceActivity extends AppCompatActivity {
         foodRecyclerView.setLayoutManager(new LinearLayoutManager(this));
         //Associates the adapter with the RecyclerView
         adapter = new FoodAdapter(foodList, this);
-        //adapter = new FoodAdapter(foodList, getApplicationContext());
         foodRecyclerView.setAdapter(adapter);
+    }
+
+
 
 
     // UI to update as user types
@@ -152,23 +155,10 @@ public class AtYourServiceActivity extends AppCompatActivity {
         searchInput.requestFocus();
     }
 
-    // Add ChipGroup to hold the chips
-    private void addChipGroup() {
-        chipGroup = new ChipGroup(this);
-        chipGroup.setId(R.id.chipGroup);
-        constLayout.addView(chipGroup);
-        ConstraintSet chipGroupConstraint = new ConstraintSet();
-        chipGroupConstraint.constrainHeight(chipGroup.getId(), ConstraintSet.WRAP_CONTENT);
-        chipGroupConstraint.constrainWidth(chipGroup.getId(), ConstraintSet.WRAP_CONTENT);
-        chipGroupConstraint.connect(chipGroup.getId(), ConstraintSet.LEFT, ConstraintSet.PARENT_ID, ConstraintSet.LEFT);
-        chipGroupConstraint.connect(chipGroup.getId(), ConstraintSet.RIGHT, ConstraintSet.PARENT_ID, ConstraintSet.RIGHT);
-        chipGroupConstraint.connect(chipGroup.getId(), ConstraintSet.TOP, toolbar.getId(), ConstraintSet.BOTTOM);
-        chipGroupConstraint.applyTo(constLayout);
-    }
 
     // Search for food and add a chip to the UI
     public void searchFood(View view) {
-        if (textInputContents.length() > 0) {
+        if (textInputContents.length() > 0 && chipNotDuplicate(textInputContents)) {
             requestFoodFromAPI(textInputContents);
             addChip(textInputContents);
         }
@@ -176,18 +166,20 @@ public class AtYourServiceActivity extends AppCompatActivity {
 
     // Search for food and add a chip to the UI
     private void searchFood() {
-        if (textInputContents.length() > 0) {
+        if (textInputContents.length() > 0 && chipNotDuplicate(textInputContents)) {
             requestFoodFromAPI(textInputContents);
             addChip(textInputContents);
         }
     }
 
+    // return true if searchTerm is not already a chip
+    private boolean chipNotDuplicate(String searchTerm) {
+        return !searchList.stream().anyMatch(x -> x.equals(searchTerm));
+    }
+
     // Add a chip
     // THIS SHOULD TRIGGER THE GET REQUEST
     private void addChip(String searchString) {
-        if (chipGroup == null) {
-            addChipGroup();
-        }
         // Create the chip and give it an ID
         Chip newChip = new Chip(this);
         newChip.setId(chipID);
@@ -206,58 +198,9 @@ public class AtYourServiceActivity extends AppCompatActivity {
         newChip.setOnCloseIconClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
-                // create retrofit instance
-                Retrofit retrofit = new Retrofit.Builder()
-                        .baseUrl("https://www.themealdb.com/api/json/v1/1/")
-                        .addConverterFactory(GsonConverterFactory.create())
-                        .build();
-
-                MealAPI mealAPI = retrofit.create(MealAPI.class);
-
-                Call<JsonElement> call = mealAPI.getMeals(searchBar.getText().toString());
-
-                call.enqueue(new Callback<JsonElement>() {
-                    @SuppressLint("NotifyDataSetChanged")
-                    @Override
-                    public void onResponse(Call<JsonElement> call, Response<JsonElement> response) {
-                        if (!response.isSuccessful()) {
-                            //result_tv.setText("Code: " + response.code());
-                            return;
-                        }
-
-                        JsonElement jsonElement = response.body();
-                        JsonObject jsonObject = jsonElement.getAsJsonObject();
-                        JsonArray foods = (JsonArray) jsonObject.get("meals");
-                        Log.d("FOOD", String.valueOf(foods.get(0).isJsonObject()));
-                        for (int i = 0; i < foods.size(); i++) {
-                            JsonObject item = foods.get(i).getAsJsonObject();
-                            Food food = new Food();
-                            food.setMidMeal(String.valueOf(item.get("idMeal")));
-                            food.setmStrMeal(String.valueOf(item.get("strMeal")));
-                            food.setmStrMealThumb(String.valueOf(item.get("strMealThumb")));
-                            food.setmStrTags(String.valueOf(item.get("strTags")));
-                            foodList.add(food);
-                        }
-
-                        adapter.notifyDataSetChanged();
-
-                        for (Food food : foodList) {
-                            Log.d("FOODNAME", food.getmStrMeal());
-                            Log.d("FOODPHOTO", food.getmStrMealThumb());
-                        }
-                    }
-
-                    @Override
-                    public void onFailure(Call<JsonElement> call, Throwable t) {
-                        result_tv.setText(t.getMessage());
-                    }
-                });
-
                 chipGroup.removeView(newChip);
                 searchList.remove(newChip.getText());
                 chipList.remove(newChip);
-
 
             }
         });
@@ -293,7 +236,6 @@ public class AtYourServiceActivity extends AppCompatActivity {
 //        chipIDs = (List<Integer>) savedInstanceState.getSerializable("chipIDs");
         searchList = (List<String>) savedInstanceState.getSerializable("searchList");
         chipList = (List<Chip>) savedInstanceState.getSerializable("chipList");
-        addChipGroup();
         chipList.forEach(x -> {
             chipGroup.addView(x);
             x.setOnCloseIconClickListener(new View.OnClickListener() {
@@ -319,20 +261,32 @@ public class AtYourServiceActivity extends AppCompatActivity {
                 }
                 JsonElement jsonElement = response.body();
                 JsonObject jsonObject = jsonElement.getAsJsonObject();
-                JsonArray foods = (JsonArray) jsonObject.get("meals");
-                Log.d("FOOD", String.valueOf(foods.get(0).isJsonObject()));
-                for (int i = 0; i < foods.size(); i++) {
-                    JsonObject item = foods.get(i).getAsJsonObject();
-                    Food food = new Food();
-                    food.setMidMeal(String.valueOf(item.get("idMeal")));
-                    food.setmStrMeal(String.valueOf(item.get("strMeal")));
-                    food.setmStrMealThumb(String.valueOf(item.get("strMealThumb")));
-                    food.setmStrTags(String.valueOf(item.get("strTags")));
-                    foodList.add(food);
+                if (!jsonObject.get("meals").isJsonNull()) {
+                    JsonArray foods = (JsonArray) jsonObject.get("meals");
+                    Log.d("FOOD", String.valueOf(foods.get(0).isJsonObject()));
+                    for (int i = 0; i < foods.size(); i++) {
+                        JsonObject item = foods.get(i).getAsJsonObject();
+                        // if food isn't a duplicate
+                        if (foodNotDuplicate(String.valueOf(item.get("idMeal")))) {
+                            Food food = new Food();
+                            food.setMidMeal(String.valueOf(item.get("idMeal")));
+                            food.setmStrMeal(String.valueOf(item.get("strMeal")));
+                            food.setmStrMealThumb(String.valueOf(item.get("strMealThumb")));
+                            food.setmStrTags(String.valueOf(item.get("strTags")));
+                            foodList.add(food);
+                        }
+                    }
+                    adapter.notifyDataSetChanged();
+                    for (Food food : foodList) {
+                        Log.d("FOODNAME", food.getmStrMeal());
+                    }
                 }
-                for (Food food : foodList) {
-                    Log.d("FOODNAME", food.getmStrMeal());
-                }
+            }
+
+            // Check if a food exists in foodList based on the id received from the API
+            // Return true if the idMeal parameter is not already in foodList
+            private boolean foodNotDuplicate(String idMeal) {
+                return !foodList.stream().anyMatch(x -> idMeal.equals(x.getMidMeal()));
             }
 
             @Override

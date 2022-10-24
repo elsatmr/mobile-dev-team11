@@ -32,6 +32,7 @@
         android:backgroundTint="#9AF8F8F8"
         android:hint='Search foods here...'
         android:inputType="text"
+        android:shadowColor="#00FFFFFF"
         android:textColor="#F1F0F0"
         android:textColorHint="#7EF3F3F3"
         android:textStyle="normal"
@@ -53,21 +54,21 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"
          app:srcCompat="@android:drawable/ic_menu_search"
-        app:tint="#F8F8F8" />        
+        app:tint="#F8F8F8" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/results"
-        android:layout_width="396dp"
-        android:layout_height="617dp"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
         android:layout_marginStart="6dp"
         android:layout_marginEnd="9dp"
-        android:layout_marginBottom="21dp"
-        android:text="Results Display Here"
+        android:layout_marginBottom="16dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="1.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/search_bar" />
-       
+        app:layout_constraintTop_toBottomOf="@+id/chipGroup" />
+
     <ImageButton
         android:id="@+id/clearTextBtn"
         android:layout_width="wrap_content"
@@ -90,8 +91,20 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:translationZ="5dp"
-        tools:layout_editor_absoluteX="166dp"
-        tools:layout_editor_absoluteY="364dp" />
+        app:layout_constraintBottom_toBottomOf="@+id/results"
+        app:layout_constraintEnd_toEndOf="@+id/results"
+        app:layout_constraintStart_toStartOf="@+id/results"
+        app:layout_constraintTop_toTopOf="@+id/results" />
+
+    <com.google.android.material.chip.ChipGroup
+        android:id="@+id/chipGroup"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/toolbar">
+
+    </com.google.android.material.chip.ChipGroup>
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>
