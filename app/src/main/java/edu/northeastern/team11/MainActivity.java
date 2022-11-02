@@ -19,4 +19,9 @@ public class MainActivity extends AppCompatActivity {
         startActivity(intent);
     }
 
+    public void openStickersActivity(View view) {
+        Intent intent = new Intent(this, StickersActivity.class);
+        startActivity(intent);
+    }
+
 }
