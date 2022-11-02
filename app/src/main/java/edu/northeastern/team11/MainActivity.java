@@ -4,9 +4,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
-import android.widget.Button;
 
 public class MainActivity extends AppCompatActivity {
     @Override
@@ -20,7 +18,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void openStickersActivity(View view) {
-        Intent intent = new Intent(this, StickersActivity.class);
+        Intent intent = new Intent(this, StickersMainActivity.class);
         startActivity(intent);
     }
 
