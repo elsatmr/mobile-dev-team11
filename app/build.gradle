@@ -1,6 +1,10 @@
 plugins {
     id 'com.android.application'
+    // add google services gradle plugin
+    id 'com.google.gms.google-services'
 }
+
+
 
 android {
     compileSdk 32
@@ -49,4 +53,16 @@ dependencies {
 
     // dependency for image loading
     implementation 'com.squareup.picasso:picasso:2.71828'
+
+    // import firebase BoM
+    implementation platform('com.google.firebase:firebase-bom:31.0.2')
+
+    // firebase SDK for google analytics
+    implementation 'com.google.firebase:firebase-analytics'
+
+    // dependencies for other firebase products
+    implementation 'com.google.firebase:firebase-auth'
+    implementation 'com.google.firebase:firebase-firestore'
+
+
 }
