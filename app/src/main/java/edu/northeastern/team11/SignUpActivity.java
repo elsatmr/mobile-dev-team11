@@ -32,20 +32,23 @@ public class SignUpActivity extends AppCompatActivity {
 
         // connect with firebase
         mDatabase = FirebaseDatabase.getInstance();
-
         signUpButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 DatabaseReference ref = mDatabase.getReferenceFromUrl("https://stickers-19c0f-default-rtdb.firebaseio.com/");
-
             }
         });
-
-
-
-
-
-
-
     }
+
+
+
+
+
+
+
+
+
+
+
+
 }
