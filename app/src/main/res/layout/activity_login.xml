@@ -10,24 +10,21 @@
         android:id="@+id/login_header"
         android:layout_width="240dp"
         android:layout_height="38dp"
-        android:layout_marginStart="100dp"
-        android:layout_marginTop="200dp"
-        android:layout_marginEnd="99dp"
         android:text="Enter Username:"
         android:textAlignment="center"
         android:textSize="20sp"
-        app:layout_constraintBottom_toTopOf="@id/username_edittext"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.493"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.19" />
 
     <EditText
         android:id="@+id/username_edittext"
         android:layout_width="234dp"
         android:layout_height="51dp"
-        android:layout_marginStart="100dp"
-        android:layout_marginEnd="97dp"
+        android:layout_marginTop="32dp"
         android:hint="ex) acheung"
         app:layout_constraintBottom_toTopOf="@+id/login_screen_login"
         app:layout_constraintEnd_toEndOf="parent"
@@ -39,15 +36,20 @@
         android:id="@+id/login_screen_login"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="158dp"
-        android:layout_marginTop="20dp"
-        android:layout_marginEnd="165dp"
-        android:layout_marginBottom="80dp"
+        android:layout_marginTop="60dp"
         android:onClick="loginScreenLoginButtonClicked"
         android:text="Login"
-        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.509"
         app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/username_edittext" />
+
+    <TextView
+        android:id="@+id/errorLoginMsg"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="invalid username "
+        android:textColor="#EF0202"
+        app:layout_constraintStart_toStartOf="@+id/username_edittext"
         app:layout_constraintTop_toBottomOf="@+id/username_edittext" />
 </androidx.constraintlayout.widget.ConstraintLayout>
