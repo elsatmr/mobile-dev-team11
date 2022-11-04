@@ -5,26 +5,44 @@ import android.os.Bundle;
 import android.util.Log;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 public class AllStickersActivity extends AppCompatActivity {
-    private TextView currentUser;
+    private TextView currentUserText;
+    private String userName;
+    DatabaseReference db;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_all_stickers_screen);
 
-        // PLACEHOLDER - This is how you get the current user from Shared Preferences
-        currentUser = findViewById(R.id.currentUser);
-        currentUser.setText("My username is " + getCurrentUser());
+        currentUserText = findViewById(R.id.currentUser);
+        db = FirebaseDatabase.getInstance().getReference();
+
+        getCurrentUser();
+        currentUserText.setText("My username is " + userName); // PLACEHOLDER ONLY
+
 
     }
 
 
     // get the username of who is signed in
-    private String getCurrentUser() {
-        SharedPreferences sharedPref = getSharedPreferences("settings",0);
-        return sharedPref.getString("username", null);
+    private void getCurrentUser() {
+        SharedPreferences sharedPref = getSharedPreferences("settings", 0);
+        userName = sharedPref.getString("username", null);
     }
+
 }
