@@ -10,4 +10,18 @@ public class Sticker {
         this.sentCount = sentCount;
         this.url = url;
     }
+
+    public Sticker(){}
+
+    public int getReceivedCount() {
+        return receivedCount;
+    }
+
+    public int getSentCount() {
+        return sentCount;
+    }
+
+    public String getUrl() {
+        return url;
+    }
 }
