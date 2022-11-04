@@ -19,15 +19,15 @@
             android:id="@+id/signup_header"
             android:layout_width="232dp"
             android:layout_height="34dp"
-            android:layout_marginTop="100dp"
             android:text="Create an Account"
             android:textAlignment="center"
             android:textSize="20sp"
-            app:layout_constraintBottom_toTopOf="@id/new_username"
+            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.506"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="0.19" />
 
         <EditText
             android:id="@+id/new_username"
