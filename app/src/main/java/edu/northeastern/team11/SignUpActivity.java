@@ -78,7 +78,8 @@ public class SignUpActivity extends AppCompatActivity {
                     newUser.requestFocus();
                 } else { // username is available
                     // Write username to database
-                    addNewUserToDb(newUser.getText().toString().trim());
+//                    addNewUserToDb(newUser.getText().toString().trim());
+                    addNewUserToDb2(newUser.getText().toString().trim());
                     // Save username in shared preferences
                     SharedPreferences.Editor editor = getSharedPreferences("settings", Context.MODE_PRIVATE).edit();
                     editor.putString("username", newUser.getText().toString().trim());
@@ -100,28 +101,51 @@ public class SignUpActivity extends AppCompatActivity {
         startActivity(intent);
     }
 
+//    // Add a new user to the database and set sentCount=0 and receivedCount=0 for all images
+//    private void addNewUserToDb(String username) {
+//        try {
+//            StorageReference storageRef = FirebaseStorage.getInstance().getReference();
+//            // Get all files in Storage
+//            storageRef.child("csStickers").listAll().addOnSuccessListener(new OnSuccessListener<ListResult>() {
+//                @Override
+//                public void onSuccess(ListResult listResult) {
+//                    // For each file...
+//                    for (StorageReference fileRef : listResult.getItems()) {
+//                        Image x = new Image(0, 0);
+//                        db.child("users").child(username).child(String.valueOf(counter)).setValue(x);
+//                        counter += 1;
+//                    }
+//                    counter = 0;
+//                }
+//            }).addOnFailureListener(new OnFailureListener() {
+//                @Override
+//                public void onFailure(@NonNull Exception e) {
+//                    Log.i("dbError", e.toString());
+//                }
+//            });
+//        } catch (Error e) {
+//            Log.e("ERROR", e.toString());
+//        }
+//    }
+
     // Add a new user to the database and set sentCount=0 and receivedCount=0 for all images
-    private void addNewUserToDb(String username) {
+    private void addNewUserToDb2(String username) {
         try {
-            StorageReference storageRef = FirebaseStorage.getInstance().getReference();
-            // Get all files in Storage
-            storageRef.child("csStickers").listAll().addOnSuccessListener(new OnSuccessListener<ListResult>() {
-                @Override
-                public void onSuccess(ListResult listResult) {
-                    // For each file...
-                    for (StorageReference fileRef : listResult.getItems()) {
-                        Image x = new Image(0, 0);
-                        db.child("users").child(username).child(String.valueOf(counter)).setValue(x);
-                        counter += 1;
-                    }
-                    counter = 0;
+            // For each string resource that starts with "sticker":
+            int counter = 0;
+            while (true) {
+                int resId = getResources().getIdentifier("sticker" + counter, "string", getPackageName());
+                if (resId == 0) {
+                    // String resrouce doesnt exist
+                    break;
+                } else {
+                    String stickerUrl = getResources().getString(resId);
+                    Image sticker = new Image(0, 0, stickerUrl);
+                    db.child("users").child(username).child(String.valueOf(counter)).setValue(sticker);
+                    counter += 1;
                 }
-            }).addOnFailureListener(new OnFailureListener() {
-                @Override
-                public void onFailure(@NonNull Exception e) {
-                    Log.i("dbError", e.toString());
-                }
-            });
+            }
+
         } catch (Error e) {
             Log.e("ERROR", e.toString());
         }
@@ -132,16 +156,21 @@ public class SignUpActivity extends AppCompatActivity {
     private class Image {
         public int sentCount;
         public int receivedCount;
+        public String urlString;
 
-        public Image(int sentCount, int receivedCount) {
-            sentCount = sentCount;
-            receivedCount = receivedCount;
+        public Image(int sentCount, int receivedCount, String url) {
+            this.sentCount = sentCount;
+            this.receivedCount = receivedCount;
+            this.urlString = url;
         }
         public int getSentCount() {
             return sentCount;
         }
         public int getReceivedCount() {
             return receivedCount;
+        }
+        public String getUrlString() {
+            return urlString;
         }
 
     }

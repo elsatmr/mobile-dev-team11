@@ -1,3 +1,13 @@
 <resources>
     <string name="app_name">Team11</string>
+    <string name="sticker0">https://firebasestorage.googleapis.com/v0/b/stickers-19c0f.appspot.com/o/csStickers%2F08754654d.jpeg?alt=media%26token=ff6c0fd7-dc54-4746-a8e3-9e33a868a64f</string>
+    <string name="sticker1">https://firebasestorage.googleapis.com/v0/b/stickers-19c0f.appspot.com/o/csStickers%2F11605377_0.jpeg?alt=media%26token=e7fff815-cc47-4921-9b96-cbd353cd5ba0</string>
+    <string name="sticker2">https://firebasestorage.googleapis.com/v0/b/stickers-19c0f.appspot.com/o/csStickers%2F21227326_0.jpeg?alt=media%26token=65b64032-0d15-4ce6-be1c-f060cf81bab7</string>
+    <string name="sticker3">https://firebasestorage.googleapis.com/v0/b/stickers-19c0f.appspot.com/o/csStickers%2F29167738_0.jpeg?alt=media%26token=f31a1d68-e6ba-4bf4-9a1b-42159cbaf099</string>
+    <string name="sticker4">https://firebasestorage.googleapis.com/v0/b/stickers-19c0f.appspot.com/o/csStickers%2F5899135_0.jpeg?alt=media%26token=f37e1156-47f4-489a-9e21-bca32d593353</string>
+    <string name="sticker5">https://firebasestorage.googleapis.com/v0/b/stickers-19c0f.appspot.com/o/csStickers%2Ffunny-computer-gamer-programmer-science-tee-tshirt-sticker.jpeg?alt=media%26token=00a31c2d-b42d-474b-a217-7ccb81039125</string>
+    <string name="sticker6">https://firebasestorage.googleapis.com/v0/b/stickers-19c0f.appspot.com/o/csStickers%2Fimages.jpg?alt=media%26token=1fc2c212-73df-4bf6-9637-ba6479b95ac9</string>
+    <string name="sticker7">https://firebasestorage.googleapis.com/v0/b/stickers-19c0f.appspot.com/o/csStickers%2Fo7897987987.jpeg?alt=media%26token=2a4da97a-6171-4f96-8dda-5421a026e63b</string>
+    <string name="sticker8">https://firebasestorage.googleapis.com/v0/b/stickers-19c0f.appspot.com/o/csStickers%2Fst%2Csmall%2C507x507-pad%2C600x600%2Cf8f8f8.jpeg?alt=media%26token=f4e9bb32-584e-477f-a25b-8d580f3ec764</string>
+    <string name="sticker9">https://firebasestorage.googleapiqs.com/v0/b/stickers-19c0f.appspot.com/o/csStickers%2Fst%2Csmall%2C507x507-pad%2C600x600%2Cf8f8f8.u2.jpg?alt=media%26token=b8192727-ebee-47d6-9a38-66ddd3e59f3f</string>
 </resources>
