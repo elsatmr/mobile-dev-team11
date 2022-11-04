@@ -18,6 +18,8 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Team11"
         tools:targetApi="31">
+        <activity android:name=".SendStickerActivity"
+            android:configChanges="orientation|screenSize"/>
         <activity android:name=".AllStickersActivity"
             android:configChanges="orientation|screenSize" />
         <activity android:name=".LoginActivity"

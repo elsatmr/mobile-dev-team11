@@ -1,8 +1,10 @@
 package edu.northeastern.team11;
 
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -43,6 +45,11 @@ public class AllStickersActivity extends AppCompatActivity {
     private void getCurrentUser() {
         SharedPreferences sharedPref = getSharedPreferences("settings", 0);
         userName = sharedPref.getString("username", null);
+    }
+
+    public void goToSendStickers(View view) {
+        Intent intent = new Intent(this, SendStickerActivity.class);
+        startActivity(intent);
     }
 
 }
