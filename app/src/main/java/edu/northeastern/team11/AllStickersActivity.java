@@ -5,6 +5,8 @@ import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -20,6 +22,8 @@ public class AllStickersActivity extends AppCompatActivity {
     private DatabaseReference dbRef;
     private FirebaseDatabase firebaseDb;
     private List<Sticker> stickerList;
+    StickerAdapter adapter;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -36,6 +40,7 @@ public class AllStickersActivity extends AppCompatActivity {
                     Sticker newSticker = s.getValue(Sticker.class);
                     stickerList.add(newSticker);
                 }
+                adapter.notifyDataSetChanged();
             }
 
             @Override
@@ -43,5 +48,9 @@ public class AllStickersActivity extends AppCompatActivity {
 
             }
         });
+        RecyclerView stickerRecyclerView = findViewById(R.id.sticker_recycler_view);
+        stickerRecyclerView.setLayoutManager(new LinearLayoutManager(this));
+        adapter = new StickerAdapter(stickerList, this);
+        stickerRecyclerView.setAdapter(adapter);
     }
 }
