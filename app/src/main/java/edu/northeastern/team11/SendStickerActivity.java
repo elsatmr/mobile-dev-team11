@@ -223,32 +223,32 @@ public class SendStickerActivity extends AppCompatActivity {
 //        }
 //    }
 
-    private class StickerHistory {
-        private int receivedCount;
-        private int sentCount;
-        private String urlString;
-
-        public StickerHistory(int receivedCount, int sentCount, String urlString) {
-            this.receivedCount = receivedCount;
-            this.sentCount = sentCount;
-            this.urlString = urlString;
-        }
-        public StickerHistory() {
-            this.receivedCount = receivedCount;
-            this.sentCount = sentCount;
-            this.urlString = urlString;
-        }
-
-        public int getReceivedCount() {
-            return receivedCount;
-        }
-
-        public int getSentCount() {
-            return sentCount;
-        }
-
-        public String getUrlString() {
-            return urlString;
-        }
-    }
+//    private class StickerHistory {
+//        private int receivedCount;
+//        private int sentCount;
+//        private String urlString;
+//
+//        public StickerHistory(int receivedCount, int sentCount, String urlString) {
+//            this.receivedCount = receivedCount;
+//            this.sentCount = sentCount;
+//            this.urlString = urlString;
+//        }
+//        public StickerHistory() {
+//            this.receivedCount = receivedCount;
+//            this.sentCount = sentCount;
+//            this.urlString = urlString;
+//        }
+//
+//        public int getReceivedCount() {
+//            return receivedCount;
+//        }
+//
+//        public int getSentCount() {
+//            return sentCount;
+//        }
+//
+//        public String getUrlString() {
+//            return urlString;
+//        }
+//    }
 }
