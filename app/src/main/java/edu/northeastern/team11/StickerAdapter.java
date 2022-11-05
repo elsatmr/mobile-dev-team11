@@ -46,14 +46,13 @@ public class StickerAdapter extends RecyclerView.Adapter<StickerViewHolder> {
         }
         newChip.setTextColor(Color.parseColor("#FFFFFF"));
         newChip.setChipBackgroundColor(ColorStateList.valueOf(Color.parseColor("#FF8A74BC")));
-//        chipGroup.addView(newChip);
+        chipGroup.addView(newChip);
     }
 
     @Override
     public void onBindViewHolder(@NonNull StickerViewHolder holder, int position) {
         Sticker currSticker = stickerList.get(position);
         String url = currSticker.getUrlString();
-        Log.d("url", url + currSticker.getSentCount());
         addChip(String.valueOf(currSticker.getReceivedCount()), holder.recSendCount, true, false);
         addChip(String.valueOf(currSticker.getSentCount()), holder.recSendCount, false, true);
         BackgroundThread thread = new BackgroundThread(holder, url);

@@ -24,4 +24,8 @@ public class Sticker {
     public String getUrlString() {
         return urlString;
     }
+
+    public void setUrlString(String urlString) {
+        this.urlString = urlString;
+    }
 }

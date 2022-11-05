@@ -7,6 +7,7 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.recyclerview.widget.StaggeredGridLayoutManager;
 
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -38,10 +39,11 @@ public class AllStickersActivity extends AppCompatActivity {
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 for (DataSnapshot s : snapshot.getChildren()) {
                     Sticker newSticker = s.getValue(Sticker.class);
+                    newSticker.setUrlString(newSticker.getUrlString().replace("%26", "&"));
                     stickerList.add(newSticker);
                 }
                 adapter.notifyDataSetChanged();
-                Log.d("SIZE", String.valueOf(stickerList.get(0).getUrlString()));
+                Log.d("SIZE", String.valueOf(stickerList.size()));
             }
 
             @Override
@@ -50,7 +52,7 @@ public class AllStickersActivity extends AppCompatActivity {
             }
         });
         RecyclerView stickerRecyclerView = findViewById(R.id.sticker_recycler_view);
-        stickerRecyclerView.setLayoutManager(new LinearLayoutManager(this));
+        stickerRecyclerView.setLayoutManager(new StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL));
         adapter = new StickerAdapter(stickerList, this);
         stickerRecyclerView.setAdapter(adapter);
     }

@@ -16,6 +16,6 @@ public class StickerViewHolder extends RecyclerView.ViewHolder{
     public StickerViewHolder(@NonNull View itemView) {
         super(itemView);
         this.stickerImageView = itemView.findViewById(R.id.stickerImageView);
-        this.recSendCount = itemView.findViewById(R.id.chipGroup);
+        this.recSendCount = itemView.findViewById(R.id.stickerChipGroup);
     }
 }
