@@ -52,10 +52,10 @@ public class StickerAdapter extends RecyclerView.Adapter<StickerViewHolder> {
     @Override
     public void onBindViewHolder(@NonNull StickerViewHolder holder, int position) {
         Sticker currSticker = stickerList.get(position);
-        String url = currSticker.getUrl();
+        String url = currSticker.getUrlString();
+        Log.d("url", url + currSticker.getSentCount());
         addChip(String.valueOf(currSticker.getReceivedCount()), holder.recSendCount, true, false);
         addChip(String.valueOf(currSticker.getSentCount()), holder.recSendCount, false, true);
-        Log.d("HERE", "HERE");
         BackgroundThread thread = new BackgroundThread(holder, url);
         thread.start();
 

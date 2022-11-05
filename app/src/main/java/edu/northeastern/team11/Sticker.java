@@ -3,12 +3,12 @@ package edu.northeastern.team11;
 public class Sticker {
     private int receivedCount;
     private int sentCount;
-    private String url;
+    private String urlString;
 
-    public Sticker(int receivedCount, int sentCount, String url) {
+    public Sticker(int receivedCount, int sentCount, String urlString) {
         this.receivedCount = receivedCount;
         this.sentCount = sentCount;
-        this.url = url;
+        this.urlString = urlString;
     }
 
     public Sticker(){}
@@ -21,7 +21,7 @@ public class Sticker {
         return sentCount;
     }
 
-    public String getUrl() {
-        return url;
+    public String getUrlString() {
+        return urlString;
     }
 }

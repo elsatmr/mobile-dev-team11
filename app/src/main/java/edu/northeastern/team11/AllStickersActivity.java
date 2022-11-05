@@ -30,7 +30,7 @@ public class AllStickersActivity extends AppCompatActivity {
         setContentView(R.layout.activity_all_stickers_screen);
         firebaseDb = FirebaseDatabase.getInstance();
         dbRef = firebaseDb.getReferenceFromUrl("https://stickers-19c0f-default-rtdb.firebaseio.com/");
-        Query userQuery = dbRef.child("users").child("elsatmr");
+        Query userQuery = dbRef.child("users").child("ash");
         stickerList = new ArrayList<>();
         Log.d("QUERY", userQuery.toString());
         userQuery.addValueEventListener(new ValueEventListener() {
@@ -41,6 +41,7 @@ public class AllStickersActivity extends AppCompatActivity {
                     stickerList.add(newSticker);
                 }
                 adapter.notifyDataSetChanged();
+                Log.d("SIZE", String.valueOf(stickerList.get(0).getUrlString()));
             }
 
             @Override
