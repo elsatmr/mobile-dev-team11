@@ -31,11 +31,7 @@ import java.util.Objects;
 
 public class SendStickerActivity extends AppCompatActivity {
 
-    private TextView header;
     private ListView listView;
-    private ConstraintLayout constraintLayout;
-    private long index;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,9 +39,7 @@ public class SendStickerActivity extends AppCompatActivity {
         setContentView(R.layout.activity_send_sticker);
 
         // get UI elements
-        header = findViewById(R.id.send_screen_instructions);
         listView = findViewById(R.id.list_view);
-        constraintLayout = findViewById(R.id.layout_send_sticker);
 
         // set up listView adapter and arraylist to add to adapter
         ArrayList<String> usersList = new ArrayList<>();
@@ -54,6 +48,7 @@ public class SendStickerActivity extends AppCompatActivity {
 
         // connect with database
         DatabaseReference ref = FirebaseDatabase.getInstance().getReference().child("users");
+        // read users in the database and notify adapter to display users on ui
         ref.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
@@ -64,18 +59,17 @@ public class SendStickerActivity extends AppCompatActivity {
                 }
                 // display each user in listview
                 adapter.notifyDataSetChanged();
-
             }
 
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
                 Log.e("Send Stickers error", error.toString());
-
             }
         });
         sendSticker();
     }
 
+    // handles clicking on user item in list view, then sending sticker to this user
     private void sendSticker() {
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -89,25 +83,8 @@ public class SendStickerActivity extends AppCompatActivity {
 
     // get index of new entry, then write the new transaction to the db
     private void addNewTransactionToDb(String receiver) {
+
             DatabaseReference ref = FirebaseDatabase.getInstance().getReference();
-            ref.child("transactions").addValueEventListener(new ValueEventListener() {
-
-                @Override
-                public void onDataChange(@NonNull DataSnapshot snapshot) {
-                     // get current total of transactions
-//                    index = 0;
-//                    Log.i("childrenCount: ",  String.valueOf(snapshot.getChildrenCount()));
-                    index = snapshot.getChildrenCount() + 1L;
-                    Log.i("index: ", String.valueOf(index));
-
-                }
-
-                @Override
-                public void onCancelled(@NonNull DatabaseError error) {
-                    Log.e("addNewTransactionToDb", error.toString());
-                }
-            });
-
             // get the current date and time
             Calendar calendar = Calendar.getInstance();
             Date dt = calendar.getTime();
@@ -119,9 +96,10 @@ public class SendStickerActivity extends AppCompatActivity {
             // create transaction object
             Transaction transaction = new Transaction(dt.toString(), sender, receiver, 0);
 
-            // write object to db
-            Log.i("indexAtAdd: ", String.valueOf(index));
-            ref.child("transactions").child(String.valueOf(index)).setValue(transaction);
+            // generate a unique Id for new transactions
+            String key = ref.child("transactions").push().getKey();
+            // write to database
+            ref.child("transactions").child(key).setValue(transaction);
     }
 
 
