@@ -1,8 +1,10 @@
 package edu.northeastern.team11;
 
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -38,6 +40,10 @@ public class AllStickersActivity extends AppCompatActivity {
 
     }
 
+    public void goToStickerScreen(View view) {
+        Intent intent = new Intent(this, StickerScreen.class);
+        startActivity(intent);
+    }
 
     // get the username of who is signed in
     private void getCurrentUser() {
