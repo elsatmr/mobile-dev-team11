@@ -1,6 +1,7 @@
 package edu.northeastern.team11;
 
 import android.content.Context;
+import android.content.Intent;
 import android.content.res.ColorStateList;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -57,8 +58,16 @@ public class StickerAdapter extends RecyclerView.Adapter<StickerViewHolder> {
         addChip(String.valueOf(currSticker.getSentCount()), holder.recSendCount, false, true);
         BackgroundThread thread = new BackgroundThread(holder, url);
         thread.start();
+        holder.itemView.setOnClickListener(view -> {
+            Context context = view.getContext();
+            String stickerId = String.valueOf(position);
+            Intent intent = new Intent(context, StickerScreen.class);
+            intent.putExtra("stickerId", stickerId);
+            context.startActivity(intent);
+        });
 
     }
+
 
     class BackgroundThread extends Thread {
         StickerViewHolder threadHolder;
