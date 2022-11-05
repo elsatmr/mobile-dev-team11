@@ -56,7 +56,7 @@ public class LoginActivity extends AppCompatActivity {
                 public void onCancelled(@NonNull DatabaseError error) {
 
                 }
-        });
+            });
 
         }
     }
