@@ -46,7 +46,7 @@ public class SendStickerActivity extends AppCompatActivity {
         if (getIntent().getExtras().getString("stickerId") != null) {
             stickerId = getIntent().getExtras().getString("stickerId");
         } else {
-            stickerId = "0"; // WE CAN REMOVE THIS ONCE COMBINES WITH ELSAS CODE
+            stickerId = "0";
         }
         // get UI elements
         listView = findViewById(R.id.list_view);
