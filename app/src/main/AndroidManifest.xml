@@ -21,6 +21,7 @@
         <activity android:name=".SendStickerActivity"
             android:configChanges="orientation|screenSize" />
 
+
         <activity android:name=".AllStickersActivity"
             android:configChanges="orientation|screenSize" />
         <activity android:name=".LoginActivity"
