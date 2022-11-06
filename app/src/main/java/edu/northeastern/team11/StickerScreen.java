@@ -1,11 +1,13 @@
 package edu.northeastern.team11;
 
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Gravity;
+import android.view.View;
 import android.widget.ImageView;
 import android.widget.TableLayout;
 import android.widget.TableRow;
@@ -223,5 +225,10 @@ public class StickerScreen extends AppCompatActivity {
                 e.printStackTrace();
             }
         }
+    }
+
+    public void sendStickerButtonClicked(View view) {
+        Intent intent = new Intent(this, SendStickerActivity.class);
+        startActivity(intent);
     }
 }

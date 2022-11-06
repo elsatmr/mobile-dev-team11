@@ -68,6 +68,7 @@
         android:backgroundTint="#3F51B5"
         android:paddingHorizontal="50dp"
         android:text="Send Sticker"
+        android:onClick="sendStickerButtonClicked"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/stickerLogImage" />
