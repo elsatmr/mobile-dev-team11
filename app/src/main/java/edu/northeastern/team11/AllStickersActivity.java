@@ -3,6 +3,8 @@ package edu.northeastern.team11;
 import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
+import android.app.PendingIntent;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Build;
 import android.os.Bundle;
@@ -37,6 +39,7 @@ public class AllStickersActivity extends AppCompatActivity {
     NotificationManagerCompat notificationManagerCompat;
     Notification notification;
     String username;
+    String stickerId;
 
 
     @Override
@@ -69,24 +72,13 @@ public class AllStickersActivity extends AppCompatActivity {
             }
         });
 
-        transactionRef.orderByKey().limitToLast(1).addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-
-            }
-        });
-
         transactionRef.orderByKey().limitToLast(1).addChildEventListener(new ChildEventListener() {
             @Override
             public void onChildAdded(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
                 Log.d("DATA SNAPSHOT T", snapshot.getKey());
                 String receiver = snapshot.child("receiver").getValue(String.class);
                 String sender = snapshot.child("sender").getValue(String.class);
+                stickerId = snapshot.child("stickerID").getValue(String.class);
                 if (Objects.equals(username, receiver)) {
                     sendNotification(sender);
                 }
@@ -147,8 +139,10 @@ public class AllStickersActivity extends AppCompatActivity {
 
         // Prepare intent which is triggered if the
         // notification is selected
-        //Intent intent = new Intent(this, ReceiveNotificationActivity.class);
-        //PendingIntent pIntent = PendingIntent.getActivity(this, (int) System.currentTimeMillis(), intent, 0);
+        Intent intent = new Intent(this, StickerScreen.class);
+        intent.putExtra("stickerId", stickerId);
+        PendingIntent pIntent = PendingIntent.getActivity(this, (int) System.currentTimeMillis(), intent, PendingIntent.FLAG_MUTABLE);
+
         //PendingIntent callIntent = PendingIntent.getActivity(this, (int) System.currentTimeMillis(),
         //        new Intent(this, FakeCallActivity.class), 0);
 
@@ -162,6 +156,7 @@ public class AllStickersActivity extends AppCompatActivity {
                 .setContentTitle("New sticker from " + senderName)
                 .setContentText("You received new sticker!")
                 .setPriority(NotificationCompat.PRIORITY_HIGH)
+                .setContentIntent(pIntent)
                 // hide the notification after its selected
                 .setAutoCancel(true);
 
