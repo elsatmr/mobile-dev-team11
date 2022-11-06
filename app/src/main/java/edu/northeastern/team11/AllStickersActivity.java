@@ -26,6 +26,7 @@ import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 public class AllStickersActivity extends AppCompatActivity {
     private DatabaseReference dbRef;
@@ -35,6 +36,8 @@ public class AllStickersActivity extends AppCompatActivity {
     StickerAdapter adapter;
     NotificationManagerCompat notificationManagerCompat;
     Notification notification;
+    String username;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -42,8 +45,8 @@ public class AllStickersActivity extends AppCompatActivity {
         setContentView(R.layout.activity_all_stickers_screen);
         firebaseDb = FirebaseDatabase.getInstance();
         dbRef = firebaseDb.getReferenceFromUrl("https://stickers-19c0f-default-rtdb.firebaseio.com/");
+        username = this.getCurrentUser();
         transactionRef = firebaseDb.getReference().child("transactions");
-        String username = this.getCurrentUser();
         Query userQuery = dbRef.child("users").child(username);
         stickerList = new ArrayList<>();
         Log.d("QUERY", userQuery.toString());
@@ -66,7 +69,7 @@ public class AllStickersActivity extends AppCompatActivity {
             }
         });
 
-        transactionRef.addValueEventListener(new ValueEventListener() {
+        transactionRef.orderByKey().limitToLast(1).addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
 
@@ -78,16 +81,19 @@ public class AllStickersActivity extends AppCompatActivity {
             }
         });
 
-        transactionRef.addChildEventListener(new ChildEventListener() {
+        transactionRef.orderByKey().limitToLast(1).addChildEventListener(new ChildEventListener() {
             @Override
             public void onChildAdded(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
-                Log.d("SNAPSHOT", snapshot.getValue(NewTransaction.class).toString());
-                sendNotification();
+                Log.d("DATA SNAPSHOT T", snapshot.getKey());
+                String receiver = snapshot.child("receiver").getValue(String.class);
+                String sender = snapshot.child("sender").getValue(String.class);
+                if (Objects.equals(username, receiver)) {
+                    sendNotification(sender);
+                }
             }
 
             @Override
             public void onChildChanged(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
-
             }
 
             @Override
@@ -137,7 +143,7 @@ public class AllStickersActivity extends AppCompatActivity {
         }
     }
 
-    public void sendNotification() {
+    public void sendNotification(String senderName) {
 
         // Prepare intent which is triggered if the
         // notification is selected
@@ -153,7 +159,7 @@ public class AllStickersActivity extends AppCompatActivity {
 
         NotificationCompat.Builder builder = new NotificationCompat.Builder(this, "Channel_Sticker_ID")
                 .setSmallIcon(android.R.drawable.stat_notify_chat)
-                .setContentTitle("New sticker from" + "username")
+                .setContentTitle("New sticker from " + senderName)
                 .setContentText("You received new sticker!")
                 .setPriority(NotificationCompat.PRIORITY_HIGH)
                 // hide the notification after its selected
