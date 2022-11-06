@@ -1,11 +1,13 @@
 package edu.northeastern.team11;
 
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Gravity;
+import android.view.View;
 import android.widget.ImageView;
 import android.widget.TableLayout;
 import android.widget.TableRow;
@@ -63,44 +65,46 @@ public class StickerScreen extends AppCompatActivity {
 
 
     // Append a row to the log table in the UI
-    private void appendRow(Transaction trx){
-        TableRow row = new TableRow(this);
-        row.setPadding(0,10, 0, 10);
-        row.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.MATCH_PARENT, TableRow.LayoutParams.WRAP_CONTENT));
+    private void appendRow(Transaction trx) {
+        if (trx.getReceiver().equals(userName) || trx.getSender().equals(userName)) {
+            TableRow row = new TableRow(this);
+            row.setPadding(0, 10, 0, 10);
+            row.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.MATCH_PARENT, TableRow.LayoutParams.WRAP_CONTENT));
 
-        TextView dateView = new TextView(this);
-        dateView.setWidth(100);
-        String input = trx.dateTime;
-        DateTimeFormatter f = DateTimeFormatter.ofPattern( "E MMM dd HH:mm:ss z uuuu" )
-                .withLocale( Locale.US );
-        ZonedDateTime zdt = ZonedDateTime.parse( input , f );
-        LocalDate ld = zdt.toLocalDate();
-        DateTimeFormatter fLocalDate = DateTimeFormatter.ofPattern( "dd/MM/uuuu" );
-        String output = ld.format( fLocalDate) ;
+            TextView dateView = new TextView(this);
+            dateView.setWidth(100);
+            String input = trx.dateTime;
+            DateTimeFormatter f = DateTimeFormatter.ofPattern("E MMM dd HH:mm:ss z uuuu")
+                    .withLocale(Locale.US);
+            ZonedDateTime zdt = ZonedDateTime.parse(input, f);
+            LocalDate ld = zdt.toLocalDate();
+            DateTimeFormatter fLocalDate = DateTimeFormatter.ofPattern("MM/dd/uuuu");
+            String output = ld.format(fLocalDate);
 
-        dateView.setText(output);
-        row.addView(dateView);
+            dateView.setText(output);
+            row.addView(dateView);
 
-        TextView usernameView = new TextView(this);
-        usernameView.setWidth(125);
-        if (trx.sender == userName) {
-            usernameView.setText(trx.receiver);
-        } else {
-            usernameView.setText(trx.sender);
+            TextView usernameView = new TextView(this);
+            usernameView.setWidth(125);
+            if (trx.sender == userName) {
+                usernameView.setText(trx.receiver);
+            } else {
+                usernameView.setText(trx.sender);
+            }
+            row.addView(usernameView);
+
+            TextView actionView = new TextView(this);
+            actionView.setWidth(100);
+            if (trx.getSender().equals(userName)) {
+                actionView.setText("sent");
+            } else {
+                actionView.setText("received");
+            }
+            actionView.setGravity(Gravity.CENTER);
+            row.addView(actionView);
+
+            logTable.addView(row);
         }
-        row.addView(usernameView);
-
-        TextView actionView = new TextView(this);
-        actionView.setWidth(100);
-        if (trx.sender == userName) {
-            actionView.setText("sent");
-        } else {
-            actionView.setText("received");
-        }
-        actionView.setGravity(Gravity.CENTER);
-        row.addView(actionView);
-
-        logTable.addView(row);
     }
 
     // Get sticker url
@@ -140,7 +144,7 @@ public class StickerScreen extends AppCompatActivity {
 
     // Get the list of transactions for this stickerId and populate the log table with rows
     private void getLog() {
-        db.child("transactions").orderByChild("stickerId").equalTo(Long.valueOf(stickerId)).addListenerForSingleValueEvent(new ValueEventListener() {
+        db.child("transactions").orderByChild("stickerId").equalTo(stickerId).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 for (DataSnapshot trx : snapshot.getChildren()) {
@@ -148,7 +152,7 @@ public class StickerScreen extends AppCompatActivity {
                             trx.child("dateTime").getValue(String.class),
                             trx.child("receiver").getValue(String.class),
                             trx.child("sender").getValue(String.class),
-                            trx.child("stickerId").getValue(Long.class));
+                            trx.child("stickerId").getValue(String.class));
                     appendRow(transaction);
                 }
             }
@@ -169,11 +173,12 @@ public class StickerScreen extends AppCompatActivity {
         private String dateTime;
         private String sender;
         private String receiver;
-        private Long stickerId;
+        private String stickerId;
 
-        public Transaction(){}
+        public Transaction() {
+        }
 
-        public Transaction(String dateTime, String receiver, String sender, Long stickerId) {
+        public Transaction(String dateTime, String receiver, String sender, String stickerId) {
             this.dateTime = dateTime;
             this.sender = sender;
             this.receiver = receiver;
@@ -183,13 +188,16 @@ public class StickerScreen extends AppCompatActivity {
         public String getDateTime() {
             return this.dateTime;
         }
+
         public String getSender() {
             return this.sender;
         }
+
         public String getReceiver() {
             return this.receiver;
         }
-        public Long getStickerId() {
+
+        public String getStickerId() {
             return this.stickerId;
         }
     }
@@ -223,5 +231,11 @@ public class StickerScreen extends AppCompatActivity {
                 e.printStackTrace();
             }
         }
+    }
+
+    public void sendStickerButtonClicked(View view) {
+        Intent intent = new Intent(this, SendStickerActivity.class);
+        intent.putExtra("stickerId", stickerId);
+        startActivity(intent);
     }
 }
