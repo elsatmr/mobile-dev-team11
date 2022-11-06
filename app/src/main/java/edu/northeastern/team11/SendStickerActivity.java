@@ -37,12 +37,17 @@ import java.util.Objects;
 public class SendStickerActivity extends AppCompatActivity {
 
     private ListView listView;
+    private String stickerId;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_send_sticker);
-
+        if (getIntent().getExtras().getString("stickerId") != null) {
+            stickerId = getIntent().getExtras().getString("stickerId");
+        } else {
+            stickerId = "0"; // WE CAN REMOVE THIS ONCE COMBINES WITH ELSAS CODE
+        }
         // get UI elements
         listView = findViewById(R.id.list_view);
 
@@ -99,7 +104,7 @@ public class SendStickerActivity extends AppCompatActivity {
             String sender  = sp.getString("username", null);
 
             // create transaction object
-            Transaction transaction = new Transaction(dt.toString(), sender, receiver, 0);
+            Transaction transaction = new Transaction(dt.toString(), sender, receiver, stickerId);
 
             // generate a unique Id for new transactions
             String key = ref.child("transactions").push().getKey();
@@ -111,9 +116,6 @@ public class SendStickerActivity extends AppCompatActivity {
 
     // update user's receivedCount snd sentCount
     private void updateSentReceivedCounts(String receiver, String sender) {
-        // need to get the stickerId, for now just hardcoding 0
-        String stickerId = String.valueOf(0);
-
         // get db ref
         DatabaseReference ref = FirebaseDatabase.getInstance().getReference();
 
@@ -129,10 +131,10 @@ public class SendStickerActivity extends AppCompatActivity {
         public String dateTime ;
         public String sender;
         public String receiver;
-        public int stickerId;
+        public String stickerId;
 
 
-        public Transaction(String dateTime, String sender, String receiver, int stickerId) {
+        public Transaction(String dateTime, String sender, String receiver, String stickerId) {
             this.dateTime = dateTime;
             this.sender = sender;
             this.receiver = receiver;
@@ -151,7 +153,7 @@ public class SendStickerActivity extends AppCompatActivity {
             return receiver;
         }
 
-        public int getStickerId() {
+        public String getStickerId() {
             return stickerId;
         }
     }

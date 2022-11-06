@@ -229,6 +229,7 @@ public class StickerScreen extends AppCompatActivity {
 
     public void sendStickerButtonClicked(View view) {
         Intent intent = new Intent(this, SendStickerActivity.class);
+        intent.putExtra("stickerId", stickerId);
         startActivity(intent);
     }
 }
