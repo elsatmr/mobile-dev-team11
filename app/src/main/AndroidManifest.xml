@@ -30,6 +30,8 @@
             android:configChanges="orientation|screenSize" />
         <activity android:name=".StickersMainActivity"
             android:configChanges="orientation|screenSize" />
+        <activity android:name=".AboutActivity"
+            android:configChanges="orientation|screenSize" />
         <activity
             android:name=".AtYourServiceActivity"
             android:configChanges="orientation|screenSize"

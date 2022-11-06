@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fillViewport="true"
+    tools:context=".MainActivity">
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        tools:context=".MainActivity"
+        android:padding="16dp">
+
+        <ImageView
+            android:id="@+id/coverImageView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:srcCompat="@drawable/cover"
+            app:layout_constraintBottom_toTopOf="@id/headerMainTextView" />
+
+        <TextView
+            android:id="@+id/headerMainTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Hello, we are Team 11! :)"
+            android:textSize="24dp"
+            android:textStyle="bold"
+            app:layout_constraintBottom_toTopOf="@+id/secondHeaderMainTextView"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.496"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/coverImageView" />
+
+        <TextView
+            android:id="@+id/secondHeaderMainTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Team members:"
+            android:textSize="18dp"
+            app:layout_constraintBottom_toTopOf="@+id/nameOneMainTextView"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/headerMainTextView" />
+
+        <TextView
+            android:id="@+id/nameOneMainTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Ashley Cheung, Elsa Tamara"
+            android:textSize="18dp"
+            app:layout_constraintBottom_toTopOf="@+id/nameTwoMainTextView"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.497"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/secondHeaderMainTextView" />
+
+        <TextView
+            android:id="@+id/nameTwoMainTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Michael Hart, Tomiris Kozhabekkyzy"
+            android:textSize="18dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="0.797" />
+
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</ScrollView>

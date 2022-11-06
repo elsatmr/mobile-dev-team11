@@ -24,5 +24,9 @@ public class StickersMainActivity extends AppCompatActivity {
         startActivity(intent);
     }
 
+    public void aboutClicked(View view) {
+        Intent intent = new Intent(this, AboutActivity.class);
+        startActivity(intent);
+    }
 
 }
