@@ -86,8 +86,8 @@ public class StickerScreen extends AppCompatActivity {
 
             TextView usernameView = new TextView(this);
             usernameView.setWidth(125);
-            if (trx.sender == userName) {
-                usernameView.setText(trx.receiver);
+            if (trx.getSender().equals(userName)) {
+                usernameView.setText(trx.getReceiver());
             } else {
                 usernameView.setText(trx.sender);
             }
