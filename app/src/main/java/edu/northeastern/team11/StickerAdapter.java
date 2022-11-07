@@ -54,6 +54,7 @@ public class StickerAdapter extends RecyclerView.Adapter<StickerViewHolder> {
     public void onBindViewHolder(@NonNull StickerViewHolder holder, int position) {
         Sticker currSticker = stickerList.get(position);
         String url = currSticker.getUrlString();
+        holder.recSendCount.removeAllViews();
         addChip(String.valueOf(currSticker.getReceivedCount()), holder.recSendCount, true, false);
         addChip(String.valueOf(currSticker.getSentCount()), holder.recSendCount, false, true);
         BackgroundThread thread = new BackgroundThread(holder, url);
