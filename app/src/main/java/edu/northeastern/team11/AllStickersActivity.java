@@ -138,7 +138,7 @@ public class AllStickersActivity extends AppCompatActivity {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             CharSequence name = "Received sticker notification";
             String description = "Notification channel";
-            int importance = NotificationManager.IMPORTANCE_DEFAULT;
+            int importance = NotificationManager.IMPORTANCE_HIGH;
             NotificationChannel channel = new NotificationChannel("Channel_Sticker_ID", name, importance);
             channel.setDescription(description);
             // Register the channel with the system; you can't change the importance
@@ -167,8 +167,9 @@ public class AllStickersActivity extends AppCompatActivity {
                 .setSmallIcon(android.R.drawable.stat_notify_chat)
                 .setContentTitle("New sticker from " + senderName)
                 .setContentText("You received new sticker!")
-                .setPriority(NotificationCompat.PRIORITY_HIGH)
+                .setPriority(NotificationCompat.PRIORITY_MAX)
                 .setContentIntent(pIntent)
+                .setDefaults(NotificationCompat.DEFAULT_ALL)
                 // hide the notification after its selected
                 .setAutoCancel(true);
 
