@@ -47,6 +47,7 @@ public class AllStickersActivity extends AppCompatActivity {
     private DatabaseReference dbRef;
     private FirebaseDatabase firebaseDb;
     private List<Sticker> stickerList;
+    RecyclerView stickerRecyclerView;
     StickerAdapter adapter;
     private DatabaseReference transactionRef;
     NotificationManagerCompat notificationManagerCompat;
@@ -65,18 +66,17 @@ public class AllStickersActivity extends AppCompatActivity {
 
         Query userQuery = dbRef.child("users").child(username);
         stickerList = new ArrayList<>();
-        Log.d("QUERY", userQuery.toString());
         createNotificationChannel();
         userQuery.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
+                stickerList.clear();
                 for (DataSnapshot s : snapshot.getChildren()) {
                     Sticker newSticker = s.getValue(Sticker.class);
                     newSticker.setUrlString(newSticker.getUrlString().replace("%26", "&"));
                     stickerList.add(newSticker);
                 }
                 adapter.notifyDataSetChanged();
-                Log.d("SIZE", String.valueOf(stickerList.size()));
             }
 
             @Override
@@ -84,7 +84,7 @@ public class AllStickersActivity extends AppCompatActivity {
 
             }
         });
-
+        stickerRecyclerView = findViewById(R.id.sticker_recycler_view);
         transactionRef.orderByKey().limitToLast(1).addChildEventListener(new ChildEventListener() {
             @Override
             public void onChildAdded(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
@@ -123,7 +123,6 @@ public class AllStickersActivity extends AppCompatActivity {
         adapter = new StickerAdapter(stickerList, this);
         stickerRecyclerView.setAdapter(adapter);
     }
-
 
     // get the username of who is signed in
     private String getCurrentUser() {
