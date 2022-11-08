@@ -21,6 +21,7 @@
         <activity android:name=".SendStickerActivity"
             android:configChanges="orientation|screenSize" />
 
+
         <activity android:name=".AllStickersActivity"
             android:configChanges="orientation|screenSize" />
         <activity android:name=".LoginActivity"
@@ -28,6 +29,8 @@
         <activity android:name=".SignUpActivity"
             android:configChanges="orientation|screenSize" />
         <activity android:name=".StickersMainActivity"
+            android:configChanges="orientation|screenSize" />
+        <activity android:name=".AboutActivity"
             android:configChanges="orientation|screenSize" />
         <activity
             android:name=".AtYourServiceActivity"
