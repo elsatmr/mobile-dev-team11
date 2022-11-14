@@ -10,4 +10,5 @@
     <string name="sticker7">https://firebasestorage.googleapis.com/v0/b/stickers-19c0f.appspot.com/o/csStickers%2Fo7897987987.jpeg?alt=media%26token=2a4da97a-6171-4f96-8dda-5421a026e63b</string>
     <string name="sticker8">https://firebasestorage.googleapis.com/v0/b/stickers-19c0f.appspot.com/o/csStickers%2Fst%2Csmall%2C507x507-pad%2C600x600%2Cf8f8f8.jpeg?alt=media%26token=f4e9bb32-584e-477f-a25b-8d580f3ec764</string>
     <string name="sticker9">https://firebasestorage.googleapis.com/v0/b/stickers-19c0f.appspot.com/o/csStickers%2FWhich-Key-Is-Any-Key-Funny-Computer-Meme-Photo.jpeg?alt=media%26token=618f24b1-4822-4f47-a8f8-e949fd36864a</string>
+    <string name="mapbox_access_token">sk.eyJ1IjoiaGFydC1taSIsImEiOiJjbGFoOWh1Z2gwa3pmM3Btb3Rna3l4cG5qIn0.6ZOifBmD8UT_k__TMLqKiA</string>
 </resources>
