@@ -46,7 +46,22 @@
         </activity>
         <activity android:name=".StickerScreen"
             android:screenOrientation="portrait" />
+<!--        SLURP-->
         <activity android:name=".slurp.LandingScreen"
+            android:screenOrientation="portrait" />
+        <activity android:name=".slurp.LoginScreen"
+            android:screenOrientation="portrait" />
+        <activity android:name=".slurp.SignupScreen"
+            android:screenOrientation="portrait" />
+        <activity android:name=".slurp.FeedScreen"
+            android:screenOrientation="portrait" />
+        <activity android:name=".slurp.SearchDishesScreen"
+            android:screenOrientation="portrait" />
+        <activity android:name=".slurp.SearchUsersScreen"
+            android:screenOrientation="portrait" />
+        <activity android:name=".slurp.AddDishScreen"
+            android:screenOrientation="portrait" />
+        <activity android:name=".slurp.ProfileScreen"
             android:screenOrientation="portrait" />
     </application>
 

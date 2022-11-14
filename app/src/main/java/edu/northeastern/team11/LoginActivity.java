@@ -26,7 +26,7 @@ public class LoginActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
 
-        userName = findViewById(R.id.username_edittext);
+        userName = findViewById(R.id.email);
         errorText = findViewById(R.id.errorLoginMsg);
         errorText.setVisibility(View.INVISIBLE);
     }
