@@ -6,9 +6,7 @@
     android:layout_height="match_parent"
     android:fillViewport="true"
     tools:context=".MainActivity">
-    <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:app="http://schemas.android.com/apk/res-auto"
-        xmlns:tools="http://schemas.android.com/tools"
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         tools:context=".MainActivity"
@@ -88,15 +86,17 @@
         app:layout_constraintTop_toBottomOf="@id/atYourServiceMainButton"
         app:layout_constraintBottom_toTopOf="@+id/slurpMainButton"
         android:onClick="openStickersActivity"/>
-    <Button
-        android:id="@+id/slurpMainButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Slurp!"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/firebaseDbMainButton"
-        app:layout_constraintBottom_toBottomOf="parent"/>
+
+        <Button
+            android:id="@+id/slurpMainButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:onClick="goToSlurp"
+            android:text="Slurp!"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/firebaseDbMainButton" />
 
 
     </androidx.constraintlayout.widget.ConstraintLayout>

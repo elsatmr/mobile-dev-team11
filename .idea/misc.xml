@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="DesignSurface">
+    <option name="filePathToZoomLevelMap">
+      <map>
+        <entry key="app/src/main/res/layout/activity_main.xml" value="0.3220108695652174" />
+        <entry key="app/src/main/res/layout/activity_stickers.xml" value="0.15353260869565216" />
+        <entry key="app/src/main/res/layout/slrup_landing.xml" value="0.34092935177572115" />
+        <entry key="app/src/main/res/layout/sticker_vholder.xml" value="0.19300911854103345" />
+      </map>
+    </option>
+  </component>
+  <component name="ExternalStorageConfigurationManager" enabled="true" />
+  <component name="ProjectRootManager" version="2" languageLevel="JDK_11" project-jdk-name="11" project-jdk-type="JavaSDK" />
+</project>
