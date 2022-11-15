@@ -22,4 +22,9 @@ public class MainActivity extends AppCompatActivity {
         startActivity(intent);
     }
 
+    public void openSlurpActivity(View view) {
+        Intent intent = new Intent(this, MainSlurpActivity.class);
+        startActivity(intent);
+    }
+
 }
