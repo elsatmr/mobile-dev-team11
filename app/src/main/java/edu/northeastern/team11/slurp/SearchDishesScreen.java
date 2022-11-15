@@ -34,6 +34,19 @@ public class SearchDishesScreen extends AppCompatActivity {
 
         // Firebase - get Stickers as placeholder
         db = FirebaseDatabase.getInstance().getReference();
+        getCuisines();
+
+        // RecyclerView setup
+        dishCategoryRecycler = findViewById(R.id.dishCategoryRecycler);
+        dishCategoryRecycler.setLayoutManager(new StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL));
+        adapter = new DishCategoryAdapter(dishCategoryList, this);
+        dishCategoryRecycler.setAdapter(adapter);
+
+    }
+
+    // Get the cuisines from the database
+    // USING STICKERS AS PLACEHOLDER!
+    private void getCuisines() {
         db.child("stickers").addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
@@ -45,18 +58,12 @@ public class SearchDishesScreen extends AppCompatActivity {
                 }
                 adapter.notifyDataSetChanged();
             }
-
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
 
             }
         });
-
-        // RecyclerView setup
-        dishCategoryRecycler = findViewById(R.id.dishCategoryRecycler);
-        dishCategoryRecycler.setLayoutManager(new StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL));
-        adapter = new DishCategoryAdapter(dishCategoryList, this);
-        dishCategoryRecycler.setAdapter(adapter);
     }
+
 
 }
