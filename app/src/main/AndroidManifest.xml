@@ -70,6 +70,8 @@
             android:screenOrientation="portrait" />
         <activity android:name=".slurp.ProfileScreen"
             android:screenOrientation="portrait" />
+        <activity android:name=".slurp.DishesMapListScreen"
+            android:screenOrientation="portrait" />
     </application>
 
 </manifest>

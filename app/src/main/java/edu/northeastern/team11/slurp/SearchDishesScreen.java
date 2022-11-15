@@ -2,36 +2,61 @@ package edu.northeastern.team11.slurp;
 
 import android.os.Bundle;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.RecyclerView;
+import androidx.recyclerview.widget.StaggeredGridLayoutManager;
 
-import com.google.android.material.bottomnavigation.BottomNavigationView;
-import com.mapbox.maps.MapView;
-import com.mapbox.maps.Style;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import edu.northeastern.team11.R;
 
 public class SearchDishesScreen extends AppCompatActivity {
 
-    MapView mapView;
+    private List<DishCategory> dishCategoryList;
+    RecyclerView dishCategoryRecycler;
+    DishCategoryAdapter adapter;
+    DatabaseReference db;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.slurp_search_dishes);
+        dishCategoryList = new ArrayList<>();
 
-        // Setup the bottom navigation tabs
-        BottomNavigationView bottomNavigationView=findViewById(R.id.bottom_navigation);
-        bottomNavigationView.setSelectedItemId(R.id.search_dishes);
-        bottomNavigationView.setOnItemSelectedListener(new BottomTabListener(this));
+        // Firebase - get Stickers as placeholder
+        db = FirebaseDatabase.getInstance().getReference();
+        db.child("stickers").addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                dishCategoryList.clear();
+                for (DataSnapshot dish : snapshot.getChildren()) {
+                    String cat = dish.getValue(String.class);
+                    DishCategory dishCategory = new DishCategory(cat);
+                    dishCategoryList.add(dishCategory);
+                }
+                adapter.notifyDataSetChanged();
+            }
 
-        // Hide top action bar
-        ActionBar actionBar = getSupportActionBar();
-        actionBar.hide();
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
 
-        // MapBox
-        mapView = findViewById(R.id.mapView);
-        mapView.getMapboxMap().loadStyleUri(Style.MAPBOX_STREETS);
+            }
+        });
+
+        // RecyclerView setup
+        dishCategoryRecycler = findViewById(R.id.dishCategoryRecycler);
+        dishCategoryRecycler.setLayoutManager(new StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL));
+        adapter = new DishCategoryAdapter(dishCategoryList, this);
+        dishCategoryRecycler.setAdapter(adapter);
     }
 
 }
