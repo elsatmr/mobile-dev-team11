@@ -8,6 +8,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.recyclerview.widget.StaggeredGridLayoutManager;
 
+import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -31,6 +32,15 @@ public class SearchDishesScreen extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.slurp_search_dishes);
         dishCategoryList = new ArrayList<>();
+
+        // Hide top action bar
+        ActionBar actionBar = getSupportActionBar();
+        actionBar.hide();
+
+        // Setup the bottom navigation tabs
+        BottomNavigationView bottomNavigationView=findViewById(R.id.bottom_navigation);
+        bottomNavigationView.setSelectedItemId(R.id.search_users);
+        bottomNavigationView.setOnItemSelectedListener(new BottomTabListener(this));
 
         // Firebase - get Stickers as placeholder
         db = FirebaseDatabase.getInstance().getReference();
