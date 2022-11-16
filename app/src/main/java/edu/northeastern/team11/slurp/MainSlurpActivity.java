@@ -1,4 +1,4 @@
-package edu.northeastern.team11;
+package edu.northeastern.team11.slurp;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
@@ -7,17 +7,22 @@ import androidx.fragment.app.FragmentTransaction;
 
 import android.os.Bundle;
 
-import edu.northeastern.team11.databinding.ActivityMainBinding;
-import edu.northeastern.team11.databinding.ActivityMainSlurpBinding;
+import edu.northeastern.team11.HomeFragment;
+import edu.northeastern.team11.R;
+import edu.northeastern.team11.databinding.SlurpActivityMainBinding;
+import edu.northeastern.team11.slurp.AddItemFragment;
+import edu.northeastern.team11.slurp.CategoryFragment;
+import edu.northeastern.team11.slurp.ProfileFragment;
+import edu.northeastern.team11.slurp.SearchUserFragment;
 
 public class MainSlurpActivity extends AppCompatActivity {
 
-    ActivityMainSlurpBinding binding;
+    SlurpActivityMainBinding binding;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        binding = ActivityMainSlurpBinding.inflate(getLayoutInflater());
+        binding = SlurpActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
         setCurrentFragment(new HomeFragment());
 
