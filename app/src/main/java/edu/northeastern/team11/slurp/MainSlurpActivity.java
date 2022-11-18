@@ -7,6 +7,7 @@ import androidx.fragment.app.FragmentTransaction;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
@@ -25,6 +26,7 @@ public class MainSlurpActivity extends AppCompatActivity {
     SlurpActivityMainBinding binding;
     Button signUp;
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -32,15 +34,6 @@ public class MainSlurpActivity extends AppCompatActivity {
         setContentView(binding.getRoot());
         setCurrentFragment(new HomeFragment());
 
-        signUp = findViewById(R.id.slurp_signup_button);
-
-        signUp.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent intent = new Intent(view.getContext(), SlurpSignUpActivity.class);
-                startActivity(intent);
-            }
-        });
 
 
 
@@ -71,5 +64,10 @@ public class MainSlurpActivity extends AppCompatActivity {
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
         fragmentTransaction.replace(R.id.flFragment, fragment);
         fragmentTransaction.commit();
+    }
+
+    public String getCurUser() {
+        SharedPreferences sharedPref = getSharedPreferences("settings", 0);
+        return sharedPref.getString("username", null);
     }
 }

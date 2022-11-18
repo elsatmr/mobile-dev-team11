@@ -1,6 +1,7 @@
 package edu.northeastern.team11.slurp;
 
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
@@ -69,6 +70,8 @@ public class SlurpSignUpActivity extends AppCompatActivity {
                     editor.putString("username", newUser.getText().toString().trim());
                     editor.apply();
 
+                    // launch main slurp activity
+                    signInUser();
                 }
             }
 
@@ -88,4 +91,11 @@ public class SlurpSignUpActivity extends AppCompatActivity {
         ref.child("users_slurp").child(username).child("profilePhotoLink").setValue("no_profile_pic_set");
         ref.child("users_slurp").child(username).child("slurperStatusPoints").setValue(0);
     }
+
+    private void signInUser() {
+        Intent intent = new Intent(this, MainSlurpActivity.class);
+        startActivity(intent);
+    }
+
+
 }

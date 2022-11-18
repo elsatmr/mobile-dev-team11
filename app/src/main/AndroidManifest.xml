@@ -18,9 +18,12 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Team11"
         tools:targetApi="31">
-        <activity android:name=".slurp.SlurpSignUpActivity"
+
+        <activity android:name=".slurp.CurrentUserActivity"
             android:configChanges="orientation|screenSize" />
 
+        <activity android:name=".slurp.SlurpSignUpActivity"
+            android:configChanges="orientation|screenSize" />
         <activity
             android:name=".slurp.MainSlurpActivity"
             android:exported="false" />
