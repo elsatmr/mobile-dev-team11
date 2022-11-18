@@ -93,7 +93,8 @@ public class CategoryFragment extends Fragment {
         recyclerView = view.findViewById(R.id.dishCategoryRecycler);
         adapter = new DishCategoryAdapter(dishCategoryList, view.getContext());
         recyclerView.setHasFixedSize(true);
-        recyclerView.setLayoutManager(new StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL));
+        recyclerView.setLayoutManager(new StaggeredGridLayoutManager(
+                2, StaggeredGridLayoutManager.VERTICAL));
         recyclerView.setAdapter(adapter);
 
         // Have to return the view
@@ -103,14 +104,15 @@ public class CategoryFragment extends Fragment {
     // Get the cuisines from the database
     // USING STICKERS AS PLACEHOLDER!
     private void getCuisines() {
-        db.child("stickers").addValueEventListener(new ValueEventListener() {
+        db.child("category").addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 dishCategoryList.clear();
                 for (DataSnapshot dish : snapshot.getChildren()) {
-                    String cat = dish.getValue(String.class);
-                    DishCategoryItem dishCategory = new DishCategoryItem(cat);
-                    dishCategoryList.add(dishCategory);
+                    String url = dish.getValue(String.class);
+                    String label = dish.getKey();
+                    DishCategoryItem dishCategoryItem = new DishCategoryItem(label, url);
+                    dishCategoryList.add(dishCategoryItem);
                 }
                 adapter.notifyDataSetChanged();
             }

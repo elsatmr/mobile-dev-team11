@@ -37,8 +37,10 @@ public class DishCategoryAdapter extends RecyclerView.Adapter<DishCategoryViewHo
 
     @Override
     public void onBindViewHolder(@NonNull DishCategoryViewHolder holder, int position) {
-        String currentCategory = dishCategoryList.get(position).getCategoryName();
-        BackgroundThread thread = new BackgroundThread(holder, currentCategory);
+        String categoryUrl = dishCategoryList.get(position).getCategoryUrl();
+        String categoryLabel = dishCategoryList.get(position).getCategoryName();
+        BackgroundThread thread = new BackgroundThread(holder, categoryUrl, categoryLabel);
+        holder.dishCategoryLabel.setText(categoryLabel);
         thread.start();
         holder.itemView.setOnClickListener(view -> {
             Context context = view.getContext();
@@ -53,10 +55,12 @@ public class DishCategoryAdapter extends RecyclerView.Adapter<DishCategoryViewHo
     class BackgroundThread extends Thread {
         DishCategoryViewHolder threadHolder;
         String imageUri;
+        String label;
 
-        BackgroundThread(DishCategoryViewHolder threadHolder, String url) {
+        BackgroundThread(DishCategoryViewHolder threadHolder, String url, String categoryLabel) {
             this.threadHolder = threadHolder;
             this.imageUri = url;
+            this.label = categoryLabel;
         }
 
         @Override
@@ -71,6 +75,7 @@ public class DishCategoryAdapter extends RecyclerView.Adapter<DishCategoryViewHo
                         }
                     }
                 });
+//                threadHolder.dishCategoryLabel.setText(label);
             } catch (MalformedURLException e) {
                 Log.d("THREAD", e.getMessage());
                 System.out.println("The URL is not valid.");
