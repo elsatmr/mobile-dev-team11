@@ -51,7 +51,6 @@ public class SlurpLoginActivity extends AppCompatActivity {
                                 editor.putString("username", user);
                                 editor.apply();
                                 launchMainSlurperActivity();
-
                             } else {
                                 errorText.setVisibility(View.VISIBLE);
                                 username.setText("");
@@ -65,7 +64,6 @@ public class SlurpLoginActivity extends AppCompatActivity {
                         }
                     });
                 }
-
             }
         });
 

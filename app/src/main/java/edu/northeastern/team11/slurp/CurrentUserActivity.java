@@ -22,6 +22,7 @@ public class CurrentUserActivity extends AppCompatActivity {
         signUpButton = findViewById(R.id.user_signup_button);
         loginButton = findViewById(R.id.user_login_button);
 
+        // create a new user on sign up page
         signUpButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -30,6 +31,7 @@ public class CurrentUserActivity extends AppCompatActivity {
             }
         });
 
+        // user logs in
         loginButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {

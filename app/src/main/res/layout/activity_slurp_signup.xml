@@ -8,8 +8,6 @@
     android:fillViewport="true"
     tools:context=".SignUpActivity"
     >
-
-
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -23,20 +21,32 @@
             android:text="Create an Account"
             android:textAlignment="center"
             android:textSize="20sp"
+            android:layout_marginBottom="50dp"
             app:layout_constraintBottom_toTopOf="@id/username_info"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.491"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
+        <TextView
+            android:id="@+id/username_info"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Input desired username:"
+            app:layout_constraintBottom_toTopOf="@id/new_username"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.342"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/signup_header" />
+
         <EditText
             android:id="@+id/new_username"
             android:layout_width="234dp"
             android:layout_height="48dp"
-            android:layout_marginTop="65dp"
             android:hint="ex) acheung"
             app:layout_constraintBottom_toTopOf="@id/errorText"
             app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.502"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/signup_header" />
 
@@ -51,7 +61,8 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.454"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/location_et" />
+            app:layout_constraintTop_toBottomOf="@+id/location_et"
+            app:layout_constraintVertical_bias="1.0" />
 
         <TextView
             android:id="@+id/errorText"
@@ -61,20 +72,6 @@
             android:textColor="#F30000"
             app:layout_constraintStart_toStartOf="@+id/new_username"
             app:layout_constraintTop_toBottomOf="@+id/new_username" />
-
-        <TextView
-            android:id="@+id/username_info"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="97dp"
-            android:layout_marginEnd="163dp"
-            android:layout_marginBottom="16dp"
-            android:text="Input desired username:"
-            app:layout_constraintBottom_toTopOf="@id/new_username"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.0"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/signup_header" />
 
         <TextView
             android:id="@+id/city_state_info"

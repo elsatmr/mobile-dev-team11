@@ -55,8 +55,8 @@ public class SlurpSignUpActivity extends AppCompatActivity {
 
     private void addUser() {
         ref = mDatabase.getReference();
-        String query = "users_slurp/" + newUser.getText().toString().trim();
-        ref.child("query").addValueEventListener(new ValueEventListener() {
+        String userName = newUser.getText().toString().trim();
+        ref.child("users_slurp").child(userName).addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 if (snapshot.exists()) {
@@ -82,6 +82,7 @@ public class SlurpSignUpActivity extends AppCompatActivity {
         });
     }
 
+    // write to db information about the new user
     private void addNewSlurpUser(String username, String cityState) {
         ref.child("users_slurp").child(username).child("cityState").setValue(cityState);
         ref.child("users_slurp").child(username).child("friends").child("total").setValue(0);
@@ -96,6 +97,4 @@ public class SlurpSignUpActivity extends AppCompatActivity {
         Intent intent = new Intent(this, MainSlurpActivity.class);
         startActivity(intent);
     }
-
-
 }
