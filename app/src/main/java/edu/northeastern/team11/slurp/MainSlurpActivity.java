@@ -66,8 +66,4 @@ public class MainSlurpActivity extends AppCompatActivity {
         fragmentTransaction.commit();
     }
 
-    public String getCurUser() {
-        SharedPreferences sharedPref = getSharedPreferences("settings", 0);
-        return sharedPref.getString("username", null);
-    }
 }

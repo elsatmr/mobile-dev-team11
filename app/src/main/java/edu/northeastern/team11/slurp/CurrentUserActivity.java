@@ -29,7 +29,13 @@ public class CurrentUserActivity extends AppCompatActivity {
                 startActivity(intent);
             }
         });
+
+        loginButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(view.getContext(), SlurpLoginActivity.class);
+                startActivity(intent);
+            }
+        });
     }
-
-
 }
