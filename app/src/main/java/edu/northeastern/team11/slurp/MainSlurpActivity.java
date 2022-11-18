@@ -4,9 +4,14 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
+import androidx.recyclerview.widget.RecyclerView;
 
+import android.content.Intent;
 import android.os.Bundle;
+import android.view.View;
+import android.widget.Button;
 
+import edu.northeastern.team11.AboutActivity;
 import edu.northeastern.team11.HomeFragment;
 import edu.northeastern.team11.R;
 import edu.northeastern.team11.databinding.SlurpActivityMainBinding;
@@ -18,6 +23,7 @@ import edu.northeastern.team11.slurp.SearchUserFragment;
 public class MainSlurpActivity extends AppCompatActivity {
 
     SlurpActivityMainBinding binding;
+    Button signUp;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -25,6 +31,18 @@ public class MainSlurpActivity extends AppCompatActivity {
         binding = SlurpActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
         setCurrentFragment(new HomeFragment());
+
+        signUp = findViewById(R.id.slurp_signup_button);
+
+        signUp.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(view.getContext(), SlurpSignUpActivity.class);
+                startActivity(intent);
+            }
+        });
+
+
 
         binding.bottomNavigationView.setOnItemSelectedListener(item -> {
             switch (item.getItemId()) {
