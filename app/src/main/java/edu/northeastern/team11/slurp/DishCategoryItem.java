@@ -1,13 +1,13 @@
 package edu.northeastern.team11.slurp;
 
-public class DishCategory {
+public class DishCategoryItem {
     private String categoryName;
 
-    public DishCategory(String categoryName) {
+    public DishCategoryItem(String categoryName) {
         this.categoryName = categoryName;
     }
 
-    public DishCategory(){}
+    public DishCategoryItem(){}
 
     public String getCategoryName() {
         return categoryName;
