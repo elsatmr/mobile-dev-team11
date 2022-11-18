@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -11,11 +12,16 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.view.GravityCompat;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.mapbox.android.core.permissions.PermissionsListener;
 import com.mapbox.android.core.permissions.PermissionsManager;
 import com.mapbox.mapboxsdk.Mapbox;
+import com.mapbox.mapboxsdk.camera.CameraPosition;
+import com.mapbox.mapboxsdk.camera.CameraUpdateFactory;
+import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.location.LocationComponent;
 import com.mapbox.mapboxsdk.location.LocationComponentActivationOptions;
 import com.mapbox.mapboxsdk.location.LocationComponentOptions;
@@ -38,6 +44,7 @@ public class DishesMapListScreen extends AppCompatActivity implements OnMapReady
     String category;
     TextView categoryView;
     MapView mapView;
+    FloatingActionButton homeFab;
     private MapboxMap mapboxMap;
     private LocationComponent locationComponent;
     private boolean isInTrackingMode;
@@ -50,6 +57,7 @@ public class DishesMapListScreen extends AppCompatActivity implements OnMapReady
         Mapbox.getInstance(this, getString(R.string.mapbox_access_token));
         setContentView(R.layout.slurp_search_dishes_maplist);
         categoryView = findViewById(R.id.category);
+        homeFab = findViewById(R.id.homeFab);
         if (getIntent().getExtras().getString("category") != null) {
             category = getIntent().getExtras().getString("category");
             categoryView.setText(category);
@@ -67,16 +75,18 @@ public class DishesMapListScreen extends AppCompatActivity implements OnMapReady
         mapView = findViewById(R.id.mapView);
         mapView.onCreate(savedInstanceState);
         mapView.getMapAsync(this);
+        addHomeClickListener();
     }
     @Override
     public void onMapReady(@NonNull MapboxMap mapboxMap) {
         this.mapboxMap = mapboxMap;
-        mapboxMap.setStyle(Style.LIGHT, new Style.OnStyleLoaded() {
+        mapboxMap.setStyle(Style.OUTDOORS, new Style.OnStyleLoaded() {
             @Override
             public void onStyleLoaded(@NonNull Style style) {
                 enableLocationComponent(style);
             }
         });
+        mapboxMap.getUiSettings().setCompassMargins(0,560,20,0);
     }
 
     @SuppressWarnings( {"MissingPermission"})
@@ -87,7 +97,7 @@ public class DishesMapListScreen extends AppCompatActivity implements OnMapReady
 // Create and customize the LocationComponent's options
             LocationComponentOptions customLocationComponentOptions = LocationComponentOptions.builder(this)
                     .elevation(5)
-                    .accuracyAlpha(0.2f)
+                    .accuracyAlpha(.2f)
                     .accuracyColor(Color.RED)
                     .pulseEnabled(true)
 //                    .foregroundDrawable(com.mapbox.mapboxsdk.R.drawable.mapbox_info_bg_selector)
@@ -108,7 +118,7 @@ public class DishesMapListScreen extends AppCompatActivity implements OnMapReady
             locationComponent.setLocationComponentEnabled(true);
 
             // Set the component's camera mode
-            locationComponent.setCameraMode(CameraMode.TRACKING);
+            locationComponent.setCameraMode(CameraMode.TRACKING_GPS_NORTH);
 
             // Set the component's render mode
             locationComponent.setRenderMode(RenderMode.COMPASS);
@@ -119,15 +129,16 @@ public class DishesMapListScreen extends AppCompatActivity implements OnMapReady
             // Add the camera tracking listener. Fires if the map camera is manually moved.
             locationComponent.addOnCameraTrackingChangedListener(this);
 
+
+
             findViewById(R.id.mapView).setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
                     if (!isInTrackingMode) {
                         isInTrackingMode = true;
                         locationComponent.setCameraMode(CameraMode.TRACKING);
-                        locationComponent.zoomWhileTracking(11f);
-//                        Toast.makeText(this,
-//                                Toast.LENGTH_SHORT).show();
+                        locationComponent.zoomWhileTracking(16f);
+                        Toast.makeText(getBaseContext(), "???", Toast.LENGTH_SHORT).show();
                     } else {
 //                        Toast.makeText(this, "xxxxx",
 //                                Toast.LENGTH_SHORT).show();
@@ -227,5 +238,20 @@ public class DishesMapListScreen extends AppCompatActivity implements OnMapReady
     public void onLowMemory() {
         super.onLowMemory();
         mapView.onLowMemory();
+    }
+
+    private void addHomeClickListener() {
+        homeFab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                CameraPosition position = new CameraPosition.Builder()
+                        .target(new LatLng(locationComponent.getLastKnownLocation().getLatitude(), locationComponent.getLastKnownLocation().getLongitude()))
+                        .zoom(15)
+//                        .bearing(180)
+//                        .tilt(30)
+                        .build();
+                mapboxMap.animateCamera(CameraUpdateFactory.newCameraPosition(position), 3000);
+            }
+        });
     }
 }
