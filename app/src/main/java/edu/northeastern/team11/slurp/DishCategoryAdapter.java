@@ -15,6 +15,7 @@ import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.List;
+import java.util.Locale;
 
 import edu.northeastern.team11.R;
 
@@ -40,7 +41,7 @@ public class DishCategoryAdapter extends RecyclerView.Adapter<DishCategoryViewHo
         String categoryUrl = dishCategoryList.get(position).getCategoryUrl();
         String categoryLabel = dishCategoryList.get(position).getCategoryName();
         BackgroundThread thread = new BackgroundThread(holder, categoryUrl, categoryLabel);
-        holder.dishCategoryLabel.setText(categoryLabel);
+        holder.dishCategoryLabel.setText(categoryLabel.toUpperCase(Locale.ROOT));
         thread.start();
         holder.itemView.setOnClickListener(view -> {
             Context context = view.getContext();
