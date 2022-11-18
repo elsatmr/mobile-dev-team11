@@ -6,6 +6,8 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 
+import edu.northeastern.team11.slurp.MainSlurpActivity;
+
 public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -19,6 +21,11 @@ public class MainActivity extends AppCompatActivity {
 
     public void openStickersActivity(View view) {
         Intent intent = new Intent(this, StickersMainActivity.class);
+        startActivity(intent);
+    }
+
+    public void openSlurpActivity(View view) {
+        Intent intent = new Intent(this, MainSlurpActivity.class);
         startActivity(intent);
     }
 
