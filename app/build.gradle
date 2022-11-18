@@ -68,10 +68,12 @@ dependencies {
     implementation 'com.google.firebase:firebase-analytics'
 
     // MapBox
-    implementation 'com.mapbox.maps:android:10.9.1'
-    implementation("com.google.android.gms:play-services-location:18.0.0")
-
-    implementation 'androidx.work:work-runtime:2.7.1'
+    implementation 'com.mapbox.mapboxsdk:mapbox-android-sdk:9.7.1'
+    implementation 'com.mapbox.mapboxsdk:mapbox-android-core:5.0.2'
+    implementation 'com.mapbox.mapboxsdk:mapbox-sdk-geojson:6.9.0'
+    implementation 'com.mapbox.mapboxsdk:mapbox-sdk-services:6.9.0'
+    implementation 'com.mapbox.mapboxsdk:mapbox-sdk-turf:6.9.0'
+    implementation 'com.mapbox.mapboxsdk:mapbox-sdk-core:6.9.0'
 
     // dependencies for other firebase products
 //    implementation 'com.google.firebase:firebase-auth'
