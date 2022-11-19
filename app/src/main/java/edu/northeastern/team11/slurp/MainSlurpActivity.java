@@ -54,4 +54,5 @@ public class MainSlurpActivity extends AppCompatActivity {
         fragmentTransaction.replace(R.id.flFragment, fragment);
         fragmentTransaction.commit();
     }
+
 }

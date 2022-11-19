@@ -26,8 +26,8 @@ android {
         }
     }
     buildFeatures {
-        viewBinding true
-        dataBinding true
+        viewBinding = true
+        dataBinding = true
     }
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
@@ -62,22 +62,32 @@ dependencies {
     // dependency for image loading
 //    implementation 'com.squareup.picasso:picasso:2.71828'
 
-    implementation 'com.google.firebase:firebase-database'
 
-    // import firebase BoM
-    implementation platform('com.google.firebase:firebase-bom:31.0.2')
-    // Add the dependency for the Realtime Database library
+    // Firebase
     implementation 'com.google.firebase:firebase-database'
-    // Add the dependency for the Cloud Storage library
+    implementation platform('com.google.firebase:firebase-bom:31.0.2')
+    implementation 'com.google.firebase:firebase-database'
     implementation 'com.google.firebase:firebase-storage'
 
     // firebase SDK for google analytics
     implementation 'com.google.firebase:firebase-analytics'
 
+    // Navigation
+    implementation "androidx.navigation:navigation-fragment:2.5.3"
+    implementation "androidx.navigation:navigation-ui:2.5.3"
+
     implementation 'androidx.work:work-runtime:2.7.1'
 
     //material ui dependencies
     implementation 'com.google.android.material:material:1.7.0'
+
+    //MapBox
+    implementation 'com.mapbox.mapboxsdk:mapbox-android-sdk:9.7.1'
+    implementation 'com.mapbox.mapboxsdk:mapbox-android-core:5.0.2'
+    implementation 'com.mapbox.mapboxsdk:mapbox-sdk-geojson:6.9.0'
+    implementation 'com.mapbox.mapboxsdk:mapbox-sdk-services:6.9.0'
+    implementation 'com.mapbox.mapboxsdk:mapbox-sdk-turf:6.9.0'
+    implementation 'com.mapbox.mapboxsdk:mapbox-sdk-core:6.9.0'
 
     // dependencies for other firebase products
 //    implementation 'com.google.firebase:firebase-auth'

@@ -1,13 +1,19 @@
 package edu.northeastern.team11.slurp;
 
+import android.app.Activity;
+import android.app.FragmentManager;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.FragmentController;
+import androidx.fragment.app.FragmentTransaction;
 import androidx.recyclerview.widget.RecyclerView;
 
 import java.io.IOException;
@@ -16,13 +22,16 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.List;
 import java.util.Locale;
+import java.util.function.Function;
 
+import edu.northeastern.team11.HomeFragment;
 import edu.northeastern.team11.R;
 
-public class DishCategoryAdapter extends RecyclerView.Adapter<DishCategoryViewHolder>{
+public class DishCategoryAdapter extends RecyclerView.Adapter<DishCategoryViewHolder> {
 
     private final List<DishCategoryItem> dishCategoryList;
     private final Context context;
+    edu.northeastern.team11.databinding.SlurpActivityMainBinding binding;
 
     public DishCategoryAdapter(List<DishCategoryItem> dishCategoryList, Context context) {
         this.dishCategoryList = dishCategoryList;
@@ -46,9 +55,10 @@ public class DishCategoryAdapter extends RecyclerView.Adapter<DishCategoryViewHo
         holder.itemView.setOnClickListener(view -> {
             Context context = view.getContext();
             String dishCategoryId = String.valueOf(position);
-//            Intent intent = new Intent(context, DishesMapListScreen.class);
-//            intent.putExtra("category", "Cuisine "+dishCategoryId);
-//            context.startActivity(intent);
+            AppCompatActivity activity = (AppCompatActivity) view.getContext();
+            Bundle bundle = new Bundle();
+            bundle.putString("category", categoryLabel);
+            activity.getSupportFragmentManager().beginTransaction().replace(R.id.flFragment, DishMapFragment.class, bundle).commit();
         });
     }
 
