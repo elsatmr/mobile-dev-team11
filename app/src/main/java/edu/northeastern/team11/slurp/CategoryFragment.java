@@ -1,12 +1,16 @@
 package edu.northeastern.team11.slurp;
 
+import android.annotation.SuppressLint;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 import edu.northeastern.team11.R;
 
@@ -57,10 +61,23 @@ public class CategoryFragment extends Fragment {
         }
     }
 
+    @SuppressLint("SetTextI18n")
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.slurp_fragment_category, container, false);
+        View view = inflater.inflate(R.layout.slurp_fragment_category, container, false);
+        String userName = getCurUserCategoryFrag();
+        Log.i("test", userName);
+        TextView tv = (TextView) view.findViewById(R.id.category_frag_user);
+        tv.setText("CATEGORY FRAG, Current User: " + userName);
+
+        return view;
+    }
+
+    // get the current user from shared preferences
+    private String getCurUserCategoryFrag() {
+        SharedPreferences sharedPreferences = getActivity().getSharedPreferences("settings", 0);
+        return sharedPreferences.getString("username", null);
     }
 }
