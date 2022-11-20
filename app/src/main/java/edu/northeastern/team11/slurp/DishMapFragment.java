@@ -109,7 +109,6 @@ public class DishMapFragment extends Fragment implements OnMapReadyCallback, OnL
 
             // Get an instance of the component
             locationComponent = mapboxMap.getLocationComponent();
-
             LocationComponentActivationOptions locationComponentActivationOptions =
                     LocationComponentActivationOptions.builder(getContext(), loadedMapStyle)
                             .locationComponentOptions(customLocationComponentOptions)
