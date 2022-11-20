@@ -6,7 +6,10 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 
+
+import edu.northeastern.team11.slurp.CurrentUserActivity;
 import edu.northeastern.team11.slurp.MainSlurpActivity;
+import edu.northeastern.team11.slurp.SlurpSignUpActivity;
 
 public class MainActivity extends AppCompatActivity {
     @Override
@@ -25,7 +28,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void openSlurpActivity(View view) {
-        Intent intent = new Intent(this, MainSlurpActivity.class);
+        Intent intent = new Intent(this, CurrentUserActivity.class);
         startActivity(intent);
     }
 
