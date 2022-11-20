@@ -25,7 +25,7 @@ public class MainSlurpActivity extends AppCompatActivity {
         binding = SlurpActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
         setCurrentFragment(new HomeFragment());
-
+        getSupportActionBar().hide();
         binding.bottomNavigationView.setOnItemSelectedListener(item -> {
             switch (item.getItemId()) {
                 case R.id.homeMenuItem:

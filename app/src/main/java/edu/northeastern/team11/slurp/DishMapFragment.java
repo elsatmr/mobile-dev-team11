@@ -1,7 +1,12 @@
 package edu.northeastern.team11.slurp;
 
+import android.annotation.SuppressLint;
+import android.content.Intent;
 import android.graphics.Color;
+import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -9,6 +14,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
@@ -21,6 +27,7 @@ import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.location.LocationComponent;
 import com.mapbox.mapboxsdk.location.LocationComponentActivationOptions;
 import com.mapbox.mapboxsdk.location.LocationComponentOptions;
+import com.mapbox.mapboxsdk.location.LocationUpdate;
 import com.mapbox.mapboxsdk.location.OnCameraTrackingChangedListener;
 import com.mapbox.mapboxsdk.location.OnLocationClickListener;
 import com.mapbox.mapboxsdk.location.modes.CameraMode;
@@ -72,7 +79,6 @@ public class DishMapFragment extends Fragment implements OnMapReadyCallback, OnL
         mapView = view.findViewById(R.id.mapView);
         mapView.onCreate(savedInstanceState);
         mapView.getMapAsync(this);
-        addHomeClickListener();
         return view;
     }
     @Override
@@ -101,33 +107,25 @@ public class DishMapFragment extends Fragment implements OnMapReadyCallback, OnL
 //                    .foregroundDrawable(com.mapbox.mapboxsdk.R.drawable.mapbox_info_bg_selector)
                     .build();
 
-// Get an instance of the component
+            // Get an instance of the component
             locationComponent = mapboxMap.getLocationComponent();
 
             LocationComponentActivationOptions locationComponentActivationOptions =
                     LocationComponentActivationOptions.builder(getContext(), loadedMapStyle)
                             .locationComponentOptions(customLocationComponentOptions)
                             .build();
-
             // Activate with options
             locationComponent.activateLocationComponent(locationComponentActivationOptions);
-
             // Enable to make component visible
             locationComponent.setLocationComponentEnabled(true);
-
             // Set the component's camera mode
             locationComponent.setCameraMode(CameraMode.TRACKING_GPS_NORTH);
-
             // Set the component's render mode
             locationComponent.setRenderMode(RenderMode.COMPASS);
-
             // Add the location icon click listener
             locationComponent.addOnLocationClickListener(this);
-
             // Add the camera tracking listener. Fires if the map camera is manually moved.
             locationComponent.addOnCameraTrackingChangedListener(this);
-
-
 
             getView().findViewById(R.id.mapView).setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -143,10 +141,12 @@ public class DishMapFragment extends Fragment implements OnMapReadyCallback, OnL
                     }
                 }
             });
+            addHomeClickListener();
 
         } else {
             permissionsManager = new PermissionsManager(this);
             permissionsManager.requestLocationPermissions(getActivity());
+            enableLocationComponent(loadedMapStyle);
         }
     }
 
@@ -178,21 +178,21 @@ public class DishMapFragment extends Fragment implements OnMapReadyCallback, OnL
 
     @Override
     public void onExplanationNeeded(List<String> permissionsToExplain) {
-        Toast.makeText(getContext(), "Need permissions!", Toast.LENGTH_LONG).show();
+        Toast.makeText(getContext(), "Need permissions!", Toast.LENGTH_SHORT).show();
     }
 
     @Override
     public void onPermissionResult(boolean granted) {
         if (granted) {
-            mapboxMap.getStyle(new Style.OnStyleLoaded() {
+            mapboxMap.setStyle(Style.OUTDOORS, new Style.OnStyleLoaded() {
                 @Override
                 public void onStyleLoaded(@NonNull Style style) {
                     enableLocationComponent(style);
                 }
             });
+
         } else {
             Toast.makeText(getContext(), "permissions denied", Toast.LENGTH_LONG).show();
-
         }
     }
 
