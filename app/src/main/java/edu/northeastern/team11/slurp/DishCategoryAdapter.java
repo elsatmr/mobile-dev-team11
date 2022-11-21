@@ -58,7 +58,7 @@ public class DishCategoryAdapter extends RecyclerView.Adapter<DishCategoryViewHo
             AppCompatActivity activity = (AppCompatActivity) view.getContext();
             Bundle bundle = new Bundle();
             bundle.putString("category", categoryLabel);
-            activity.getSupportFragmentManager().beginTransaction().replace(R.id.flFragment, DishMapFragment.class, bundle).commit();
+            activity.getSupportFragmentManager().beginTransaction().replace(R.id.flFragment, SubcategoryFragment.class, bundle).commit();
         });
     }
 

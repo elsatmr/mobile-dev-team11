@@ -45,7 +45,10 @@ public class DishMapFragment extends Fragment implements OnMapReadyCallback, OnL
 
 
     private String category;
+    private String subcategory;
     private TextView categoryTextView;
+    private TextView categoryLabel;
+    private TextView subcategoryLabel;
     FloatingActionButton homeFab;
     MapView mapView;
     MapboxMap mapboxMap;
@@ -53,6 +56,7 @@ public class DishMapFragment extends Fragment implements OnMapReadyCallback, OnL
     private boolean isInTrackingMode;
     PermissionsManager permissionsManager;
     PermissionsListener permissionsListener;
+
 
     public DishMapFragment() {
         // Required empty public constructor
@@ -63,6 +67,7 @@ public class DishMapFragment extends Fragment implements OnMapReadyCallback, OnL
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
             category = getArguments().getString("category");
+            subcategory = getArguments().getString("subcategory");
         }
 
     }
@@ -74,6 +79,10 @@ public class DishMapFragment extends Fragment implements OnMapReadyCallback, OnL
         Mapbox.getInstance(getContext(), getString(R.string.mapbox_access_token));
         View view = inflater.inflate(R.layout.slurp_fragment_dishes_maplist, container, false);
         categoryTextView = view.findViewById(R.id.categoryLabel);
+        categoryLabel = view.findViewById(R.id.categoryValue);
+        categoryLabel.setText(category);
+        subcategoryLabel = view.findViewById(R.id.dishValue);
+        subcategoryLabel.setText(subcategory);
         categoryTextView.setText(category.toUpperCase());
         homeFab = view.findViewById(R.id.homeFab);
         mapView = view.findViewById(R.id.mapView);
@@ -153,7 +162,7 @@ public class DishMapFragment extends Fragment implements OnMapReadyCallback, OnL
     @Override
     public void onLocationComponentClick() {
         if (locationComponent.getLastKnownLocation() != null) {
-            Toast.makeText(getContext(), String.format("Location: ",
+            Toast.makeText(getContext(), String.format("Latitude: %.2f\nLongitude: %.2f",
                     locationComponent.getLastKnownLocation().getLatitude(),
                     locationComponent.getLastKnownLocation().getLongitude()), Toast.LENGTH_LONG).show();
         }
@@ -191,6 +200,7 @@ public class DishMapFragment extends Fragment implements OnMapReadyCallback, OnL
             });
 
         } else {
+
             Toast.makeText(getContext(), "permissions denied", Toast.LENGTH_LONG).show();
         }
     }
