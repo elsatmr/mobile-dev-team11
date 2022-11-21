@@ -102,12 +102,12 @@ public class CategoryFragment extends Fragment {
     // Get the cuisines from the database
     // USING STICKERS AS PLACEHOLDER!
     private void getCuisines() {
-        db.child("category").addValueEventListener(new ValueEventListener() {
+        db.child("categoryTest").addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 dishCategoryList.clear();
                 for (DataSnapshot dish : snapshot.getChildren()) {
-                    String url = dish.getValue(String.class);
+                    String url = dish.child("imageUrl").getValue(String.class);
                     String label = dish.getKey();
                     DishCategoryItem dishCategoryItem = new DishCategoryItem(label, url);
                     dishCategoryList.add(dishCategoryItem);
