@@ -1,5 +1,6 @@
 package edu.northeastern.team11.slurp;
 
+import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
@@ -33,7 +34,7 @@ public class MainSlurpActivity extends AppCompatActivity {
         binding = SlurpActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
         setCurrentFragment(new HomeFragment());
-
+        getSupportActionBar().hide();
 
 
 

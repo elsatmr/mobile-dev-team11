@@ -1,8 +1,10 @@
 package edu.northeastern.team11.slurp;
 
+import android.content.Context;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -20,6 +22,7 @@ import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 import edu.northeastern.team11.R;
 
@@ -28,16 +31,9 @@ import edu.northeastern.team11.R;
  * Use the {@link CategoryFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class CategoryFragment extends Fragment {
+public class SubcategoryFragment extends Fragment {
 
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
-
-    // TODO: Rename and change types of parameters
-    private String mParam1;
-    private String mParam2;
+    private String category;
 
     // USED VARIABLES
     DatabaseReference db;
@@ -45,34 +41,16 @@ public class CategoryFragment extends Fragment {
     DishCategoryAdapter adapter;
     List<DishCategoryItem> dishCategoryList;
 
-    public CategoryFragment() {
+    public SubcategoryFragment() {
         // Required empty public constructor
     }
 
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
-     * @return A new instance of fragment CategoryFragment.
-     */
-    // TODO: Rename and change types and number of parameters
-    public static CategoryFragment newInstance(String param1, String param2) {
-        CategoryFragment fragment = new CategoryFragment();
-        Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
-        fragment.setArguments(args);
-        return fragment;
-    }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
+            category = getArguments().getString("category");
         }
     }
 
@@ -80,7 +58,7 @@ public class CategoryFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        View view = inflater.inflate(R.layout.slurp_fragment_category, container, false);
+        View view = inflater.inflate(R.layout.slurp_fragment_subcategory, container, false);
 
         // Firebase - get Stickers as placeholder
         db = FirebaseDatabase.getInstance().getReference();
@@ -88,11 +66,30 @@ public class CategoryFragment extends Fragment {
 
         // Add recycler view for Categories
         dishCategoryList = new ArrayList<>();
-        recyclerView = view.findViewById(R.id.dishCategoryRecycler);
-        adapter = new DishCategoryAdapter(dishCategoryList, view.getContext());
+        recyclerView = view.findViewById(R.id.dishSubcategoryRecycler);
+
+        adapter = new DishCategoryAdapter(dishCategoryList, view.getContext()) {
+            @Override
+            public void onBindViewHolder(@NonNull DishCategoryViewHolder holder, int position) {
+                String categoryUrl = dishCategoryList.get(position).getCategoryUrl();
+                String dish = dishCategoryList.get(position).getCategoryName();
+                BackgroundThread thread = new BackgroundThread(holder, categoryUrl, category);
+                holder.dishCategoryLabel.setText(dish.toUpperCase(Locale.ROOT));
+                thread.start();
+                holder.itemView.setOnClickListener(view -> {
+                    Context context = view.getContext();
+                    String dishCategoryId = String.valueOf(position);
+                    AppCompatActivity activity = (AppCompatActivity) view.getContext();
+                    Bundle bundle = new Bundle();
+                    bundle.putString("category", category);
+                    bundle.putString("subcategory", dishCategoryList.get(position).getCategoryName());
+                    activity.getSupportFragmentManager().beginTransaction().replace(R.id.flFragment, DishMapFragment.class, bundle).commit();
+                });
+            }
+        };
         recyclerView.setHasFixedSize(true);
         recyclerView.setLayoutManager(new StaggeredGridLayoutManager(
-                2, StaggeredGridLayoutManager.VERTICAL));
+                1, StaggeredGridLayoutManager.VERTICAL));
         recyclerView.setAdapter(adapter);
 
         // Have to return the view
@@ -102,12 +99,12 @@ public class CategoryFragment extends Fragment {
     // Get the cuisines from the database
     // USING STICKERS AS PLACEHOLDER!
     private void getCuisines() {
-        db.child("categoryTest").addValueEventListener(new ValueEventListener() {
+        db.child("categoryTest").child(category).child("dishes").addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 dishCategoryList.clear();
                 for (DataSnapshot dish : snapshot.getChildren()) {
-                    String url = dish.child("imageUrl").getValue(String.class);
+                    String url = dish.getValue(String.class);
                     String label = dish.getKey();
                     DishCategoryItem dishCategoryItem = new DishCategoryItem(label, url);
                     dishCategoryList.add(dishCategoryItem);
