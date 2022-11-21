@@ -10,6 +10,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -38,6 +39,7 @@ import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
 import com.mapbox.mapboxsdk.maps.Style;
 
 import java.util.List;
+import java.util.Objects;
 
 import edu.northeastern.team11.R;
 
@@ -46,8 +48,9 @@ public class DishMapFragment extends Fragment implements OnMapReadyCallback, OnL
 
     private String category;
     private String subcategory;
-    private TextView categoryTextView;
     private TextView categoryLabel;
+    private ImageButton categoryButton;
+    private ImageButton subcategoryButton;
     private TextView subcategoryLabel;
     FloatingActionButton homeFab;
     MapView mapView;
@@ -78,12 +81,13 @@ public class DishMapFragment extends Fragment implements OnMapReadyCallback, OnL
         // Inflate the layout for this fragment
         Mapbox.getInstance(getContext(), getString(R.string.mapbox_access_token));
         View view = inflater.inflate(R.layout.slurp_fragment_dishes_maplist, container, false);
-        categoryTextView = view.findViewById(R.id.categoryLabel);
         categoryLabel = view.findViewById(R.id.categoryValue);
         categoryLabel.setText(category);
         subcategoryLabel = view.findViewById(R.id.dishValue);
         subcategoryLabel.setText(subcategory);
-        categoryTextView.setText(category.toUpperCase());
+        categoryButton = view.findViewById(R.id.categoryButton);
+        subcategoryButton = view.findViewById(R.id.dishButton);
+        addButtonListeners();
         homeFab = view.findViewById(R.id.homeFab);
         mapView = view.findViewById(R.id.mapView);
         mapView.onCreate(savedInstanceState);
@@ -260,6 +264,40 @@ public class DishMapFragment extends Fragment implements OnMapReadyCallback, OnL
                 mapboxMap.animateCamera(CameraUpdateFactory.newCameraPosition(position), 3000);
             }
         });
+    }
+
+    // Display the category recycler view so the user can select the category
+    private void displayCategories() {
+        getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.flFragment, CategoryFragment.class, null).commit();
+    }
+
+    // Display the subcategory recyclerview so the user can select the dish/subcategory
+    private void displaySubcategories() {
+        Bundle bundle = new Bundle();
+        bundle.putString("category", category);
+        getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.flFragment, SubcategoryFragment.class, bundle).commit();
+    }
+
+    // Add listeners to the category and dish buttons on the UI
+    private void addButtonListeners() {
+        View.OnClickListener categorySelectListener = new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                displayCategories();
+                Log.d("Should be =", "select category fragment");
+            }
+        };
+        categoryLabel.setOnClickListener(categorySelectListener);
+        categoryButton.setOnClickListener(categorySelectListener);
+        View.OnClickListener subcategorySelectListener = new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                displaySubcategories();
+                Log.d("Should be =", "select SUBcategory fragment");
+            }
+        };
+        subcategoryButton.setOnClickListener(subcategorySelectListener);
+        subcategoryLabel.setOnClickListener(subcategorySelectListener);
     }
 
 }
