@@ -67,8 +67,8 @@ public class SearchUserFragment extends Fragment {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.slurp_fragment_search_user, container, false);
         String userName = getCurUserSearchUserFrag();
-        TextView tv = (TextView) view.findViewById(R.id.searchUser_frag_user);
-        tv.setText("SEARCH USER FRAG, Current User: " + userName);
+//        TextView tv = (TextView) view.findViewById(R.id.searchUser_frag_user);
+//        tv.setText("SEARCH USER FRAG, Current User: " + userName);
 
         return view;
     }
