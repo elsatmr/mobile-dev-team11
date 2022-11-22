@@ -116,15 +116,17 @@ public class SearchUserFragment extends Fragment {
                     if (task.isSuccessful() && task.getResult().getValue() != null) {
                         // username exists
                         Log.d("here", String.valueOf(task.getResult().getKey()));
+                        errMsg.setVisibility(View.INVISIBLE);
                     } else {
                         // searched username does not exist
                         Log.d("error getting data: ", String.valueOf(task.getException()));
+                        errMsg.setVisibility(View.VISIBLE);
                     }
                 } else {
-                    Log.d("error","EditText username is empty" );
+                    Log.d("error","EditText username is empty");
                 }
+            }
 
-                }
         });
     }
 
