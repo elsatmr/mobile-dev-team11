@@ -3,10 +3,11 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="200dp"
-    app:cardCornerRadius="16dp"
-    app:cardElevation="8dp"
-    app:cardUseCompatPadding="true">
+    android:layout_height="125dp"
+    android:layout_margin="5dp"
+    app:cardCornerRadius="10dp"
+    app:cardElevation="4dp"
+    app:cardUseCompatPadding="false">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
@@ -14,9 +15,12 @@
 
         <ImageView
             android:id="@+id/restDishImageView"
-            android:layout_width="match_parent"
+            android:layout_width="120dp"
             android:layout_height="0dp"
-            app:layout_constraintBottom_toTopOf="@+id/restNameTextView"
+            android:layout_marginTop="2dp"
+            android:layout_marginBottom="2dp"
+            android:scaleType="fitCenter"
+            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
@@ -24,11 +28,82 @@
             android:id="@+id/restNameTextView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="categoryLabelText"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="4dp"
+            android:text="Joe's Italian Bistro"
             android:textAlignment="center"
+            android:textColor="#00092C"
             android:textStyle="bold"
-            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/restDishImageView"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/addressText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:text="123 Main Derby Street, 4A"
+            app:layout_constraintStart_toStartOf="@+id/restNameTextView"
+            app:layout_constraintTop_toBottomOf="@+id/restNameTextView" />
+
+        <TextView
+            android:id="@+id/cityText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="2dp"
+            android:text="Leominster"
+            app:layout_constraintStart_toStartOf="@+id/addressText"
+            app:layout_constraintTop_toBottomOf="@+id/addressText" />
+
+        <TextView
+            android:id="@+id/cityText3"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="4dp"
+            android:text="MA"
+            app:layout_constraintStart_toEndOf="@+id/cityText"
+            app:layout_constraintTop_toBottomOf="@+id/addressText" />
+
+        <TextView
+            android:id="@+id/cityText4"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="4dp"
+            android:text="01453"
+            app:layout_constraintStart_toEndOf="@+id/cityText3"
+            app:layout_constraintTop_toBottomOf="@+id/addressText" />
+
+        <com.google.android.material.chip.Chip
+            android:id="@+id/chipReviewCount"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="5dp"
+            android:backgroundTint="#005F63"
+            android:text="Reviews: 23"
+            android:textColor="#FFFFFF"
+            android:textSize="12sp"
+            android:visibility="visible"
+            app:chipMinHeight="28dp"
+            app:layout_constraintEnd_toStartOf="@+id/chipSlurpScore"
+            app:layout_constraintTop_toTopOf="@+id/chipSlurpScore" />
+
+        <com.google.android.material.chip.Chip
+            android:id="@+id/chipSlurpScore"
+            style="@style/Widget.MaterialComponents.Chip.Choice"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="-3dp"
+            android:layout_marginEnd="5dp"
+            android:backgroundTint="#4A0E9F"
+            android:text="Score: 4.6"
+            android:textColor="#FFFFFF"
+            android:textSize="12sp"
+            android:visibility="visible"
+            app:chipMinHeight="28dp"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent" />
+            app:layout_constraintTop_toBottomOf="@+id/cityText3" />
+
     </androidx.constraintlayout.widget.ConstraintLayout>
 </androidx.cardview.widget.CardView>
