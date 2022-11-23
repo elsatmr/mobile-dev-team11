@@ -56,7 +56,7 @@
             app:layout_constraintTop_toBottomOf="@+id/addressText" />
 
         <TextView
-            android:id="@+id/cityText3"
+            android:id="@+id/stateText"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
@@ -66,13 +66,13 @@
             app:layout_constraintTop_toBottomOf="@+id/addressText" />
 
         <TextView
-            android:id="@+id/cityText4"
+            android:id="@+id/zipText"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
             android:layout_marginTop="4dp"
             android:text="01453"
-            app:layout_constraintStart_toEndOf="@+id/cityText3"
+            app:layout_constraintStart_toEndOf="@+id/stateText"
             app:layout_constraintTop_toBottomOf="@+id/addressText" />
 
         <com.google.android.material.chip.Chip
@@ -103,7 +103,7 @@
             android:visibility="visible"
             app:chipMinHeight="28dp"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/cityText3" />
+            app:layout_constraintTop_toBottomOf="@+id/stateText" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </androidx.cardview.widget.CardView>

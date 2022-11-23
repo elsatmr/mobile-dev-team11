@@ -47,10 +47,23 @@ public class RestaurantDishAdapter extends RecyclerView.Adapter<RestaurantDishVi
 
     @Override
     public void onBindViewHolder(@NonNull RestaurantDishViewHolder holder, int position) {
-        String imageUrl = restDishList.get(position).getRestImageUrl();
-        String restName = restDishList.get(position).getRestName();
+        RestaurantDish r1 = restDishList.get(position);
+        String imageUrl = r1.getRestImageUrl();
+        String restName = r1.getRestName();
+        String street = r1.getStreet();
+        String city = r1.getCity();
+        String state = r1.getState();
+        String zip = r1.getZip();
+        String reviewCount = String.valueOf(r1.getReviewCount());
+        String score = String.valueOf(r1.getSlurpScore());
         BackgroundThread thread = new BackgroundThread(holder, imageUrl, restName);
         holder.restNameTextView.setText(restName);
+        holder.streetText.setText(street);
+        holder.cityText.setText(city);
+        holder.stateText.setText(state);
+        holder.zipText.setText(zip);
+        holder.reviewCount.setText("Reviews: " + reviewCount);
+        holder.slurpScore.setText("Score: " + score);
         thread.start();
 //        holder.itemView.setOnClickListener(view -> {
 //            AppCompatActivity activity = (AppCompatActivity) view.getContext();

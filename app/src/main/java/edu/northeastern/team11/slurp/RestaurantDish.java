@@ -9,16 +9,16 @@ public class RestaurantDish {
     private String city;
     private String state;
     private String zip;
-    private Long latitude;
-    private Long longitude;
-    private Long slurpScore;
+    private Float latitude;
+    private Float longitude;
+    private Float slurpScore;
     private Integer reviewCount;
     private String restImageUrl;
 
     public RestaurantDish(){}
 
 
-    public RestaurantDish(String restName, String dishName, String category, String street, String city, String state, String zip, Long latitude, Long longitude, Long slurpScore, Integer reviewCount, String restImageUrl) {
+    public RestaurantDish(String restName, String dishName, String category, String street, String city, String state, String zip, Float latitude, Float longitude, Float slurpScore, Integer reviewCount, String restImageUrl) {
         this.restName = restName;
         this.dishName = dishName;
         this.category = category;
@@ -35,7 +35,7 @@ public class RestaurantDish {
 
     // Add a review and adjust the slurpScore and reviewCount
     public void addReview(long newScore){
-        long updatedScore = (getSlurpScore() * getReviewCount() + newScore) / (getReviewCount() + 1);
+        Float updatedScore = (getSlurpScore() * getReviewCount() + newScore) / (getReviewCount() + 1);
         setSlurpScore(updatedScore);
         setReviewCount(getReviewCount() + 1);
     }
@@ -96,27 +96,27 @@ public class RestaurantDish {
         this.zip = zip;
     }
 
-    public Long getLatitude() {
+    public Float getLatitude() {
         return latitude;
     }
 
-    public void setLatitude(long latitude) {
+    public void setLatitude(Float latitude) {
         this.latitude = latitude;
     }
 
-    public Long getLongitude() {
+    public Float getLongitude() {
         return longitude;
     }
 
-    public void setLongitude(long longitude) {
+    public void setLongitude(Float longitude) {
         this.longitude = longitude;
     }
 
-    public Long getSlurpScore() {
+    public Float getSlurpScore() {
         return slurpScore;
     }
 
-    public void setSlurpScore(long slurpScore) {
+    public void setSlurpScore(Float slurpScore) {
         this.slurpScore = slurpScore;
     }
 

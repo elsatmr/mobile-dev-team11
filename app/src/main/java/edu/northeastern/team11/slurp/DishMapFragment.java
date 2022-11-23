@@ -349,10 +349,11 @@ public class DishMapFragment extends Fragment implements OnMapReadyCallback, OnL
                         String _state = restDish.child("state").getValue(String.class);
                         String _zip = restDish.child("zip").getValue(String.class);
                         String _restName = restDish.child("name").getValue(String.class);
-                        Long _lat = restDish.child("lat").getValue(Long.class);
-                        Long _long = restDish.child("long").getValue(Long.class);
-                        Long _slurpScore = restDish.child("dishes").child("slurpScore").getValue(Long.class);
-                        Integer _reviewCount = restDish.child("dishes").child("reviewCount").getValue(Integer.class);
+                        Float _lat = restDish.child("lat").getValue(Float.class);
+                        Float _long = restDish.child("long").getValue(Float.class);
+                        Float _slurpScore = restDish.child("dishes").child(subcategory).child("slurpScore").getValue(Float.class);
+                        Log.d("slurpScore", _slurpScore.toString());
+                        Integer _reviewCount = restDish.child("dishes").child(subcategory).child("reviewCount").getValue(Integer.class);
                         String _restImageUrl = restDish.child("imageUrl").getValue(String.class);
                         RestaurantDish newRestDish = new RestaurantDish(_restName, subcategory, category, _street, _city, _state, _zip, _lat, _long, _slurpScore, _reviewCount, _restImageUrl);
                         restDishList.add(newRestDish);
