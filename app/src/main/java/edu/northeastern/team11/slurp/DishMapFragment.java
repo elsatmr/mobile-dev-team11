@@ -113,7 +113,7 @@ public class DishMapFragment extends Fragment implements OnMapReadyCallback, OnL
                 1, StaggeredGridLayoutManager.VERTICAL));
         restDishRecycler.setAdapter(adapter);
         return view;
-        //
+
     }
     @Override
     public void onMapReady(@NonNull MapboxMap mapboxMap) {
