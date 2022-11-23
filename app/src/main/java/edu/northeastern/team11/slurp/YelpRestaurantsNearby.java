@@ -34,13 +34,13 @@ import retrofit2.converter.gson.GsonConverterFactory;
 // Helper class that queries Yelp Fusion API to get a list of nearby restaurants within a 500 meter radius
 public class YelpRestaurantsNearby {
 
-    private static YelpAPI yelpAPI;
-    private static List<Restaurant> restaurantList;
-    private static Long myLatitude;
-    private static Long myLongitude;
-    private static Long searchRadius;
-    private static Context context;
-    private static FusedLocationProviderClient fusedLocationClient;
+    private YelpAPI yelpAPI;
+    private List<Restaurant> restaurantList;
+    private Long myLatitude;
+    private Long myLongitude;
+    private Long searchRadius;
+    private Context context;
+    private FusedLocationProviderClient fusedLocationClient;
 
     public YelpRestaurantsNearby(Context c) {
         this.restaurantList = new ArrayList<>();
@@ -55,7 +55,7 @@ public class YelpRestaurantsNearby {
     }
 
     // Get permissions if needed and then query Yelp Fusion -> populates restaurantList
-    public static void getNearbyRestaurants() {
+    public void getNearbyRestaurants() {
         // Check if permissions are enabled
         if (ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             // Request permissions
@@ -81,7 +81,7 @@ public class YelpRestaurantsNearby {
     }
 
     // GET request from API
-    private static void requestRestaurantsFromAPI(Long latitude, Long longitude, Long radius) {
+    private void requestRestaurantsFromAPI(Long latitude, Long longitude, Long radius) {
         Call<JsonElement> call = yelpAPI.getRestaurants(String.valueOf(latitude), String.valueOf(longitude), String.valueOf(radius));
         call.enqueue(new Callback<JsonElement>() {
             @Override
@@ -130,8 +130,16 @@ public class YelpRestaurantsNearby {
         });
     }
 
-    public static List<Restaurant> getRestaurantList() {
+    public List<Restaurant> getRestaurantList() {
         return restaurantList;
+    }
+
+    public void printRestaurants() {
+        final int[] counter = {0};
+        restaurantList.forEach(d -> {
+            Log.d(String.valueOf(counter[0]), d.getName());
+            counter[0] += 1;
+        });
     }
 
 }

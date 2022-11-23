@@ -112,6 +112,9 @@ public class DishMapFragment extends Fragment implements OnMapReadyCallback, OnL
         restDishRecycler.setLayoutManager(new StaggeredGridLayoutManager(
                 1, StaggeredGridLayoutManager.VERTICAL));
         restDishRecycler.setAdapter(adapter);
+//        YelpRestaurantsNearby testRests = new YelpRestaurantsNearby(getContext());
+//        testRests.getRestaurantList();
+//        testRests.printRestaurants();
         return view;
     }
     @Override
