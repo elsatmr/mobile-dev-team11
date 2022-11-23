@@ -8,6 +8,7 @@ import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.View;
 import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
@@ -31,6 +32,7 @@ public class RestaurantDishAdapter extends RecyclerView.Adapter<RestaurantDishVi
 
     private final List<RestaurantDish> restDishList;
     private final Context context;
+    ViewGroup parentView;
     edu.northeastern.team11.databinding.SlurpActivityMainBinding binding;
 
     public RestaurantDishAdapter(List<RestaurantDish> restDishList, Context context) {
@@ -42,6 +44,7 @@ public class RestaurantDishAdapter extends RecyclerView.Adapter<RestaurantDishVi
     @NonNull
     @Override
     public RestaurantDishViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        parentView = parent;
         return new RestaurantDishViewHolder(LayoutInflater.from(context).inflate(R.layout.slurp_restaurant_dish_viewholder, parent, false));
     }
 
@@ -63,7 +66,8 @@ public class RestaurantDishAdapter extends RecyclerView.Adapter<RestaurantDishVi
         holder.stateText.setText(state);
         holder.zipText.setText(zip);
         holder.reviewCount.setText("Reviews: " + reviewCount);
-        holder.slurpScore.setText("Score: " + score);
+        String dishName = r1.getDishName();
+        holder.slurpScore.setText(dishName + " score: " + score);
         thread.start();
 //        holder.itemView.setOnClickListener(view -> {
 //            AppCompatActivity activity = (AppCompatActivity) view.getContext();
