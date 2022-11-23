@@ -71,6 +71,7 @@ public class DishMapFragment extends Fragment implements OnMapReadyCallback, OnL
     private List<RestaurantDish> restDishList;
     private RecyclerView restDishRecycler;
     private RestaurantDishAdapter adapter;
+    List<Restaurant> restList;
 
     public DishMapFragment() {
         // Required empty public constructor
@@ -112,6 +113,11 @@ public class DishMapFragment extends Fragment implements OnMapReadyCallback, OnL
         restDishRecycler.setLayoutManager(new StaggeredGridLayoutManager(
                 1, StaggeredGridLayoutManager.VERTICAL));
         restDishRecycler.setAdapter(adapter);
+
+        YelpRestaurants rest = new YelpRestaurants(getContext());
+        restList = rest.getNearbyRestaurants();
+
+
         return view;
 
     }
@@ -186,6 +192,13 @@ public class DishMapFragment extends Fragment implements OnMapReadyCallback, OnL
     @SuppressWarnings( {"MissingPermission"})
     @Override
     public void onLocationComponentClick() {
+
+        // TESTING THE YELP API CALL!!!!!!
+        restList.forEach(d -> {
+            Log.d("restzzz", d.getName());
+        });
+        // END OF TEST
+
         if (locationComponent.getLastKnownLocation() != null) {
             Toast.makeText(getContext(), String.format("Latitude: %.2f\nLongitude: %.2f",
                     locationComponent.getLastKnownLocation().getLatitude(),
