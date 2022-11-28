@@ -6,7 +6,6 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
-import androidx.cardview.widget.CardView;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.recyclerview.widget.StaggeredGridLayoutManager;
@@ -15,6 +14,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -28,8 +28,10 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 import edu.northeastern.team11.R;
 
@@ -49,8 +51,10 @@ public class SearchUserFragment extends Fragment {
     RecyclerView rv;
     UsersAdapter adapter;
     private List<UsersItem> usersList;
+    private List<UsersItem> usersListCopy;
     EditText userSearched;
     TextView errMsg;
+    TextView suggestedUsersMsg;
     Button searchButton;
     String curUser;
 
@@ -106,9 +110,12 @@ public class SearchUserFragment extends Fragment {
         searchButton = view.findViewById(R.id.search_for_user_button);
         errMsg = view.findViewById(R.id.search_user_error_msg);
         errMsg.setVisibility(View.INVISIBLE);
+        suggestedUsersMsg = view.findViewById(R.id.suggested_users_tv);
+
 
         // set up recyclerView to initially include all users in db
         usersList = new ArrayList<>();
+        usersListCopy = new ArrayList<>();
         rv = view.findViewById(R.id.users_rv);
         adapter = new UsersAdapter(usersList, view.getContext());
         rv.setHasFixedSize(true);
@@ -120,7 +127,11 @@ public class SearchUserFragment extends Fragment {
         searchButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                findUser();
+                // hide keyboard
+                InputMethodManager imm = (InputMethodManager)getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
+                imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
+                // search for user
+                findUser(view);
             }
         });
 
@@ -129,7 +140,7 @@ public class SearchUserFragment extends Fragment {
 
 
 
-    // get all users from the db and add to usersList
+    // get all users and initially display them as suggested users
     private void getAllUsers(View view) {
         db.child("users_slurp").addValueEventListener(new ValueEventListener() {
             @SuppressLint("NotifyDataSetChanged")
@@ -145,6 +156,9 @@ public class SearchUserFragment extends Fragment {
                 }
                 Log.i("userList size: ", String.valueOf(usersList.size()));
                 adapter.notifyDataSetChanged();
+                // make copy
+                usersListCopy.addAll(usersList);
+                Log.i("usersListCopy: ", String.valueOf(usersListCopy.size()));
             }
 
             @Override
@@ -155,7 +169,7 @@ public class SearchUserFragment extends Fragment {
     }
 
     // update recyclerView to only show the user that was searched for
-    private void findUser() {
+    private void findUser(View view) {
         db.child("users_slurp").child(userSearched.getText().toString().trim()).get().addOnCompleteListener(new OnCompleteListener<DataSnapshot>() {
             @Override
             public void onComplete(@NonNull Task<DataSnapshot> task) {
@@ -165,10 +179,27 @@ public class SearchUserFragment extends Fragment {
                         Log.d("here", String.valueOf(task.getResult().getKey()));
                         errMsg.setVisibility(View.INVISIBLE);
 
+                        usersList.clear();
+                        String userName = String.valueOf(task.getResult().getKey());
+                        Button addFriendButton = view.findViewById(R.id.add_friend_button);
+                        UsersItem searchedUser = new UsersItem(userName, addFriendButton);
+                        usersList.add(searchedUser);
+                        adapter.notifyDataSetChanged();
+
+                        suggestedUsersMsg.setVisibility(View.INVISIBLE);
+
+
                     } else {
                         // username does not exist
                         Log.d("error getting data: ", String.valueOf(task.getException()));
                         errMsg.setVisibility(View.VISIBLE);
+                        usersList.clear();
+                        usersList.addAll(usersListCopy);
+                        Log.i("userListCopy: ", String.valueOf(usersListCopy.size()));
+                        adapter.notifyDataSetChanged();
+
+                        suggestedUsersMsg.setVisibility(View.VISIBLE);
+
                     }
                 } else {
                     Log.d("error","EditText username is empty");
