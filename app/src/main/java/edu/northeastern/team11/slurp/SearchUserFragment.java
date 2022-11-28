@@ -99,6 +99,8 @@ public class SearchUserFragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.slurp_fragment_search_user, container, false);
+
+        // get the user that is logged in
         curUser = getCurUserSearchUserFrag();
 
         // get reference to the db
@@ -112,8 +114,7 @@ public class SearchUserFragment extends Fragment {
         errMsg.setVisibility(View.INVISIBLE);
         suggestedUsersMsg = view.findViewById(R.id.suggested_users_tv);
 
-
-        // set up recyclerView to initially include all users in db
+        // set up recyclerView logic
         usersList = new ArrayList<>();
         usersListCopy = new ArrayList<>();
         rv = view.findViewById(R.id.users_rv);
@@ -121,7 +122,6 @@ public class SearchUserFragment extends Fragment {
         rv.setHasFixedSize(true);
         rv.setLayoutManager(new StaggeredGridLayoutManager(1, StaggeredGridLayoutManager.VERTICAL));
         rv.setAdapter(adapter);
-
 
         // search database for the username input
         searchButton.setOnClickListener(new View.OnClickListener() {
@@ -140,7 +140,7 @@ public class SearchUserFragment extends Fragment {
 
 
 
-    // get all users and initially display them as suggested users
+    // set up recyclerView to initially include all users in db as "Suggested Users"
     private void getAllUsers(View view) {
         db.child("users_slurp").addValueEventListener(new ValueEventListener() {
             @SuppressLint("NotifyDataSetChanged")
@@ -148,6 +148,7 @@ public class SearchUserFragment extends Fragment {
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 for (DataSnapshot user : snapshot.getChildren()) {
                     String username = user.getKey();
+                    // don't add the logged in user to the usersList
                     if (!Objects.equals(username, curUser)) {
                         Button addFriendButton = view.findViewById(R.id.add_friend_button);
                         UsersItem userItem = new UsersItem(username, addFriendButton);
@@ -156,7 +157,7 @@ public class SearchUserFragment extends Fragment {
                 }
                 Log.i("userList size: ", String.valueOf(usersList.size()));
                 adapter.notifyDataSetChanged();
-                // make copy
+                // make a copy to keep track of the suggested users
                 usersListCopy.addAll(usersList);
                 Log.i("usersListCopy: ", String.valueOf(usersListCopy.size()));
             }
@@ -171,6 +172,7 @@ public class SearchUserFragment extends Fragment {
     // update recyclerView to only show the user that was searched for
     private void findUser(View view) {
         db.child("users_slurp").child(userSearched.getText().toString().trim()).get().addOnCompleteListener(new OnCompleteListener<DataSnapshot>() {
+            @SuppressLint("NotifyDataSetChanged")
             @Override
             public void onComplete(@NonNull Task<DataSnapshot> task) {
                 if (userSearched.getText().toString().length()!= 0) {
@@ -179,6 +181,7 @@ public class SearchUserFragment extends Fragment {
                         Log.d("here", String.valueOf(task.getResult().getKey()));
                         errMsg.setVisibility(View.INVISIBLE);
 
+                        // update recyclerView to only display the user that was searched for
                         usersList.clear();
                         String userName = String.valueOf(task.getResult().getKey());
                         Button addFriendButton = view.findViewById(R.id.add_friend_button);
@@ -193,20 +196,26 @@ public class SearchUserFragment extends Fragment {
                         // username does not exist
                         Log.d("error getting data: ", String.valueOf(task.getException()));
                         errMsg.setVisibility(View.VISIBLE);
-                        usersList.clear();
-                        usersList.addAll(usersListCopy);
-                        Log.i("userListCopy: ", String.valueOf(usersListCopy.size()));
-                        adapter.notifyDataSetChanged();
-
-                        suggestedUsersMsg.setVisibility(View.VISIBLE);
+                        suggestUsers();
 
                     }
                 } else {
                     Log.d("error","EditText username is empty");
+                    suggestUsers();
                 }
             }
 
         });
+    }
+
+    // update recyclerView to display the suggested users
+    @SuppressLint("NotifyDataSetChanged")
+    private void suggestUsers() {
+        usersList.clear();
+        usersList.addAll(usersListCopy);
+        Log.i("userListCopy: ", String.valueOf(usersListCopy.size()));
+        adapter.notifyDataSetChanged();
+        suggestedUsersMsg.setVisibility(View.VISIBLE);
     }
 
 
