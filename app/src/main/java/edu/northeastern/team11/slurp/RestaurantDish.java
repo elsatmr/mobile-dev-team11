@@ -1,7 +1,10 @@
 package edu.northeastern.team11.slurp;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
 // Represents a dish at a restaurant with an aggregate reviewCount and Slurper score
-public class RestaurantDish {
+public class RestaurantDish implements Parcelable {
     private String restName;
     private String dishName;
     private String category;
@@ -136,4 +139,13 @@ public class RestaurantDish {
         this.restImageUrl = restImageUrl;
     }
 
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel parcel, int i) {
+
+    }
 }

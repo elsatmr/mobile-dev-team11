@@ -10,18 +10,18 @@
         android:layout_width="0dp"
         android:layout_height="200dp"
         android:scaleType="centerCrop"
+        android:tint="#80000000"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        android:tint="#C1000000"
         tools:srcCompat="@tools:sample/avatars" />
 
     <TextView
         android:id="@+id/restaurantNameTextView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
+        android:layout_marginTop="10dp"
         android:letterSpacing="0.25"
         android:text="restaurant name"
         android:textAlignment="center"
@@ -61,7 +61,7 @@
         android:id="@+id/reviewsChip"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
+        android:layout_marginTop="10dp"
         android:layout_marginEnd="12dp"
         android:backgroundTint="#FF9595"
         android:text="Reviews: 23"
@@ -110,7 +110,7 @@
         android:id="@+id/cityNameTextView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="123 South Main Terrace"
+        android:text="Leominster"
         android:textColor="#ECECEC"
         tools:layout_editor_absoluteX="49dp"
         tools:layout_editor_absoluteY="333dp" />
@@ -125,5 +125,15 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/streetTextView" />
+
+    <TextView
+        android:id="@+id/textView11"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginBottom="16dp"
+        android:text="Highest Rated Dish at Joe's:"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

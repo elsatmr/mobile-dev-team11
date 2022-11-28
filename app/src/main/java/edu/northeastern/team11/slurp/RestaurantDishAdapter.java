@@ -6,6 +6,7 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -19,6 +20,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.Serializable;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.List;
@@ -69,12 +71,13 @@ public class RestaurantDishAdapter extends RecyclerView.Adapter<RestaurantDishVi
         String dishName = r1.getDishName();
         holder.slurpScore.setText(dishName + " score: " + score);
         thread.start();
-//        holder.itemView.setOnClickListener(view -> {
-//            AppCompatActivity activity = (AppCompatActivity) view.getContext();
-//            Bundle bundle = new Bundle();
-//            bundle.putString("category", categoryLabel);
-//            activity.getSupportFragmentManager().beginTransaction().replace(R.id.flFragment, SubcategoryFragment.class, bundle).commit();
-//        });
+        holder.itemView.setOnClickListener(view -> {
+            AppCompatActivity activity = (AppCompatActivity) view.getContext();
+            Bundle bundle = new Bundle();
+
+            bundle.putParcelable("restDish", (Parcelable) r1);
+            activity.getSupportFragmentManager().beginTransaction().replace(R.id.flFragment, RestaurantDishFragment.class, bundle).commit();
+        });
     }
 
 
