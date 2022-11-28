@@ -1,12 +1,15 @@
 package edu.northeastern.team11.slurp;
 
 import android.annotation.SuppressLint;
+import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.cardview.widget.CardView;
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.RecyclerView;
+import androidx.recyclerview.widget.StaggeredGridLayoutManager;
 
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -24,6 +27,10 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+
 import edu.northeastern.team11.R;
 
 /**
@@ -39,10 +46,12 @@ public class SearchUserFragment extends Fragment {
     private static final String ARG_PARAM2 = "param2";
 
     DatabaseReference db;
+    RecyclerView rv;
+    UsersAdapter adapter;
+    private List<UsersItem> usersList;
     EditText userSearched;
     TextView errMsg;
     Button searchButton;
-    CardView cardView;
     String curUser;
 
     // TODO: Rename and change types of parameters
@@ -87,15 +96,27 @@ public class SearchUserFragment extends Fragment {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.slurp_fragment_search_user, container, false);
         curUser = getCurUserSearchUserFrag();
-//        TextView tv = (TextView) view.findViewById(R.id.searchUser_frag_user);
-//        tv.setText("SEARCH USER FRAG, Current User: " + userName);
 
+        // get reference to the db
+        db = FirebaseDatabase.getInstance().getReference();
+        getAllUsers(view);
+
+        // get ui elements
         userSearched = view.findViewById(R.id.search_username_et);
         searchButton = view.findViewById(R.id.search_for_user_button);
-        cardView = view.findViewById(R.id.user_cardView);
         errMsg = view.findViewById(R.id.search_user_error_msg);
         errMsg.setVisibility(View.INVISIBLE);
 
+        // set up recyclerView to initially include all users in db
+        usersList = new ArrayList<>();
+        rv = view.findViewById(R.id.users_rv);
+        adapter = new UsersAdapter(usersList, view.getContext());
+        rv.setHasFixedSize(true);
+        rv.setLayoutManager(new StaggeredGridLayoutManager(1, StaggeredGridLayoutManager.VERTICAL));
+        rv.setAdapter(adapter);
+
+
+        // search database for the username input
         searchButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -106,10 +127,36 @@ public class SearchUserFragment extends Fragment {
         return view;
     }
 
-    private void findUser() {
-        db = FirebaseDatabase.getInstance().getReference();
 
-        db.child("users_slurp").child(userSearched.getText().toString()).get().addOnCompleteListener(new OnCompleteListener<DataSnapshot>() {
+
+    // get all users from the db and add to usersList
+    private void getAllUsers(View view) {
+        db.child("users_slurp").addValueEventListener(new ValueEventListener() {
+            @SuppressLint("NotifyDataSetChanged")
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                for (DataSnapshot user : snapshot.getChildren()) {
+                    String username = user.getKey();
+                    if (!Objects.equals(username, curUser)) {
+                        Button addFriendButton = view.findViewById(R.id.add_friend_button);
+                        UsersItem userItem = new UsersItem(username, addFriendButton);
+                        usersList.add(userItem);
+                    }
+                }
+                Log.i("userList size: ", String.valueOf(usersList.size()));
+                adapter.notifyDataSetChanged();
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+    }
+
+    // update recyclerView to only show the user that was searched for
+    private void findUser() {
+        db.child("users_slurp").child(userSearched.getText().toString().trim()).get().addOnCompleteListener(new OnCompleteListener<DataSnapshot>() {
             @Override
             public void onComplete(@NonNull Task<DataSnapshot> task) {
                 if (userSearched.getText().toString().length()!= 0) {
@@ -117,8 +164,9 @@ public class SearchUserFragment extends Fragment {
                         // username exists
                         Log.d("here", String.valueOf(task.getResult().getKey()));
                         errMsg.setVisibility(View.INVISIBLE);
+
                     } else {
-                        // searched username does not exist
+                        // username does not exist
                         Log.d("error getting data: ", String.valueOf(task.getException()));
                         errMsg.setVisibility(View.VISIBLE);
                     }
@@ -136,4 +184,5 @@ public class SearchUserFragment extends Fragment {
         SharedPreferences sharedPreferences = getActivity().getSharedPreferences("settings", 0);
         return sharedPreferences.getString("username", null);
     }
+
 }

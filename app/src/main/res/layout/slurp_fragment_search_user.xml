@@ -61,15 +61,84 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@id/search_for_user_button"
-        app:layout_constraintBottom_toTopOf="@id/user_cardView"
-         />
+        app:layout_constraintBottom_toTopOf="@id/suggested_users_tv"
 
-    <androidx.cardview.widget.CardView
-        android:id="@+id/user_cardView"
-        android:layout_width="match_parent"
+        />
+    <TextView
+        android:id="@+id/suggested_users_tv"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:text="Suggested Users:"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@id/search_user_error_msg"
+        app:layout_constraintBottom_toTopOf="@id/users_rv"
         />
+
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/users_rv"
+        android:layout_width="match_parent"
+        android:layout_height="470dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/suggested_users_tv"
+        app:spanCount="1" />
+
+<!--        app:layout_constraintBottom_toTopOf="@id/searched_result_tv"-->
+
+
+
+
+<!--    <TextView-->
+<!--        android:id="@+id/searched_result_tv"-->
+<!--        android:layout_width="wrap_content"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:layout_marginTop="68dp"-->
+
+<!--        android:text="username here"-->
+<!--        app:layout_constraintEnd_toEndOf="@id/add_friend_button"-->
+<!--        app:layout_constraintStart_toStartOf="parent"-->
+
+<!--        app:layout_constraintTop_toBottomOf="@id/search_user_error_msg" />-->
+
+<!--    <Button-->
+<!--        android:id="@+id/add_friend_button"-->
+<!--        android:layout_width="125dp"-->
+<!--        android:layout_height="40dp"-->
+<!--        android:layout_marginTop="68dp"-->
+<!--        android:text="Add Friend"-->
+<!--        app:layout_constraintEnd_toEndOf="parent"-->
+<!--        app:layout_constraintStart_toEndOf="@id/searched_result_tv"-->
+<!--        app:layout_constraintTop_toBottomOf="@id/search_user_error_msg"-->
+
+<!--      />-->
+
+
+
+    <!--    <androidx.cardview.widget.CardView-->
+<!--        android:id="@+id/user_cardView"-->
+<!--        android:layout_width="match_parent"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        app:layout_constraintStart_toStartOf="parent"-->
+<!--        app:layout_constraintEnd_toEndOf="parent"-->
+<!--        app:layout_constraintTop_toBottomOf="@id/search_user_error_msg" >-->
+<!--        <TextView-->
+<!--            android:id="@+id/user_result_tv"-->
+<!--            android:layout_width="match_parent"-->
+<!--            android:layout_height="match_parent"-->
+<!--            android:text="username here"-->
+<!--            app:layout_constraintStart_toStartOf="parent"-->
+<!--            app:layout_constraintEnd_toEndOf="parent"-->
+<!--            app:layout_constraintTop_toBottomOf="parent"-->
+<!--            app:layout_constraintBottom_toTopOf="@id/add_friend_button"-->
+<!--            />-->
+<!--        <Button-->
+<!--            android:id="@+id/add_friend_button"-->
+<!--            android:layout_width="match_parent"-->
+<!--            android:layout_height="match_parent"-->
+<!--            android:text="Add Friend"-->
+<!--            app:layout_constraintTop_toBottomOf="@id/user_result_tv"-->
+<!--            />-->
+
 </androidx.constraintlayout.widget.ConstraintLayout>
