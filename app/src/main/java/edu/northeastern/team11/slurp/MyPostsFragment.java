@@ -5,6 +5,7 @@ import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.recyclerview.widget.StaggeredGridLayoutManager;
 
@@ -108,7 +109,7 @@ public class MyPostsFragment extends Fragment {
 
         postRecyclerView = view.findViewById(R.id.posts_recycler_view);
         postRecyclerView.setHasFixedSize(true);
-        postRecyclerView.setLayoutManager(new StaggeredGridLayoutManager(3, StaggeredGridLayoutManager.VERTICAL));
+        postRecyclerView.setLayoutManager(new GridLayoutManager(getActivity(), 3));
         adapter = new PostAdapter(dishesList, getActivity());
         postRecyclerView.setAdapter(adapter);
 
