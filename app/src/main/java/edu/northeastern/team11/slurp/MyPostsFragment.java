@@ -98,7 +98,6 @@ public class MyPostsFragment extends Fragment {
                 }
                 Log.d("SIZEEE", String.valueOf(dishesList.size()));
                 adapter.notifyDataSetChanged();
-//                setProperHeightOfView();
             }
 
             @Override
@@ -121,21 +120,6 @@ public class MyPostsFragment extends Fragment {
         return sharedPreferences.getString("username", null);
     }
 
-//    @Override
-//    public void onResume() {
-//        super.onResume();
-//        setProperHeightOfView();
-//    }
-//
-//    private void setProperHeightOfView() {
-//        View layoutView = getView().findViewById(R.id.slurpMyPostsFragment);
-//        if (layoutView!=null) {
-//            ViewGroup.LayoutParams layoutParams = layoutView.getLayoutParams();
-//            if (layoutParams!=null) {
-//                layoutParams.height = ViewGroup.LayoutParams.WRAP_CONTENT;
-//                layoutView.requestLayout();
-//            }
-//        }
-//    }
+
 
 }
