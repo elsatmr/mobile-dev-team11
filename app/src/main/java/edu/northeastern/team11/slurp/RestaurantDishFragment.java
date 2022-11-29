@@ -13,6 +13,7 @@ import android.widget.TextView;
 import androidx.fragment.app.Fragment;
 
 import com.google.android.material.chip.Chip;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -32,6 +33,7 @@ public class RestaurantDishFragment extends Fragment {
     Chip reviewCount;
     Chip slurpScore;
     ImageView restImageView;
+    FloatingActionButton goBackFAB;
 
     public RestaurantDishFragment() {
         // Required empty public constructor
@@ -59,6 +61,13 @@ public class RestaurantDishFragment extends Fragment {
         reviewCount = view.findViewById(R.id.reviewsChip);
         slurpScore = view.findViewById(R.id.scoreChip);
         restImageView = view.findViewById(R.id.restaurantImageView);
+        goBackFAB = view.findViewById(R.id.restDishGoBackFAB);
+        goBackFAB.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                goBack();
+            }
+        });
         if (restDish != null) {
             restName.setText(restDish.getRestName());
             dishName.setText(restDish.getDishName());
@@ -107,5 +116,11 @@ public class RestaurantDishFragment extends Fragment {
         }
     }
 
+    public void goBack(){
+        Bundle bundle = new Bundle();
+        bundle.putString("category", restDish.getCategory());
+        bundle.putString("subcategory", restDish.getDishName());
+        getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.flFragment, DishMapFragment.class, bundle).commit();
+    }
 
 }
