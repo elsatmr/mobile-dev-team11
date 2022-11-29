@@ -39,6 +39,7 @@ public class PostAdapter extends RecyclerView.Adapter<PostViewHolder> {
     public void onBindViewHolder(@NonNull PostViewHolder holder, int position) {
         Dish currDish = dishesList.get(position);
         String url = currDish.getImageUrl();
+        Log.d("URL", url);
         BackgroundThread thread = new BackgroundThread(holder, url);
         thread.start();
     }

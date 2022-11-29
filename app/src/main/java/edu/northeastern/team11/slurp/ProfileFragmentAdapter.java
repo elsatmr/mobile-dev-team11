@@ -23,52 +23,19 @@ public class ProfileFragmentAdapter extends FragmentStateAdapter {
     @Override
     public Fragment createFragment(int position) {
         switch (position) {
-            case 0:
-                Log.d("FRAGMENT 0", "POSTS");
-                return new UserFavoritedFragment();
             case 1:
-                Log.d("FRAGMENT 1", "FAVORITE");
                 return new UserFavoritedFragment();
             case 2:
-                Log.d("FRAGMENT 2", "REWARD");
                 return new SlurperRewardFragment();
             default:
-                return new UserFavoritedFragment();
+                return new MyPostsFragment();
         }
     }
 
     @Override
     public int getItemCount() {
-        return 0;
+        return 3;
     }
-//    private List<Fragment> fragmentList = new ArrayList<>();
-//    private List<String> titleList = new ArrayList<>();
-//
-//    public ProfileFragmentAdapter(@NonNull FragmentManager fm) {
-//        super(fm);
-//    }
-//
-//    @NonNull
-//    @Override
-//    public Fragment getItem(int position) {
-//        return fragmentList.get(position);
-//    }
-//
-//    @Override
-//    public int getCount() {
-//        return fragmentList.size();
-//    }
-//
-//    @Nullable
-//    @Override
-//    public CharSequence getPageTitle(int position) {
-//        return titleList.get(position);
-//    }
-//
-//    public void addFragment(Fragment fragment, String title) {
-//        fragmentList.add(fragment);
-//        titleList.add(title);
-//    }
 
 
 }

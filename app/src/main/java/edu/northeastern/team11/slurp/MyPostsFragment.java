@@ -8,6 +8,7 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.recyclerview.widget.StaggeredGridLayoutManager;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -83,17 +84,21 @@ public class MyPostsFragment extends Fragment {
         firebaseDb = FirebaseDatabase.getInstance();
         dbRef = firebaseDb.getReferenceFromUrl("https://stickers-19c0f-default-rtdb.firebaseio.com/");
         String username = this.getCurUserProfileFrag();
+        dishesList = new ArrayList<>();
         dbRef.child("slurpPosts").addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 dishesList.clear();
+
                 for (DataSnapshot s : snapshot.getChildren()) {
                     Dish dish = s.getValue(Dish.class);
-                    if (dish.getUserName() == username) {
+                    if (dish.getUserName().equals(username)) {
                         dishesList.add(dish);
                     }
                 }
+                Log.d("SIZEEE", String.valueOf(dishesList.size()));
                 adapter.notifyDataSetChanged();
+//                setProperHeightOfView();
             }
 
             @Override
@@ -101,9 +106,11 @@ public class MyPostsFragment extends Fragment {
 
             }
         });
+
         postRecyclerView = view.findViewById(R.id.posts_recycler_view);
-        postRecyclerView.setLayoutManager(new StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL));
-        adapter = new PostAdapter(dishesList, view.getContext());
+        postRecyclerView.setHasFixedSize(true);
+        postRecyclerView.setLayoutManager(new StaggeredGridLayoutManager(3, StaggeredGridLayoutManager.VERTICAL));
+        adapter = new PostAdapter(dishesList, getActivity());
         postRecyclerView.setAdapter(adapter);
 
         return view;
@@ -113,4 +120,22 @@ public class MyPostsFragment extends Fragment {
         SharedPreferences sharedPreferences = getActivity().getSharedPreferences("settings", 0);
         return sharedPreferences.getString("username", null);
     }
+
+//    @Override
+//    public void onResume() {
+//        super.onResume();
+//        setProperHeightOfView();
+//    }
+//
+//    private void setProperHeightOfView() {
+//        View layoutView = getView().findViewById(R.id.slurpMyPostsFragment);
+//        if (layoutView!=null) {
+//            ViewGroup.LayoutParams layoutParams = layoutView.getLayoutParams();
+//            if (layoutParams!=null) {
+//                layoutParams.height = ViewGroup.LayoutParams.WRAP_CONTENT;
+//                layoutView.requestLayout();
+//            }
+//        }
+//    }
+
 }

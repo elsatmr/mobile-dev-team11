@@ -3,12 +3,12 @@ package edu.northeastern.team11.slurp;
 public class Dish {
     private String dishName;
     private String imageUrl;
-    private String restaurantId;
-    private String slurpScore;
-    private int timestamp;
+    private long restaurantId;
+    private long slurpScore;
+    private long timestamp;
     private String userName;
 
-    public Dish(String dishName, String imageUrl, String restaurantId, String slurpScore, int timestamp, String userName) {
+    public Dish(String dishName, String imageUrl, long restaurantId, long slurpScore, long timestamp, String userName) {
         this.dishName = dishName;
         this.imageUrl = imageUrl;
         this.restaurantId = restaurantId;
@@ -27,15 +27,15 @@ public class Dish {
         return imageUrl;
     }
 
-    public String getRestaurantId() {
+    public long getRestaurantId() {
         return restaurantId;
     }
 
-    public String getSlurpScore() {
+    public long getSlurpScore() {
         return slurpScore;
     }
 
-    public int getTimestamp() {
+    public long getTimestamp() {
         return timestamp;
     }
 
