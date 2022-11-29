@@ -15,9 +15,11 @@ public class Restaurant {
     private Long longitude;
 
 
+
     public String getId() {
         return id;
     }
+
 
     public Restaurant(String name, String street, String city, String state, String zip, String phone, String imageUrl, String id, Long latitude, Long longitude) {
         this.name = name;
@@ -30,6 +32,7 @@ public class Restaurant {
         this.id = id;
         this.latitude = latitude;
         this.longitude = longitude;
+
     }
 
 

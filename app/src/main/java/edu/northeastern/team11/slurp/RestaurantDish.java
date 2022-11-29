@@ -6,6 +6,7 @@ import android.os.Parcelable;
 // Represents a dish at a restaurant with an aggregate reviewCount and Slurper score
 public class RestaurantDish implements Parcelable {
     private String restName;
+    private String restaurantId;
     private String dishName;
     private String category;
     private String street;
@@ -21,8 +22,21 @@ public class RestaurantDish implements Parcelable {
     public RestaurantDish(){}
 
 
-    public RestaurantDish(String restName, String dishName, String category, String street, String city, String state, String zip, Float latitude, Float longitude, Float slurpScore, Integer reviewCount, String restImageUrl) {
+    public String getRestaurantId() {
+        return restaurantId;
+    }
+
+    public void setRestaurantId(String restaurantId) {
+        this.restaurantId = restaurantId;
+    }
+
+    public void setReviewCount(Integer reviewCount) {
+        this.reviewCount = reviewCount;
+    }
+
+    public RestaurantDish(String restName, String restaurantId, String dishName, String category, String street, String city, String state, String zip, Float latitude, Float longitude, Float slurpScore, Integer reviewCount, String restImageUrl) {
         this.restName = restName;
+        this.restaurantId = restaurantId;
         this.dishName = dishName;
         this.category = category;
         this.street = street;
