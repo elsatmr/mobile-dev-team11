@@ -20,6 +20,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.google.android.material.tabs.TabLayout;
+import com.google.android.material.tabs.TabLayoutMediator;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -31,6 +32,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.Arrays;
+import java.util.List;
 
 import edu.northeastern.team11.FoodViewHolder;
 import edu.northeastern.team11.R;
@@ -132,10 +135,14 @@ public class ProfileFragment extends Fragment {
     }
 
     private void manageTabLayout() {
+        List<String> tabTitles = Arrays.asList("My Posts", "Favorites", "Slurper Award");
         tabLayout = view.findViewById(R.id.userProfileTabLayout);
         viewPager = view.findViewById(R.id.profile_viewpager);
         ProfileFragmentAdapter profileFragmentAdapter = new ProfileFragmentAdapter(this);
         viewPager.setAdapter(profileFragmentAdapter);
+        new TabLayoutMediator(tabLayout, viewPager,
+                (tab, position) -> tab.setText(tabTitles.get(position))
+        ).attach();
         tabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
             @Override
             public void onTabSelected(TabLayout.Tab tab) {
