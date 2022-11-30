@@ -5,7 +5,10 @@ import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,6 +18,9 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import edu.northeastern.team11.R;
 
@@ -37,6 +43,9 @@ public class MyFriendsFragment extends Fragment {
     //Variable
     private DatabaseReference dbRef;
     private FirebaseDatabase firebaseDb;
+    RecyclerView myFriendsRecyclerView;
+    ArrayList<String> friendList;
+    MyFriendsAdapter myFriendsAdapter;
 
     public MyFriendsFragment() {
         // Required empty public constructor
@@ -72,16 +81,21 @@ public class MyFriendsFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_user_favorited, container, false);
+        View view = inflater.inflate(R.layout.fragment_my_friends, container, false);
         String username = this.getCurUserProfileFrag();
+        friendList = new ArrayList<>();
         firebaseDb = FirebaseDatabase.getInstance();
         dbRef = firebaseDb.getReferenceFromUrl("https://stickers-19c0f-default-rtdb.firebaseio.com/");
+        myFriendsRecyclerView = view.findViewById(R.id.myFriends_recycler_view);
         dbRef.child("users_slurp").child(username).child("friends").addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
+                friendList.clear();
                 for (DataSnapshot s : snapshot.getChildren()) {
-                    String friend = String.valueOf(s.getValue());
+                    String friend = String.valueOf(s.getKey());
+                    friendList.add(friend);
                 }
+                myFriendsAdapter.notifyDataSetChanged();
             }
 
             @Override
@@ -89,7 +103,10 @@ public class MyFriendsFragment extends Fragment {
 
             }
         });
-
+        myFriendsAdapter = new MyFriendsAdapter(friendList, getActivity());
+        myFriendsRecyclerView.setAdapter(myFriendsAdapter);
+        myFriendsRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
+        myFriendsRecyclerView.setHasFixedSize(true);
         return view;
     }
 

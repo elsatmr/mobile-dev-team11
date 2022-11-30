@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="100dp"
+    app:cardCornerRadius="16dp"
+    app:cardElevation="4dp"
+    app:cardUseCompatPadding="true">>
+
+    <TextView
+        android:id="@+id/myFriendsTextView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:text="FRIEND"
+        android:textSize="18dp"
+        android:gravity="center"/>
+
+</androidx.cardview.widget.CardView>
