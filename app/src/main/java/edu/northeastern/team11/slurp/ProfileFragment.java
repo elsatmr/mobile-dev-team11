@@ -135,7 +135,7 @@ public class ProfileFragment extends Fragment {
     }
 
     private void manageTabLayout() {
-        List<String> tabTitles = Arrays.asList("My Posts", "Favorites", "Slurper Award");
+        List<String> tabTitles = Arrays.asList("My Posts", "My Friends", "Slurper Award");
         tabLayout = view.findViewById(R.id.userProfileTabLayout);
         viewPager = view.findViewById(R.id.profile_viewpager);
         ProfileFragmentAdapter profileFragmentAdapter = new ProfileFragmentAdapter(this);
