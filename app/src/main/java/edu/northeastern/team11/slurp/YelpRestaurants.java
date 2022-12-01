@@ -46,10 +46,10 @@ public class YelpRestaurants {
     private Context context;
     private FusedLocationProviderClient fusedLocationClient;
 
-    public YelpRestaurants (Context c) {
+    public YelpRestaurants(Context c) {
         this.restaurantList = new ArrayList<>();
 
-        // Define Interceptor and add authentication header
+        // Define Interceptor and add authentication header - needed for YELP API authentication
         Interceptor interceptor = new Interceptor() {
             @Override
             public okhttp3.Response intercept(Chain chain) throws IOException {
@@ -79,30 +79,30 @@ public class YelpRestaurants {
     public List<Restaurant> getNearbyRestaurants() {
         // Check if permissions are enabled
         if (ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            // Request permissions
-            ActivityCompat.requestPermissions((Activity) context, new String[]{
-                    Manifest.permission.ACCESS_FINE_LOCATION,
-                    Manifest.permission.ACCESS_BACKGROUND_LOCATION
-            }, 1223);
-            return null;
-        }
-        fusedLocationClient.getLastLocation()
-                .addOnSuccessListener((Activity) context, new OnSuccessListener<Location>() {
-                    @Override
-                    public void onSuccess(Location location) {
-                        // Got last known location. In some rare situations this can be null.
-                        if (location != null) {
-                            myLatitude = location.getLatitude();
-                            myLongitude = location.getLongitude();
-                            requestRestaurantsFromAPI(myLatitude, myLongitude, searchRadius);
-                        } else {
-                            Log.d("Location is", String.valueOf(location.getLongitude()));
-                        }
+            // Dont have location permissions - return empty List
+            Log.d("Yelp Restaurants", "Don't have location permissions");
+            return new ArrayList<>();
+        } else {
+            fusedLocationClient.getLastLocation()
+                    .addOnSuccessListener((Activity) context, new OnSuccessListener<Location>() {
+                        @Override
+                        public void onSuccess(Location location) {
+                            // Got last known location. In some rare situations this can be null.
+                            if (location != null) {
+                                myLatitude = location.getLatitude();
+                                myLongitude = location.getLongitude();
+                                requestRestaurantsFromAPI(myLatitude, myLongitude, searchRadius);
+                            } else {
+                                Log.d("Location is", "null");
+                            }
 
-                    }
-                });
-        return restaurantList;
+                        }
+                    });
+            return restaurantList;
+        }
     }
+
+
 
     // GET request from API
     private void requestRestaurantsFromAPI(Double latitude, Double longitude, Long radius) {
@@ -143,6 +143,7 @@ public class YelpRestaurants {
 //                    }
                 }
             }
+
             // Ensure no duplicates
             private boolean isNotDuplicate(String id) {
                 return !restaurantList.stream().anyMatch(x -> id.equals(x.getId()));
