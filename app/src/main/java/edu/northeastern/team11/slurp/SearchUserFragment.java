@@ -58,12 +58,13 @@ public class SearchUserFragment extends Fragment {
     UsersAdapter adapter;
     private List<UsersItem> usersList;
     private List<UsersItem> usersListCopy;
+    private List<String> friendsList;
     EditText userSearched;
     TextView errMsg;
     TextView suggestedUsersMsg;
     Button searchButton;
     String curUser;
-    String addedFriend;
+//    String addedFriend;
 
     // TODO: Rename and change types of parameters
     private String mParam1;
@@ -99,9 +100,6 @@ public class SearchUserFragment extends Fragment {
             mParam2 = getArguments().getString(ARG_PARAM2);
         }
 
-        if (getArguments() != null) {
-            addedFriend = getArguments().getString("friendAdded");
-        }
     }
 
     @SuppressLint("SetTextI18n")
@@ -121,7 +119,10 @@ public class SearchUserFragment extends Fragment {
 
         // get reference to the db
         db = FirebaseDatabase.getInstance().getReference();
+        getFriends();
         getAllUsers(view);
+
+        friendsList = new ArrayList<>();
 
         // get ui elements
         userSearched = view.findViewById(R.id.search_username_et);
@@ -152,7 +153,7 @@ public class SearchUserFragment extends Fragment {
         });
 
         // add a friend to the loggedInUser's friendsList in database
-        ItemTouchHelper.SimpleCallback callbackRight = new ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.RIGHT) {
+        ItemTouchHelper.SimpleCallback callbackRight = new ItemTouchHelper.SimpleCallback(ItemTouchHelper.ACTION_STATE_SWIPE,ItemTouchHelper.RIGHT) {
             @Override
             public boolean onMove(@NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder, @NonNull RecyclerView.ViewHolder target) {
                 return false;
@@ -162,81 +163,89 @@ public class SearchUserFragment extends Fragment {
             public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int direction) {
                 UsersItem usersItem = usersList.get(viewHolder.getAdapterPosition());
                 String addFriendUsername = usersItem.getUsername();
+
                 // add friend to the loggedInUser's friends list
-                db.child("users_slurp").child(curUser).child("friends").child(addFriendUsername).setValue(addFriendUsername);
+                db.child("users_slurp").child(curUser).child("friends").child(addFriendUsername).setValue(addFriendUsername).addOnCompleteListener(new OnCompleteListener<Void>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Void> task) {
+                        Toast.makeText(getActivity(),"+1 Slurper Points for Adding a Friend!", Toast.LENGTH_LONG).show();
+                    }
+                });
 
                 // update slurperStatusPoints and numFriends for loggedInUser
                 Map<String, Object> updates = new HashMap<>();
                 updates.put("users_slurp/"+curUser+"/"+"numFriends", ServerValue.increment(1));
+                // adding a friend gives the user +1 slurper points
                 updates.put("users_slurp/"+curUser+"/"+"slurperStatusPoints", ServerValue.increment(1));
                 db.updateChildren(updates);
 
-                Toast.makeText(getActivity().getBaseContext(), "friend added", Toast.LENGTH_LONG).show();
+//                View v = getActivity().findViewById(android.R.id.content);
+//                Snackbar.make(v, "+1 Slurper Points for adding " + addFriendUsername
+//                                + " to your friends list!", Snackbar.LENGTH_LONG).show();
+//                Toast.makeText(getActivity(),"+1 Slurper Points for Adding a Friend!", Toast.LENGTH_LONG).show();
             }
 
             @Override
             public int getSwipeDirs(@NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder) {
+                // if the loggedInUser swipes on a user that they are already friends with, disable
+                // swipe functionality for this viewHolder (avoids adding duplicate friends to db)
                 UsersItem usersItem = usersList.get(viewHolder.getAdapterPosition());
+                String clickedOnUser = usersItem.getUsername();
 
-
-
-
-
-
-
-                return super.getSwipeDirs(recyclerView, viewHolder);
-            }
-        };
-
-        ItemTouchHelper.SimpleCallback callbackLeft = new ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT) {
-            @Override
-            public boolean onMove(@NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder, @NonNull RecyclerView.ViewHolder target) {
-                return false;
-            }
-
-            @Override
-            public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int direction) {
-                UsersItem usersItem = usersList.get(viewHolder.getAdapterPosition());
-                String addFriendUsername = usersItem.getUsername();
-
-                db.child("users_slurp").child(curUser).child("friends").child(addFriendUsername).removeValue();
-
-                Toast.makeText(getActivity().getBaseContext(), "friend deleted", Toast.LENGTH_LONG).show();
-
-            }
-
-            @Override
-            public int getSwipeDirs(@NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder) {
-                UsersItem usersItem = usersList.get(viewHolder.getAdapterPosition());
-
-                if (usersItem.getUsername().equals("elsatmr")) {
-                    Toast.makeText(getActivity().getBaseContext(), "already friends", Toast.LENGTH_LONG).show();
-
+                if (friendsList.contains(clickedOnUser)) {
+                    View v = getActivity().findViewById(android.R.id.content);
+                    Snackbar.make(v, "Cannot add " + clickedOnUser + " since you're already friends.",
+                            Snackbar.LENGTH_LONG).show();
                     return 0;
                 }
                 return super.getSwipeDirs(recyclerView, viewHolder);
             }
         };
 
-//        private void getFriends(String friendUsername) {
-//            boolean friends = false;
-//
-//            db.child("users_slurp").child(curUser).child("friends").addValueEventListener(new ValueEventListener() {
-//                boolean friends = false;
-//                @Override
-//                public void onDataChange(@NonNull DataSnapshot snapshot) {
-//                    for (DataSnapshot friend : snapshot.getChildren()) {
-//                        if (friend.getKey().equals(friendUsername)) {
-//
-//                        }
-//                    }
-//                }
-//
-//                @Override
-//                public void onCancelled(@NonNull DatabaseError error) {
-//
-//                }
-//            });
+        // remove a friend to the loggedInUser's friendsList in database
+        ItemTouchHelper.SimpleCallback callbackLeft = new ItemTouchHelper.SimpleCallback(ItemTouchHelper.ACTION_STATE_SWIPE, ItemTouchHelper.LEFT) {
+            @Override
+            public boolean onMove(@NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder, @NonNull RecyclerView.ViewHolder target) {
+                return false;
+            }
+
+            @Override
+            public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int direction) {
+                UsersItem usersItem = usersList.get(viewHolder.getAdapterPosition());
+                String addFriendUsername = usersItem.getUsername();
+
+                // removes friend from db
+                db.child("users_slurp").child(curUser).child("friends").child(addFriendUsername).removeValue().addOnCompleteListener(new OnCompleteListener<Void>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Void> task) {
+                        Toast.makeText(getActivity(),"-1 Slurper Points for Removing a Friend!", Toast.LENGTH_LONG).show();
+                    }
+                });
+
+                // updates numFriends
+                Map<String, Object> updates = new HashMap<>();
+                // decrease Slurper Points by 1
+                updates.put("users_slurp/"+curUser+"/"+"slurperStatusPoints", ServerValue.increment(-1));
+                // decrease number of friends by 1
+                updates.put("users_slurp/"+curUser+"/"+"numFriends", ServerValue.increment(-1));
+                db.updateChildren(updates);
+            }
+
+            @Override
+            public int getSwipeDirs(@NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder) {
+                UsersItem usersItem = usersList.get(viewHolder.getAdapterPosition());
+                String clickedOnUser = usersItem.getUsername();
+
+                if (!friendsList.contains(clickedOnUser)) {
+                    View v = getActivity().findViewById(android.R.id.content);
+                    Snackbar.make(v, "Cannot unfriend " + clickedOnUser +
+                            " since you're not currently friends.", Snackbar.LENGTH_LONG).show();
+                    return 0;
+                }
+                return super.getSwipeDirs(recyclerView, viewHolder);
+            }
+        };
+
 
 
 
@@ -247,6 +256,25 @@ public class SearchUserFragment extends Fragment {
         helper2.attachToRecyclerView(rv);
 
 }
+
+    private void getFriends() {
+        db.child("users_slurp").child(curUser).child("friends").addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                for (DataSnapshot friend : snapshot.getChildren()) {
+                    friendsList.add(friend.getKey());
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+    }
+
+
+
 
     // set up recyclerView to initially include all users in db as "Suggested Users"
     @SuppressLint("SetTextI18n")
@@ -259,9 +287,21 @@ public class SearchUserFragment extends Fragment {
                     String username = user.getKey();
                     // don't add the logged in user to the usersList
                     if (!Objects.equals(username, curUser)) {
-                        Button addFriendButton = view.findViewById(R.id.add_friend_button);
-                        UsersItem userItem = new UsersItem(username, addFriendButton);
-                        usersList.add(userItem);
+                        // only add users that the loggedInUser is not currently friends with
+                        if (!friendsList.contains(username)) {
+                            Button addFriendButton = view.findViewById(R.id.add_friend_button);
+                            UsersItem userItem = new UsersItem(username, addFriendButton);
+                            usersList.add(userItem);
+                        }
+
+                        // edge case: if loggedInUser already added all the user's in the app as
+                        // friends, update the suggestedUserMsg
+                        if (usersList.size() == 0) {
+                            Log.i("edge", "edge");
+                            suggestedUsersMsg.setText("You're already friends with all users in the app!");
+                        } else {
+                            suggestedUsersMsg.setText("Suggested Users To Befriend:");
+                        }
                     }
                 }
                 Log.i("userList size: ", String.valueOf(usersList.size()));
