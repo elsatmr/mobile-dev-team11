@@ -1,5 +1,6 @@
 package edu.northeastern.team11.slurp;
 
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
@@ -12,6 +13,8 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
+
+import java.util.List;
 
 import edu.northeastern.team11.AboutActivity;
 import edu.northeastern.team11.HomeFragment;
@@ -36,6 +39,12 @@ public class MainSlurpActivity extends AppCompatActivity {
         setCurrentFragment(new HomeFragment());
         getSupportActionBar().hide();
 
+//        YelpRestaurants restaurants = new YelpRestaurants(this);
+//        List<Restaurant> restaurantsList = restaurants.getNearbyRestaurants();
+//        System.out.println("nearby restaurants");
+//        for (int i = 0; i < 50 && i < restaurantsList.size(); i++) {
+//            System.out.println(restaurantsList.get(i));
+//        }
 
 
         binding.bottomNavigationView.setOnItemSelectedListener(item -> {
@@ -58,6 +67,15 @@ public class MainSlurpActivity extends AppCompatActivity {
             }
             return true;
         });
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        Fragment fragment = (Fragment) getSupportFragmentManager().findFragmentById(R.id.addItemMenuItem);
+        if (fragment != null) {
+            fragment.onActivityResult(requestCode, resultCode, data);
+        }
     }
 
     private void setCurrentFragment(Fragment fragment) {

@@ -31,7 +31,6 @@ import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
-import java.util.Objects;
 
 import edu.northeastern.team11.R;
 
@@ -40,7 +39,7 @@ import edu.northeastern.team11.R;
  * Use the {@link AddItemFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class AddItemFragment extends Fragment {
+public class AddItemFragment2 extends Fragment {
 
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -58,7 +57,7 @@ public class AddItemFragment extends Fragment {
     private String mParam1;
     private String mParam2;
 
-    public AddItemFragment() {
+    public AddItemFragment2() {
         // Required empty public constructor
     }
 
@@ -108,32 +107,31 @@ public class AddItemFragment extends Fragment {
         button = (Button) view.findViewById(R.id.captureImage);
         image = (ImageView) view.findViewById(R.id.imageView);
         button.setOnClickListener(new View.OnClickListener() {
-          @Override
-          public void onClick(View view) {
-              if (ContextCompat.checkSelfPermission(
-                      getActivity().getApplicationContext(),
-                      Manifest.permission.CAMERA
-              ) != PackageManager.PERMISSION_GRANTED ||
-              ContextCompat.checkSelfPermission(
-                      getActivity().getApplicationContext(),
-                      Manifest.permission.WRITE_EXTERNAL_STORAGE
-              ) != PackageManager.PERMISSION_GRANTED) {
+            @Override
+            public void onClick(View view) {
+                if (ContextCompat.checkSelfPermission(
+                        getActivity().getApplicationContext(),
+                        Manifest.permission.CAMERA
+                ) != PackageManager.PERMISSION_GRANTED ||
+                        ContextCompat.checkSelfPermission(
+                                getActivity().getApplicationContext(),
+                                Manifest.permission.WRITE_EXTERNAL_STORAGE
+                        ) != PackageManager.PERMISSION_GRANTED) {
 
-                  ActivityCompat.requestPermissions(
-                          getActivity(),
-                          new String[] {
-                                  Manifest.permission.CAMERA,
-                                  Manifest.permission.WRITE_EXTERNAL_STORAGE
-                          },
-                          REQUEST_CODE_PERMISSIONS
-                  );
-              }
-              else {
-                  System.out.println("dispatchCaptureImageIntent called");
-                  dispatchCaptureImageIntent();
-              }
-          }
-      });
+                    ActivityCompat.requestPermissions(
+                            getActivity(),
+                            new String[] {
+                                    Manifest.permission.CAMERA,
+                                    Manifest.permission.WRITE_EXTERNAL_STORAGE
+                            },
+                            REQUEST_CODE_PERMISSIONS
+                    );
+                }
+                else {
+                    dispatchCaptureImageIntent();
+                }
+            }
+        });
 //        TextView tv = (TextView) view.findViewById(R.id.addItem_frag_user);
 //        tv.setText("ADD ITEM FRAG, Current User: " + userName);
 
@@ -142,31 +140,30 @@ public class AddItemFragment extends Fragment {
 
     private void dispatchCaptureImageIntent() {
         Intent intent = new Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE);
-            System.out.println("dispatchCaptureImageIntent started");
+        if (intent.resolveActivity(getActivity().getPackageManager()) != null) {
             File imageFile = null;
             try {
                 System.out.println("dispatchCaptureImageIntent");
                 imageFile = createImageFile();
             }
             catch (IOException exception) {
-                System.out.println("ERROR dispatchCaptureImageIntent");
                 Toast.makeText(getActivity().getApplicationContext(), exception.getMessage(), Toast.LENGTH_LONG).show();
             }
             if (imageFile != null) {
                 System.out.println("createImageFile");
                 Uri imageUri = FileProvider.getUriForFile(
-                        requireActivity(),
-                        "edu.northeastern.team11.fileprovider",
+                        getActivity().getApplicationContext(),
+                        "edu.northeastern.team11.slurp.fileprovider",
                         imageFile
                 );
-                System.out.println("URI"+imageUri);
+                System.out.println(imageUri);
                 intent.putExtra(MediaStore.EXTRA_OUTPUT, imageUri);
                 startActivityForResult(intent, REQUEST_CODE_CAPTURE_IMAGE);
             }
+        }
     }
 
     private File createImageFile() throws IOException {
-        System.out.println("createImageFile started");
         String fileName = "IMAGE_" + new SimpleDateFormat(
                 "yyyy_MM_DD_HH_mm_hh", Locale.getDefault()
         ).format(new Date());
@@ -183,7 +180,7 @@ public class AddItemFragment extends Fragment {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         if (requestCode == REQUEST_CODE_PERMISSIONS && grantResults.length > 0) {
             if (grantResults[0] == PackageManager.PERMISSION_GRANTED
-            && grantResults[1] == PackageManager.PERMISSION_GRANTED) {
+                    && grantResults[1] == PackageManager.PERMISSION_GRANTED) {
                 dispatchCaptureImageIntent();
             }
             else {
