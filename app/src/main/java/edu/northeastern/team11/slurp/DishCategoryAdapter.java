@@ -14,6 +14,9 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.FragmentController;
 import androidx.fragment.app.FragmentTransaction;
+import androidx.navigation.NavController;
+import androidx.navigation.Navigation;
+import androidx.navigation.fragment.NavHostFragment;
 import androidx.recyclerview.widget.RecyclerView;
 
 import java.io.IOException;
@@ -53,12 +56,9 @@ public class DishCategoryAdapter extends RecyclerView.Adapter<DishCategoryViewHo
         holder.dishCategoryLabel.setText(categoryLabel.toUpperCase(Locale.ROOT));
         thread.start();
         holder.itemView.setOnClickListener(view -> {
-            Context context = view.getContext();
-            String dishCategoryId = String.valueOf(position);
-            AppCompatActivity activity = (AppCompatActivity) view.getContext();
             Bundle bundle = new Bundle();
             bundle.putString("category", categoryLabel);
-            activity.getSupportFragmentManager().beginTransaction().replace(R.id.flFragment, SubcategoryFragment.class, bundle).commit();
+            Navigation.findNavController(view).navigate(R.id.subcategoryFragment, bundle);
         });
     }
 
