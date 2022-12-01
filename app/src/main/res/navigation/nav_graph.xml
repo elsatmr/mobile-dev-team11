@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/nav_graph"
+    app:startDestination="@id/homeFragment">
+
+    <fragment
+        android:id="@+id/homeFragment"
+        android:name="edu.northeastern.team11.HomeFragment"
+        android:label="slurp_fragment_home"
+        tools:layout="@layout/slurp_fragment_home" />
+    <fragment
+        android:id="@+id/profileFragment"
+        android:name="edu.northeastern.team11.slurp.ProfileFragment"
+        android:label="ProfileFragment" />
+    <fragment
+        android:id="@+id/searchUserFragment"
+        android:name="edu.northeastern.team11.slurp.SearchUserFragment"
+        android:label="slurp_fragment_search_user"
+        tools:layout="@layout/slurp_fragment_search_user" />
+    <fragment
+        android:id="@+id/categoryFragment"
+        android:name="edu.northeastern.team11.slurp.CategoryFragment"
+        android:label="slurp_fragment_category"
+        tools:layout="@layout/slurp_fragment_category" >
+        <action
+            android:id="@+id/action_categoryFragment_to_subcategoryFragment"
+            app:destination="@id/subcategoryFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/subcategoryFragment"
+        android:name="edu.northeastern.team11.slurp.SubcategoryFragment"
+        android:label="SubcategoryFragment" >
+        <action
+            android:id="@+id/action_subcategoryFragment_to_dishMapFragment"
+            app:destination="@id/dishMapFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/dishMapFragment"
+        android:name="edu.northeastern.team11.slurp.DishMapFragment"
+        android:label="DishMapFragment" />
+    <fragment
+        android:id="@+id/addItemFragment"
+        android:name="edu.northeastern.team11.slurp.AddItemFragment"
+        android:label="slurp_fragment_add_item"
+        tools:layout="@layout/slurp_fragment_add_item" />
+</navigation>

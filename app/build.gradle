@@ -89,6 +89,10 @@ dependencies {
     implementation 'com.mapbox.mapboxsdk:mapbox-sdk-turf:6.9.0'
     implementation 'com.mapbox.mapboxsdk:mapbox-sdk-core:6.9.0'
 
+    //navigation dependencies
+    implementation("androidx.navigation:navigation-fragment:2.5.3")
+    implementation("androidx.navigation:navigation-ui:2.5.3")
+
     // dependencies for other firebase products
 //    implementation 'com.google.firebase:firebase-auth'
 //    implementation 'com.google.firebase:firebase-firestore'

@@ -5,6 +5,10 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
+import androidx.navigation.NavController;
+import androidx.navigation.Navigation;
+import androidx.navigation.fragment.NavHostFragment;
+import androidx.navigation.ui.NavigationUI;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.content.Intent;
@@ -12,6 +16,8 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
+
+import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 import edu.northeastern.team11.AboutActivity;
 import edu.northeastern.team11.HomeFragment;
@@ -33,38 +39,12 @@ public class MainSlurpActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         binding = SlurpActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
-        setCurrentFragment(new HomeFragment());
         getSupportActionBar().hide();
-
-
-
-        binding.bottomNavigationView.setOnItemSelectedListener(item -> {
-            switch (item.getItemId()) {
-                case R.id.homeMenuItem:
-                    setCurrentFragment(new HomeFragment());
-                    break;
-                case R.id.foodCategoryMenuItem:
-                    setCurrentFragment(new CategoryFragment());
-                    break;
-                case R.id.addItemMenuItem:
-                    setCurrentFragment(new AddItemFragment());
-                    break;
-                case R.id.userSearchMenuItem:
-                    setCurrentFragment(new SearchUserFragment());
-                    break;
-                case R.id.profileMenuItem:
-                    setCurrentFragment(new ProfileFragment());
-                    break;
-            }
-            return true;
-        });
-    }
-
-    private void setCurrentFragment(Fragment fragment) {
-        FragmentManager fragmentManager = getSupportFragmentManager();
-        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-        fragmentTransaction.replace(R.id.flFragment, fragment);
-        fragmentTransaction.commit();
+        BottomNavigationView bottomNav = findViewById(R.id.bottomNavigationView);
+        NavHostFragment navHostFragment =
+                (NavHostFragment) getSupportFragmentManager().findFragmentById(R.id.nav_host_fragment);
+        NavController navController = navHostFragment.getNavController();
+        NavigationUI.setupWithNavController(bottomNav, navController);
     }
 
 }
