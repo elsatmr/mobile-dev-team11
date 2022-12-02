@@ -18,26 +18,24 @@ import java.net.URL;
 import java.util.ArrayList;
 
 import edu.northeastern.team11.R;
-import edu.northeastern.team11.StickerAdapter;
-import edu.northeastern.team11.StickerViewHolder;
 
-public class PostAdapter extends RecyclerView.Adapter<PostViewHolder> {
+public class MyPostsAdapter extends RecyclerView.Adapter<MyPostsViewHolder> {
     private final ArrayList<Dish> dishesList;
     private final Context context;
 
-    public PostAdapter(ArrayList<Dish> dishesList, Context context) {
+    public MyPostsAdapter(ArrayList<Dish> dishesList, Context context) {
         this.dishesList = dishesList;
         this.context = context;
     }
 
     @NonNull
     @Override
-    public PostViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        return new PostViewHolder(LayoutInflater.from(context).inflate(R.layout.slurp_post_view, parent, false));
+    public MyPostsViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        return new MyPostsViewHolder(LayoutInflater.from(context).inflate(R.layout.slurp_my_post_view, parent, false));
     }
 
     @Override
-    public void onBindViewHolder(@NonNull PostViewHolder holder, int position) {
+    public void onBindViewHolder(@NonNull MyPostsViewHolder holder, int position) {
         Dish currDish = dishesList.get(position);
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -56,10 +54,10 @@ public class PostAdapter extends RecyclerView.Adapter<PostViewHolder> {
     }
 
     class BackgroundThread extends Thread {
-        PostViewHolder threadHolder;
+        MyPostsViewHolder threadHolder;
         String imageUri;
 
-        BackgroundThread(PostViewHolder threadHolder, String url) {
+        BackgroundThread(MyPostsViewHolder threadHolder, String url) {
             this.threadHolder = threadHolder;
             this.imageUri = url;
         }

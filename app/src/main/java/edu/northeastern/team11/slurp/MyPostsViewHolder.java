@@ -7,9 +7,9 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 import edu.northeastern.team11.R;
 
-public class PostViewHolder extends RecyclerView.ViewHolder {
+public class MyPostsViewHolder extends RecyclerView.ViewHolder {
     public ImageView postImageView;
-    public PostViewHolder(@NonNull View itemView) {
+    public MyPostsViewHolder(@NonNull View itemView) {
         super(itemView);
         this.postImageView = itemView.findViewById(R.id.postImageView);
     }

@@ -7,7 +7,6 @@ import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-import androidx.recyclerview.widget.StaggeredGridLayoutManager;
 
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -45,7 +44,7 @@ public class MyPostsFragment extends Fragment {
     private FirebaseDatabase firebaseDb;
     ArrayList<Dish> dishesList;
     RecyclerView postRecyclerView;
-    PostAdapter adapter;
+    MyPostsAdapter adapter;
 
     public MyPostsFragment() {
         // Required empty public constructor
@@ -110,7 +109,7 @@ public class MyPostsFragment extends Fragment {
         postRecyclerView = view.findViewById(R.id.posts_recycler_view);
         postRecyclerView.setHasFixedSize(true);
         postRecyclerView.setLayoutManager(new GridLayoutManager(getActivity(), 3));
-        adapter = new PostAdapter(dishesList, getActivity());
+        adapter = new MyPostsAdapter(dishesList, getActivity());
         postRecyclerView.setAdapter(adapter);
 
         return view;
