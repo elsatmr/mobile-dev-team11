@@ -5,9 +5,11 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 
+import androidx.activity.OnBackPressedCallback;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.recyclerview.widget.StaggeredGridLayoutManager;
@@ -59,6 +61,7 @@ public class SearchUserFragment extends Fragment {
     TextView suggestedUsersMsg;
     Button searchButton;
     String curUser;
+    int backPressedCount = 0;
 //    String addedFriend;
 
     // TODO: Rename and change types of parameters
@@ -94,6 +97,7 @@ public class SearchUserFragment extends Fragment {
             mParam1 = getArguments().getString(ARG_PARAM1);
             mParam2 = getArguments().getString(ARG_PARAM2);
         }
+
 
     }
 
@@ -414,6 +418,8 @@ public class SearchUserFragment extends Fragment {
         SharedPreferences sharedPreferences = getActivity().getSharedPreferences("settings", 0);
         return sharedPreferences.getString("username", null);
     }
+
+
 
 }
 
