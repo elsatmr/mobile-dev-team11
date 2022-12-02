@@ -1,7 +1,6 @@
 package edu.northeastern.team11.slurp;
 
 import android.annotation.SuppressLint;
-import android.content.ClipData;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -9,7 +8,6 @@ import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentTransaction;
 import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.recyclerview.widget.StaggeredGridLayoutManager;
@@ -22,7 +20,6 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -31,13 +28,10 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ServerValue;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 
 import edu.northeastern.team11.R;
@@ -328,7 +322,7 @@ public class SearchUserFragment extends Fragment {
                     if (!Objects.equals(username, curUser)) {
                         // only add users that the loggedInUser is not currently friends with
                         if (!friendsList.contains(username)) {
-                            Button addFriendButton = view.findViewById(R.id.add_friend_button);
+                            Button addFriendButton = view.findViewById(R.id.get_slurper_status_button);
                             UsersItem userItem = new UsersItem(username, addFriendButton);
                             usersList.add(userItem);
                         }
@@ -374,7 +368,7 @@ public class SearchUserFragment extends Fragment {
                         // update recyclerView to only display the user that was searched for
                         usersList.clear();
                         String userName = String.valueOf(task.getResult().getKey());
-                        Button addFriendButton = view.findViewById(R.id.add_friend_button);
+                        Button addFriendButton = view.findViewById(R.id.get_slurper_status_button);
                         UsersItem searchedUser = new UsersItem(userName, addFriendButton);
 
                         usersList.add(searchedUser);

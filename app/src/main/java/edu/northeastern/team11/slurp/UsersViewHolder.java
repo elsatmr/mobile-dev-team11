@@ -16,7 +16,7 @@ public class UsersViewHolder extends RecyclerView.ViewHolder {
     public UsersViewHolder(@NonNull View itemView) {
         super(itemView);
         this.userTv = itemView.findViewById(R.id.username_tv);
-        this.button = itemView.findViewById(R.id.add_friend_button);
+        this.button = itemView.findViewById(R.id.get_slurper_status_button);
     }
 
     public TextView getUserTv() {

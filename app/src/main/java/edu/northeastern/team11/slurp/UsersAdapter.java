@@ -32,6 +32,15 @@ public class UsersAdapter  extends RecyclerView.Adapter<UsersViewHolder>{
     private final Context context;
     DatabaseReference db;
 
+    // slurper status levels - every user in the app has a Slurper Status Level
+    // which is calculated by the total number of points they have (+1 point for
+    // adding a friend, +1 making a post, +1 for voting)
+    ValueRange babySlurper = ValueRange.of(0, 4);
+    ValueRange slurperJr = ValueRange.of(5,9);
+    ValueRange slurperSr = ValueRange.of(10,19);
+    ValueRange slurperEliteForce = ValueRange.of(20,99);
+    ValueRange chiefOfSlurper = ValueRange.of(100, 1000);
+
     public UsersAdapter(List<UsersItem> usersList, Context context) {
         this.usersList = usersList;
         this.context = context;
@@ -46,115 +55,41 @@ public class UsersAdapter  extends RecyclerView.Adapter<UsersViewHolder>{
     @Override
     public void onBindViewHolder(@NonNull UsersViewHolder holder, int position) {
 
-
         String username = usersList.get(position).getUsername();
-        Button button = usersList.get(position).getAddFriendButton();
         holder.getUserTv().setText(username);
-        holder.getButton().setText("Get Slurper Status");
-
-
         holder.getButton().setOnClickListener(new View.OnClickListener() {
             @SuppressLint("SetTextI18n")
             @Override
             public void onClick(View view) {
+                // when loggedInUser clicks on "Get Slurper Status" button for a desired user,
+                // display that clickedOn user's slurper status in the app
                 db = FirebaseDatabase.getInstance().getReference();
-                SharedPreferences sharedPreferences = context.getSharedPreferences("settings", 0);
-                String loggedInUser = sharedPreferences.getString("username", null);
-
                 db.child("slurperStatusPoints").child(username).child("count").get().addOnCompleteListener(new OnCompleteListener<DataSnapshot>() {
                     @Override
                     public void onComplete(@NonNull Task<DataSnapshot> task) {
                         if (task.isSuccessful()) {
-                            Integer totalPoints = Integer.valueOf(task.getResult().getValue().toString());
-                            ValueRange babySlurper = ValueRange.of(10, 15);
+                            int totalPoints = Integer.parseInt(task.getResult().getValue().toString());
                             if (babySlurper.isValidIntValue(totalPoints)) {
                                 Toast.makeText(context, "Baby Slurper", Toast.LENGTH_LONG).show();
+                            } else if (slurperJr.isValidIntValue(totalPoints)) {
+                                Toast.makeText(context, "Slurper Jr", Toast.LENGTH_LONG).show();
+                            } else if (slurperSr.isValidIntValue(totalPoints)) {
+                                Toast.makeText(context, "Slurper Sr", Toast.LENGTH_LONG).show();
+                            } else if (slurperEliteForce.isValidIntValue(totalPoints)) {
+                                Toast.makeText(context, "Slurper Elite Force", Toast.LENGTH_LONG).show();
+                            } else if (chiefOfSlurper.isValidIntValue(totalPoints)) {
+                                Toast.makeText(context, "Chief Of Slurper", Toast.LENGTH_LONG).show();
                             }
-
-//                            if (totalPoints < 100) {
-//                                Toast.makeText(context, "Baby Slurper", Toast.LENGTH_LONG).show();
-//                            }
                         }
-
                     }
                 });
-
-//
-//                Toast.makeText(context, "Slurper Status ", Toast.LENGTH_LONG).show();
-
-//                Snackbar.make(v, "Cannot unfriend " + clickedOnUser +
-//                        " since you're not currently friends.", Snackbar.LENGTH_LONG).show();
-
-
-//                if (holder.getButton().getText().toString().equals("Add Friend")) {
-//                    // update database to add friend
-////                    String key = db.child("users_slurp").child(loggedInUser).child("friends").push().getKey();
-////                    db.child("users_slurp").child(loggedInUser).child("friends").child(key).setValue(username);
-//
-//
-//
-//                    holder.getButton().setText("Unfriend");
-//
-//
-////                    addToDb(username);
-//
-////                    Bundle bundle = new Bundle();
-////                    bundle.putString("friendAdded", username);
-////                    AppCompatActivity activity = (AppCompatActivity) view.getContext();
-////                    activity.getSupportFragmentManager().beginTransaction().replace(R.id.flFragment, SearchUserFragment.class, bundle).commit();
-//
-//////
-////                    FragmentTransaction ft =  activity.getFragmentManager().beginTransaction();
-////                    ft.detach(SearchUserFragment.class)
-//
-//                    // display toast that slurper points have been added
-//
-//                } else {
-//                    // update database to remove friend
-//                    holder.getButton().setText("Add Friend");
-//
-//                }
             }
         });
-//        addToDb(username);
-
-
-
-
 
     }
-
-//    private void addToDb(String username) {
-//        db = FirebaseDatabase.getInstance().getReference();
-//        SharedPreferences sharedPreferences = context.getSharedPreferences("settings", 0);
-//        String loggedInUser = sharedPreferences.getString("username", null);
-//        String key = db.child("users_slurp").child(loggedInUser).child("friends").push().getKey();
-//        db.child("users_slurp").child(loggedInUser).child("friends").child(key).setValue(username);
-//
-//    }
 
     @Override
     public int getItemCount() {
         return usersList.size();
     }
 }
-
-//class WritingThread extends Thread {
-//    String username;
-//    String loggedInUser;
-//
-//    public WritingThread(String username, String loggedInUser) {
-//        this.username = username;
-//        this.loggedInUser = loggedInUser;
-//    }
-//
-//    @Override
-//    public void run() {
-//        DatabaseReference db = FirebaseDatabase.getInstance().getReference();
-//
-//        String key = db.child("users_slurp").child(loggedInUser).child("friends").push().getKey();
-//        db.child("users_slurp").child(loggedInUser).child("friends").child(key).setValue(username);
-//
-//    }
-//
-//}
