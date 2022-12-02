@@ -75,14 +75,14 @@ public class AddItemFragment extends Fragment {
      * @return A new instance of fragment AddItemFragment.
      */
     // TODO: Rename and change types and number of parameters
-    /*public static AddItemFragment newInstance(String param1, String param2) {
+    public static AddItemFragment newInstance(String param1, String param2) {
         AddItemFragment fragment = new AddItemFragment();
         Bundle args = new Bundle();
         args.putString(ARG_PARAM1, param1);
         args.putString(ARG_PARAM2, param2);
         fragment.setArguments(args);
         return fragment;
-    }*/
+    }
 
     public static AddItemFragment newInstance(int param1, int param2) {
         AddItemFragment fragment = new AddItemFragment();
@@ -112,6 +112,7 @@ public class AddItemFragment extends Fragment {
         imageButton = (Button) view.findViewById(R.id.captureImage);
         submitButton = (Button) view.findViewById(R.id.submitButton);
         image = (ImageView) view.findViewById(R.id.imageView);
+        ImageView image2 = (ImageView) view.findViewById(R.id.imageView);
 //        private TextInputEditText dishName;
 //        private TextInputEditText restaurantName;
         dishName = (TextInputEditText) view.findViewById(R.id.dishName);

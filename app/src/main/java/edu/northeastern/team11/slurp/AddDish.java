@@ -39,7 +39,7 @@ import edu.northeastern.team11.R;
  * Use the {@link AddItemFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class AddItemFragment2 extends Fragment {
+public class AddDish extends Fragment {
 
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -57,7 +57,7 @@ public class AddItemFragment2 extends Fragment {
     private String mParam1;
     private String mParam2;
 
-    public AddItemFragment2() {
+    public AddDish() {
         // Required empty public constructor
     }
 
