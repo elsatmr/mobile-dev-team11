@@ -92,7 +92,7 @@ public class SlurpSignUpActivity extends AppCompatActivity {
         ref.child("users_slurp").child(username).child("profilePhotoLink").setValue("no_profile_pic_set");
         ref.child("users_slurp").child(username).child("slurperStatusPoints").setValue(0);
 
-        // with updated db
+        // with updated dbase
         ref.child("friends").child(username).child("init").setValue("init");
         ref.child("slurperStatusPoints").child(username).child("count").setValue(0);
 
