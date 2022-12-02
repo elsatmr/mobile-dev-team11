@@ -9,6 +9,7 @@ import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentTransaction;
 import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.recyclerview.widget.StaggeredGridLayoutManager;
@@ -45,7 +46,7 @@ import edu.northeastern.team11.R;
  * A simple {@link Fragment} subclass.
  * Use the {@link SearchUserFragment#newInstance} factory method to
  * create an instance of this fragment.
- */
+// */
 public class SearchUserFragment extends Fragment {
 
     // TODO: Rename parameter arguments, choose names that match
@@ -140,17 +141,17 @@ public class SearchUserFragment extends Fragment {
         rv.setLayoutManager(new StaggeredGridLayoutManager(1, StaggeredGridLayoutManager.VERTICAL));
         rv.setAdapter(adapter);
 
-        // search database for the username input
-        searchButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                // hide keyboard
-                InputMethodManager imm = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
-                imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
-                // search for user
-                findUser(view);
-            }
-        });
+//        // search database for the username input
+//        searchButton.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View view) {
+//                // hide keyboard
+//                InputMethodManager imm = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
+//                imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
+//                // search for user
+//                findUser(view);
+//            }
+//        });
 
         // add a friend to the loggedInUser's friendsList in database
         ItemTouchHelper.SimpleCallback callbackRight = new ItemTouchHelper.SimpleCallback(ItemTouchHelper.ACTION_STATE_SWIPE,ItemTouchHelper.RIGHT) {
@@ -166,41 +167,30 @@ public class SearchUserFragment extends Fragment {
                 String addFriendUsername = usersItem.getUsername();
 
                 // add friend to the loggedInUser's friends list
-//                db.child("users_slurp").child(curUser).child("friends").child(addFriendUsername).setValue(addFriendUsername).addOnCompleteListener(new OnCompleteListener<Void>() {
-//                    @Override
-//                    public void onComplete(@NonNull Task<Void> task) {
-//                        Toast.makeText(getActivity(),"+1 Slurper Points for Adding a Friend!", Toast.LENGTH_LONG).show();
-//                    }
-//                });
-                db.child("friends").child(curUser).child(addFriendUsername).setValue(addFriendUsername);
-                friendsList.remove(usersItem.getUsername());
-                usersList.remove(usersItem);
-                adapter.notifyItemRemoved(viewHolder.getAdapterPosition());
-//                adapter.notifyItemRangeChanged(viewHolder.getAdapterPosition(),  1);
-//                adapter.notifyDataSetChanged();
+                db.child("friends").child(curUser).child(addFriendUsername).setValue(addFriendUsername).addOnCompleteListener(new OnCompleteListener<Void>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Void> task) {
+                        friendsList.remove(usersItem.getUsername());
+                        usersList.remove(usersItem);
+                        adapter.notifyItemRemoved(viewHolder.getAdapterPosition());
+                        suggestUsers(view);
 
-                suggestUsers(view);
+                        // update loggedInUser's slurper points - +1 for adding a friend
+                        db.child("slurperStatusPoints").child(curUser).child("count").get().addOnCompleteListener(new OnCompleteListener<DataSnapshot>() {
+                            @Override
+                            public void onComplete(@NonNull Task<DataSnapshot> task) {
+                                if (task.isSuccessful()) {
+                                    Integer curCount = Integer.valueOf(task.getResult().getValue().toString());
+                                    db.child("slurperStatusPoints").child(curUser).child("count").setValue(curCount + 1);
+                                }
+                            }
+                        });
 
-
-                View v = getActivity().findViewById(android.R.id.content);
-                Snackbar.make(v, "+1 Slurper Points for adding " + addFriendUsername
-                        + " to your friends list!", Snackbar.LENGTH_LONG).show();
-
-//                // update slurperStatusPoints and numFriends for loggedInUser
-//                Map<String, Object> updates = new HashMap<>();
-//                updates.put("users_slurp/"+curUser+"/"+"numFriends", ServerValue.increment(1));
-//                // adding a friend gives the user +1 slurper points
-//                updates.put("users_slurp/"+curUser+"/"+"slurperStatusPoints", ServerValue.increment(1));
-//                db.updateChildren(updates);
-//
-//                View v = getActivity().findViewById(android.R.id.content);
-//                Snackbar.make(v, "+1 Slurper Points for adding " + addFriendUsername
-//                        + " to your friends list!", Snackbar.LENGTH_LONG).show();
-//                Toast.makeText(getActivity(),"+1 Slurper Points for Adding a Friend!", Toast.LENGTH_LONG).show();
-
-//                db.child("friends").child(curUser).child(addFriendUsername).child(addFriendUsername).setValue("here");
-//                usersList.remove(usersItem);
-//                adapter.notifyDataSetChanged();
+                        View v = getActivity().findViewById(android.R.id.content);
+                        Snackbar.make(v, "+1 Slurper Points for adding " + addFriendUsername
+                                + " to your friends list!", Snackbar.LENGTH_LONG).show();
+                    }
+                });
             }
 
             @Override
@@ -234,34 +224,32 @@ public class SearchUserFragment extends Fragment {
                 UsersItem usersItem = usersList.get(viewHolder.getAdapterPosition());
                 String addFriendUsername = usersItem.getUsername();
 
-                db.child("friends").child(curUser).child(addFriendUsername).removeValue();
-                friendsList.add(usersItem.getUsername());
-                usersList.add(usersItem);
-                adapter.notifyItemInserted(viewHolder.getAdapterPosition());
-//                adapter.notifyItemRangeChanged(viewHolder.getAdapterPosition(), 1);
-//                adapter.notifyDataSetChanged();
-                suggestUsers(view);
+                db.child("friends").child(curUser).child(addFriendUsername).removeValue().addOnCompleteListener(new OnCompleteListener<Void>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Void> task) {
+                        friendsList.add(usersItem.getUsername());
+                        usersList.add(usersItem);
+                        adapter.notifyItemInserted(viewHolder.getAdapterPosition());
 
-                View v = getActivity().findViewById(android.R.id.content);
-                Snackbar.make(v, "-1 Slurper Points for unfriending " + addFriendUsername
-                        + ".", Snackbar.LENGTH_LONG).show();
+                        suggestUsers(view);
 
+                        db.child("slurperStatusPoints").child(curUser).child("count").get().addOnCompleteListener(new OnCompleteListener<DataSnapshot>() {
+                            @Override
+                            public void onComplete(@NonNull Task<DataSnapshot> task) {
+                                if (task.isSuccessful()) {
+                                    Integer curCount = Integer.valueOf(task.getResult().getValue().toString());
+                                    db.child("slurperStatusPoints").child(curUser).child("count").setValue(curCount -1);
 
-//                // removes friend from db
-//                db.child("users_slurp").child(curUser).child("friends").child(addFriendUsername).removeValue().addOnCompleteListener(new OnCompleteListener<Void>() {
-//                    @Override
-//                    public void onComplete(@NonNull Task<Void> task) {
-//                        Toast.makeText(getActivity(),"-1 Slurper Points for Removing a Friend!", Toast.LENGTH_LONG).show();
-//                    }
-//                });
-//
-//                // updates numFriends
-//                Map<String, Object> updates = new HashMap<>();
-//                // decrease Slurper Points by 1
-//                updates.put("users_slurp/"+curUser+"/"+"slurperStatusPoints", ServerValue.increment(-1));
-//                // decrease number of friends by 1
-//                updates.put("users_slurp/"+curUser+"/"+"numFriends", ServerValue.increment(-1));
-//                db.updateChildren(updates);
+                                }
+                            }
+                        });
+                        View v = getActivity().findViewById(android.R.id.content);
+                        Snackbar.make(v, "-1 Slurper Points for unfriending " + addFriendUsername
+                                + ".", Snackbar.LENGTH_LONG).show();
+
+                    }
+                });
+
             }
 
             @Override
@@ -277,6 +265,7 @@ public class SearchUserFragment extends Fragment {
                 }
                 return super.getSwipeDirs(recyclerView, viewHolder);
             }
+
         };
 
 
@@ -287,6 +276,18 @@ public class SearchUserFragment extends Fragment {
 
         ItemTouchHelper helper2 = new ItemTouchHelper(callbackLeft);
         helper2.attachToRecyclerView(rv);
+
+        // search database for the username input
+        searchButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                // hide keyboard
+                InputMethodManager imm = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
+                imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
+                // search for user
+                findUser(view, callbackRight, callbackLeft);
+            }
+        });
 
     }
 
@@ -338,7 +339,7 @@ public class SearchUserFragment extends Fragment {
                             Log.i("edge", "edge");
                             suggestedUsersMsg.setText("You're already friends with all users in the app!");
                         } else {
-                            suggestedUsersMsg.setText("Suggested Users To Befriend:");
+                            suggestedUsersMsg.setText("Suggested Users To Befriend:\n(Swipe right to add friend, swipe left to remove)");
                         }
                     }
                 }
@@ -358,7 +359,8 @@ public class SearchUserFragment extends Fragment {
     }
 
     // update recyclerView to only show the user that was searched for
-    private void findUser(View view) {
+    private void findUser(View view, ItemTouchHelper.SimpleCallback helper1, ItemTouchHelper.SimpleCallback helper2) {
+
         db.child("users_slurp").child(userSearched.getText().toString().trim()).get().addOnCompleteListener(new OnCompleteListener<DataSnapshot>() {
             @SuppressLint("NotifyDataSetChanged")
             @Override
@@ -374,8 +376,11 @@ public class SearchUserFragment extends Fragment {
                         String userName = String.valueOf(task.getResult().getKey());
                         Button addFriendButton = view.findViewById(R.id.add_friend_button);
                         UsersItem searchedUser = new UsersItem(userName, addFriendButton);
+
                         usersList.add(searchedUser);
+
                         adapter.notifyDataSetChanged();
+
 
                         suggestedUsersMsg.setVisibility(View.INVISIBLE);
 
@@ -390,10 +395,6 @@ public class SearchUserFragment extends Fragment {
                 } else {
                     // make sure rv has the most up to date list of friends
                     Log.d("error", "EditText username is empty");
-//                    usersList.clear();
-//                    getFriends();
-//                    getAllUsers(view);
-//                    adapter.notifyDataSetChanged();
                     suggestUsers(view);
                 }
             }
@@ -406,10 +407,6 @@ public class SearchUserFragment extends Fragment {
     // a friend
     @SuppressLint("NotifyDataSetChanged")
     private void suggestUsers(View view) {
-//        usersList.clear();
-//        usersList.addAll(usersListCopy);
-//        Log.i("userListCopy: ", String.valueOf(usersListCopy.size()));
-//        adapter.notifyDataSetChanged();
         usersList.clear();
         getFriends();
         getAllUsers(view);
@@ -426,7 +423,11 @@ public class SearchUserFragment extends Fragment {
 
 }
 
-// original db implementation
+
+
+//// ORIGINAL
+//
+//// original db implementation
 //public class SearchUserFragment extends Fragment {
 //
 //    // TODO: Rename parameter arguments, choose names that match

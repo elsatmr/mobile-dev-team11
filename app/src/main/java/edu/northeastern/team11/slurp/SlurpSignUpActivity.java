@@ -91,6 +91,11 @@ public class SlurpSignUpActivity extends AppCompatActivity {
         ref.child("users_slurp").child(username).child("numTimesVoted").setValue(0);
         ref.child("users_slurp").child(username).child("profilePhotoLink").setValue("no_profile_pic_set");
         ref.child("users_slurp").child(username).child("slurperStatusPoints").setValue(0);
+
+        // with updated db
+        ref.child("friends").child(username).child("init").setValue("init");
+        ref.child("slurperStatusPoints").child(username).child("count").setValue(0);
+
     }
 
     private void signInUser() {
