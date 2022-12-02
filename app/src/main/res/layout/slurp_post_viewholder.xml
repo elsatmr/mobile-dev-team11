@@ -16,6 +16,7 @@
             android:id="@+id/postImageView"
             android:layout_width="match_parent"
             android:layout_height="0dp"
+            android:scaleType="centerCrop"
             app:layout_constraintBottom_toTopOf="@+id/postUserNameText"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
@@ -24,11 +25,34 @@
             android:id="@+id/postUserNameText"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="categoryLabelText"
+            android:layout_marginStart="16dp"
+            android:text="Username123ABC"
             android:textAlignment="center"
+            android:textSize="20sp"
             android:textStyle="bold"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintBottom_toTopOf="@+id/postDateText"
             app:layout_constraintStart_toStartOf="parent" />
+
+        <TextView
+            android:id="@+id/postDateText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="3dp"
+            android:text="Jan 8, 2022 9:00AM"
+            android:textAlignment="center"
+            android:textSize="10sp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="@+id/postUserNameText" />
+
+        <com.google.android.material.chip.Chip
+            android:id="@+id/postScoreChip"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="16dp"
+            android:backgroundTint="#050088"
+            android:text="4.3"
+            android:textColor="#FFFFFF"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/postUserNameText" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 </androidx.cardview.widget.CardView>

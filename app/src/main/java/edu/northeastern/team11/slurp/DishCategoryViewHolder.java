@@ -15,7 +15,7 @@ public class DishCategoryViewHolder extends RecyclerView.ViewHolder{
 
     public DishCategoryViewHolder(@NonNull View itemView) {
         super(itemView);
-        this.dishCategoryImageView = itemView.findViewById(R.id.dishCategoryImageView);
-        this.dishCategoryLabel = itemView.findViewById(R.id.categoryLabelText);
+        this.dishCategoryImageView = itemView.findViewById(R.id.postImageView);
+        this.dishCategoryLabel = itemView.findViewById(R.id.postUserNameText);
     }
 }

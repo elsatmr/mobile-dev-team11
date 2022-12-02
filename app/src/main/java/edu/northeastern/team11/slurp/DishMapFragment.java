@@ -17,8 +17,15 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.RecyclerView;
+import androidx.recyclerview.widget.StaggeredGridLayoutManager;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.mapbox.android.core.permissions.PermissionsListener;
 import com.mapbox.android.core.permissions.PermissionsManager;
 import com.mapbox.mapboxsdk.Mapbox;
@@ -38,6 +45,7 @@ import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
 import com.mapbox.mapboxsdk.maps.Style;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
@@ -59,7 +67,11 @@ public class DishMapFragment extends Fragment implements OnMapReadyCallback, OnL
     private boolean isInTrackingMode;
     PermissionsManager permissionsManager;
     PermissionsListener permissionsListener;
-
+    private DatabaseReference db;
+    private List<RestaurantDish> restDishList;
+    private RecyclerView restDishRecycler;
+    private RestaurantDishAdapter adapter;
+    List<Restaurant> restList;
 
     public DishMapFragment() {
         // Required empty public constructor
@@ -88,11 +100,26 @@ public class DishMapFragment extends Fragment implements OnMapReadyCallback, OnL
         categoryButton = view.findViewById(R.id.categoryButton);
         subcategoryButton = view.findViewById(R.id.dishButton);
         addButtonListeners();
+        db = FirebaseDatabase.getInstance().getReference();
         homeFab = view.findViewById(R.id.homeFab);
         mapView = view.findViewById(R.id.mapView);
         mapView.onCreate(savedInstanceState);
         mapView.getMapAsync(this);
+        restDishList = new ArrayList<>();
+        getRestaurants();
+        restDishRecycler = view.findViewById(R.id.restDishListRecycler);
+        adapter = new RestaurantDishAdapter(restDishList, view.getContext());
+        restDishRecycler.setHasFixedSize(true);
+        restDishRecycler.setLayoutManager(new StaggeredGridLayoutManager(
+                1, StaggeredGridLayoutManager.VERTICAL));
+        restDishRecycler.setAdapter(adapter);
+
+        YelpRestaurants rest = new YelpRestaurants(getContext());
+        restList = rest.getNearbyRestaurants();
+
+
         return view;
+
     }
     @Override
     public void onMapReady(@NonNull MapboxMap mapboxMap) {
@@ -165,6 +192,13 @@ public class DishMapFragment extends Fragment implements OnMapReadyCallback, OnL
     @SuppressWarnings( {"MissingPermission"})
     @Override
     public void onLocationComponentClick() {
+
+        // TESTING THE YELP API CALL!!!!!!
+        restList.forEach(d -> {
+            Log.d("restzzz", d.getName());
+        });
+        // END OF TEST
+
         if (locationComponent.getLastKnownLocation() != null) {
             Toast.makeText(getContext(), String.format("Latitude: %.2f\nLongitude: %.2f",
                     locationComponent.getLastKnownLocation().getLatitude(),
@@ -299,5 +333,44 @@ public class DishMapFragment extends Fragment implements OnMapReadyCallback, OnL
         subcategoryButton.setOnClickListener(subcategorySelectListener);
         subcategoryLabel.setOnClickListener(subcategorySelectListener);
     }
+
+    // Get the cuisines from the database
+    private void getRestaurants() {
+        db.child("slurpRestaurants").addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                restDishList.clear(); // Clear the list to avoid duplication
+                // 1. Build List of Restaurant Dishes
+                for (DataSnapshot restDish : snapshot.getChildren()) {
+                    if (restDish.child("dishes").child(subcategory).exists()) {
+                        String _category = restDish.child("category").getValue(String.class);
+                        String _city = restDish.child("city").getValue(String.class);
+                        String _street = restDish.child("street").getValue(String.class);
+                        String _state = restDish.child("state").getValue(String.class);
+                        String _zip = restDish.child("zip").getValue(String.class);
+                        String _restName = restDish.child("name").getValue(String.class);
+                        Float _lat = restDish.child("lat").getValue(Float.class);
+                        Float _long = restDish.child("long").getValue(Float.class);
+                        String _restId = restDish.getKey();
+                        Float _slurpScore = restDish.child("dishes").child(subcategory).child("slurpScore").getValue(Float.class);
+                        Log.d("slurpScore", _slurpScore.toString());
+                        Integer _reviewCount = restDish.child("dishes").child(subcategory).child("reviewCount").getValue(Integer.class);
+                        String _restImageUrl = restDish.child("imageUrl").getValue(String.class);
+                        RestaurantDish newRestDish = new RestaurantDish(_restName, _restId, subcategory, category, _street, _city, _state, _zip, _lat, _long, _slurpScore, _reviewCount, _restImageUrl);
+                        restDishList.add(newRestDish);
+                        Log.d("Added RestaurantDish:", newRestDish.getRestName());
+                    }
+                }
+
+                adapter.notifyDataSetChanged();
+            }
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+    }
+
+    //
 
 }

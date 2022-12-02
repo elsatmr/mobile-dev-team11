@@ -100,7 +100,6 @@ public class CategoryFragment extends Fragment {
     }
 
     // Get the cuisines from the database
-    // USING STICKERS AS PLACEHOLDER!
     private void getCuisines() {
         db.child("categoryTest").addValueEventListener(new ValueEventListener() {
             @Override
