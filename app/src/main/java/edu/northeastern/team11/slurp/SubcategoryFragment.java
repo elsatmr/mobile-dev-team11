@@ -6,6 +6,7 @@ import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
+import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.recyclerview.widget.StaggeredGridLayoutManager;
@@ -77,13 +78,10 @@ public class SubcategoryFragment extends Fragment {
                 holder.dishCategoryLabel.setText(dish.toUpperCase(Locale.ROOT));
                 thread.start();
                 holder.itemView.setOnClickListener(view -> {
-                    Context context = view.getContext();
-                    String dishCategoryId = String.valueOf(position);
-                    AppCompatActivity activity = (AppCompatActivity) view.getContext();
                     Bundle bundle = new Bundle();
                     bundle.putString("category", category);
                     bundle.putString("subcategory", dishCategoryList.get(position).getCategoryName());
-                    activity.getSupportFragmentManager().beginTransaction().replace(R.id.flFragment, DishMapFragment.class, bundle).commit();
+                    Navigation.findNavController(view).navigate(R.id.dishMapFragment, bundle);
                 });
             }
         };

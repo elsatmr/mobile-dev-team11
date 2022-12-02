@@ -89,6 +89,9 @@ dependencies {
     implementation 'com.mapbox.mapboxsdk:mapbox-sdk-turf:6.9.0'
     implementation 'com.mapbox.mapboxsdk:mapbox-sdk-core:6.9.0'
 
+    //navigation dependencies
+    implementation("androidx.navigation:navigation-fragment:2.5.3")
+    implementation("androidx.navigation:navigation-ui:2.5.3")
     // Google play services - DO NOT UPGRADE ABOVE 19
     implementation 'com.google.android.gms:play-services-location:19.0.0'
 

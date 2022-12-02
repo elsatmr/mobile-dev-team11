@@ -3,7 +3,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".slurp.SearchUserFragment">
+    tools:context=".slurp.SearchUserFragment"
+    android:id="@+id/slurp_fragment_search">
 
     <!-- TODO: Update blank fragment layout -->
     <TextView
