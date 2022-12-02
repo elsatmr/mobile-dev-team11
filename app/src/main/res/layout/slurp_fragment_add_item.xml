@@ -12,16 +12,26 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/dishName"
+            android:layout_width="207dp"
+            android:layout_height="48dp"
+            android:layout_marginBottom="20dp"
+            android:hint="Dish name"
+            app:layout_constraintBottom_toTopOf="@+id/restaurantName"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.485"
+            app:layout_constraintStart_toStartOf="parent" />
+
         <ImageView
             android:id="@+id/imageView"
             android:layout_width="match_parent"
-            android:layout_height="528dp"
+            android:layout_height="400dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_bias="0.2"
-            />
+            app:layout_constraintVertical_bias="0.2" />
 
         <Button
             android:id="@+id/captureImage"
@@ -30,8 +40,32 @@
             android:text="Take a picture"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.497"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/imageView" />
+            app:layout_constraintTop_toBottomOf="@+id/imageView"
+            app:layout_constraintVertical_bias="0.663" />
+
+        <Button
+            android:id="@+id/submitButton"
+            android:layout_width="212dp"
+            android:layout_height="wrap_content"
+            android:text="Make a post"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="@+id/captureImage"
+            app:layout_constraintTop_toBottomOf="@+id/captureImage"
+            app:layout_constraintVertical_bias="0.36" />
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/restaurantName"
+            android:layout_width="207dp"
+            android:layout_height="48dp"
+            android:hint="Restaurant name"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.485"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/imageView"
+            app:layout_constraintVertical_bias="0.373" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 
 </FrameLayout>

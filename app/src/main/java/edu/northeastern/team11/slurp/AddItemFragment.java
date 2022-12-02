@@ -26,12 +26,13 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.Toast;
 
+import com.google.android.material.textfield.TextInputEditText;
+
 import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
-import java.util.Objects;
 
 import edu.northeastern.team11.R;
 
@@ -53,7 +54,10 @@ public class AddItemFragment extends Fragment {
     // TODO: Rename and change types of parameters
     private String currentImagePath;
     private ImageView image;
-    private Button button;
+    private Button imageButton;
+    private Button submitButton;
+    private TextInputEditText dishName;
+    private TextInputEditText restaurantName;
 
     private String mParam1;
     private String mParam2;
@@ -105,9 +109,18 @@ public class AddItemFragment extends Fragment {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.slurp_fragment_add_item, container, false);
 //        String userName = getCurUserAddItemFrag();
-        button = (Button) view.findViewById(R.id.captureImage);
+        imageButton = (Button) view.findViewById(R.id.captureImage);
+        submitButton = (Button) view.findViewById(R.id.submitButton);
         image = (ImageView) view.findViewById(R.id.imageView);
-        button.setOnClickListener(new View.OnClickListener() {
+//        private TextInputEditText dishName;
+//        private TextInputEditText restaurantName;
+        dishName = (TextInputEditText) view.findViewById(R.id.dishName);
+        restaurantName = (TextInputEditText) view.findViewById(R.id.restaurantName);
+
+        String dish = dishName.getText().toString();
+        String restaurant = restaurantName.getText().toString();
+
+        imageButton.setOnClickListener(new View.OnClickListener() {
           @Override
           public void onClick(View view) {
               if (ContextCompat.checkSelfPermission(
@@ -134,10 +147,24 @@ public class AddItemFragment extends Fragment {
               }
           }
       });
+
+        submitButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                addToDataBase(dish, restaurant);
+            }
+        });
+
+
 //        TextView tv = (TextView) view.findViewById(R.id.addItem_frag_user);
 //        tv.setText("ADD ITEM FRAG, Current User: " + userName);
 
         return view;
+    }
+
+    private void addToDataBase(String dish, String restaurant) {
+        System.out.println("Dish: " + dish);
+        System.out.println("Restaurant: " + restaurant);
     }
 
     private void dispatchCaptureImageIntent() {
