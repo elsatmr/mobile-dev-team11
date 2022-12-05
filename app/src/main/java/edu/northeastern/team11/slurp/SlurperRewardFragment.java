@@ -74,11 +74,22 @@ public class SlurperRewardFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_slurper_reward, container, false);
         String username = this.getCurUserProfileFrag();
         DatabaseReference dbRef = FirebaseDatabase.getInstance().getReferenceFromUrl("https://stickers-19c0f-default-rtdb.firebaseio.com/");
-        dbRef.child("users_slurp").child(username).addValueEventListener(new ValueEventListener() {
+        dbRef.child("friends").child(username).addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
-                User user = snapshot.getValue(User.class);
-                setSlurperStatus(user, view);
+                setNumFriends(view, snapshot.getChildrenCount());
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+
+        dbRef.child("slurperStatusPoints").child(username).addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                setSlurperStatus(view, (Long) snapshot.child("count").getValue());
             }
 
             @Override
@@ -94,12 +105,23 @@ public class SlurperRewardFragment extends Fragment {
         return sharedPreferences.getString("username", null);
     }
 
-    private void setSlurperStatus(User user, View view) {
-        long number = user.getSlurperStatusPoints();
-        TextView slurperStatusTextView = view.findViewById(R.id.slurperStatusTextView);
+    private void setNumFriends(View view, long numFriends) {
         TextView slurperNumFriendsTV = view.findViewById(R.id.numFriendsTextView);
+        slurperNumFriendsTV.setText("Number of friends: " + String.valueOf(numFriends) + " \uD83D\uDE0E");
+    }
+
+    private void setNumVotes(View view, long numVotes) {
         TextView slurperNumVotesTV = view.findViewById(R.id.numVotesTextView);
+        slurperNumVotesTV.setText("Number of votes: " + String.valueOf(numVotes) + " ❤️");
+    }
+
+    private void setNumPosts(View view, long numPosts) {
         TextView slurperNumPostsTV = view.findViewById(R.id.numPostsTextView);
+        slurperNumPostsTV.setText("Number of posts: " + String.valueOf(numPosts) + " \uD83E\uDD73");
+    }
+
+    private void setSlurperStatus(View view, long number) {
+        TextView slurperStatusTextView = view.findViewById(R.id.slurperStatusTextView);
         ImageView slurperStatusImageView = view.findViewById(R.id.slurperStatusEmblem);
         if (number < 5) {
             slurperStatusTextView.setText("Baby Slurper \uD83C\uDF7C");
@@ -117,8 +139,8 @@ public class SlurperRewardFragment extends Fragment {
             slurperStatusTextView.setText("Chief of Slurper \uD83E\uDDB9");
             slurperStatusImageView.setImageResource(R.drawable.chief);
         }
-        slurperNumFriendsTV.setText("Number of friends: " + String.valueOf(user.getNumFriends()) + " \uD83D\uDE0E");
-        slurperNumPostsTV.setText("Number of posts: " + String.valueOf(user.getNumPosts()) + " \uD83E\uDD73");
-        slurperNumVotesTV.setText("Number of votes: " + String.valueOf(user.getNumTimesVoted()) + " ❤️");
+
+
+
     }
 }
