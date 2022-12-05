@@ -84,13 +84,15 @@ public class SlurpSignUpActivity extends AppCompatActivity {
 
     // write to db information about the new user
     private void addNewSlurpUser(String username, String cityState) {
+        // create a new user with user info
         ref.child("users_slurp").child(username).child("cityState").setValue(cityState);
-        ref.child("users_slurp").child(username).child("friends").child("total").setValue(0);
-        ref.child("users_slurp").child(username).child("numFriends").setValue(0);
-        ref.child("users_slurp").child(username).child("numPosts").setValue(0);
-        ref.child("users_slurp").child(username).child("numTimesVoted").setValue(0);
         ref.child("users_slurp").child(username).child("profilePhotoLink").setValue("no_profile_pic_set");
-        ref.child("users_slurp").child(username).child("slurperStatusPoints").setValue(0);
+
+        // set up new user with initially no friends
+        ref.child("friends").child(username).child("init").setValue("init");
+        // set up new user with initially 0 slurper status points
+        ref.child("slurperStatusPoints").child(username).child("count").setValue(0);
+
     }
 
     private void signInUser() {
