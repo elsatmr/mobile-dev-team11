@@ -1,8 +1,11 @@
 package edu.northeastern.team11.slurp;
 
+import android.animation.TimeInterpolator;
+import android.animation.ValueAnimator;
 import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.graphics.Color;
+import android.graphics.PointF;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
@@ -10,12 +13,17 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.BounceInterpolator;
+import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.constraintlayout.widget.ConstraintSet;
+import androidx.constraintlayout.widget.Constraints;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.recyclerview.widget.StaggeredGridLayoutManager;
@@ -28,6 +36,9 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.mapbox.android.core.permissions.PermissionsListener;
 import com.mapbox.android.core.permissions.PermissionsManager;
+import com.mapbox.geojson.Feature;
+import com.mapbox.geojson.FeatureCollection;
+import com.mapbox.geojson.Point;
 import com.mapbox.mapboxsdk.Mapbox;
 import com.mapbox.mapboxsdk.camera.CameraPosition;
 import com.mapbox.mapboxsdk.camera.CameraUpdateFactory;
@@ -44,6 +55,21 @@ import com.mapbox.mapboxsdk.maps.MapView;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
 import com.mapbox.mapboxsdk.maps.Style;
+import com.mapbox.mapboxsdk.plugins.annotation.OnSymbolClickListener;
+import com.mapbox.mapboxsdk.plugins.annotation.Symbol;
+import com.mapbox.mapboxsdk.plugins.annotation.SymbolManager;
+import com.mapbox.mapboxsdk.plugins.annotation.SymbolOptions;
+import com.mapbox.mapboxsdk.plugins.markerview.MarkerView;
+import com.mapbox.mapboxsdk.plugins.markerview.MarkerViewManager;
+import com.mapbox.mapboxsdk.style.layers.SymbolLayer;
+import com.mapbox.mapboxsdk.style.sources.GeoJsonSource;
+import com.mapbox.mapboxsdk.utils.BitmapUtils;
+
+import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.iconAllowOverlap;
+import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.iconIgnorePlacement;
+import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.iconImage;
+import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.iconOffset;
+
 
 import java.util.ArrayList;
 import java.util.List;
@@ -52,7 +78,6 @@ import java.util.Objects;
 import edu.northeastern.team11.R;
 
 public class DishMapFragment extends Fragment implements OnMapReadyCallback, OnLocationClickListener, PermissionsListener, OnCameraTrackingChangedListener {
-
 
     private String category;
     private String subcategory;
@@ -72,6 +97,16 @@ public class DishMapFragment extends Fragment implements OnMapReadyCallback, OnL
     private RecyclerView restDishRecycler;
     private RestaurantDishAdapter adapter;
     List<Restaurant> restList;
+    ConstraintLayout mapListLayout;
+    Button reSearchMap;
+    private Style thisStyle;
+
+    // Add pins to map
+    private SymbolManager symbolManager;
+    private List<Symbol> symbolList;
+    private static final String ID_ICON_PIN = "pin";
+    MarkerViewManager markerViewManager;
+    MarkerView markerView;
 
     public DishMapFragment() {
         // Required empty public constructor
@@ -106,7 +141,7 @@ public class DishMapFragment extends Fragment implements OnMapReadyCallback, OnL
         mapView.onCreate(savedInstanceState);
         mapView.getMapAsync(this);
         restDishList = new ArrayList<>();
-        getRestaurants();
+        symbolList = new ArrayList<>();
         restDishRecycler = view.findViewById(R.id.restDishListRecycler);
         adapter = new RestaurantDishAdapter(restDishList, view.getContext());
         restDishRecycler.setHasFixedSize(true);
@@ -114,6 +149,17 @@ public class DishMapFragment extends Fragment implements OnMapReadyCallback, OnL
                 1, StaggeredGridLayoutManager.VERTICAL));
         restDishRecycler.setAdapter(adapter);
 
+        // Create "search again" button on map
+        reSearchMap = view.findViewById(R.id.searchMapButton);
+        reSearchMap.setVisibility(View.INVISIBLE);
+        reSearchMap.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                addPins();
+                reSearchMap.setVisibility(View.INVISIBLE);
+            }
+        });
+        // YELP restaurants nearby current position
         YelpRestaurants rest = new YelpRestaurants(getContext());
         restList = rest.getNearbyRestaurants();
 
@@ -121,19 +167,39 @@ public class DishMapFragment extends Fragment implements OnMapReadyCallback, OnL
         return view;
 
     }
+
     @Override
     public void onMapReady(@NonNull MapboxMap mapboxMap) {
         this.mapboxMap = mapboxMap;
+        markerViewManager = new MarkerViewManager(mapView, mapboxMap);
         mapboxMap.setStyle(Style.OUTDOORS, new Style.OnStyleLoaded() {
             @Override
             public void onStyleLoaded(@NonNull Style style) {
                 enableLocationComponent(style);
+                addPinImageToStyle(style);
+                thisStyle = style;
+                // Get the restaurants and add pins to the map
+                getRestaurants();
             }
         });
-        mapboxMap.getUiSettings().setCompassMargins(0,560,20,0);
+        mapboxMap.getUiSettings().setCompassMargins(0, 560, 20, 0);
+        // When the map moves, allow the user to research the map
+        mapboxMap.addOnCameraMoveListener(new MapboxMap.OnCameraMoveListener() {
+            @Override
+            public void onCameraMove() {
+                reSearchMap.setVisibility(View.VISIBLE);
+            }
+        });
+        reSearchMap.setVisibility(View.INVISIBLE);
     }
 
-    @SuppressWarnings( {"MissingPermission"})
+    private void addPinImageToStyle(Style style) {
+        style.addImage(ID_ICON_PIN,
+                BitmapUtils.getBitmapFromDrawable(getContext().getDrawable(R.drawable.red_push_pin_10)), true);
+    }
+
+
+    @SuppressWarnings({"MissingPermission"})
     private void enableLocationComponent(@NonNull Style loadedMapStyle) {
 // Check if permissions are enabled and if not request
         if (PermissionsManager.areLocationPermissionsGranted(getContext())) {
@@ -189,7 +255,8 @@ public class DishMapFragment extends Fragment implements OnMapReadyCallback, OnL
         }
     }
 
-    @SuppressWarnings( {"MissingPermission"})
+
+    @SuppressWarnings({"MissingPermission"})
     @Override
     public void onLocationComponentClick() {
 
@@ -220,6 +287,7 @@ public class DishMapFragment extends Fragment implements OnMapReadyCallback, OnL
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         permissionsManager.onRequestPermissionsResult(requestCode, permissions, grantResults);
+
     }
 
     @Override
@@ -243,7 +311,7 @@ public class DishMapFragment extends Fragment implements OnMapReadyCallback, OnL
         }
     }
 
-    @SuppressWarnings( {"MissingPermission"})
+    @SuppressWarnings({"MissingPermission"})
     public void onStart() {
         super.onStart();
         mapView.onStart();
@@ -361,9 +429,10 @@ public class DishMapFragment extends Fragment implements OnMapReadyCallback, OnL
                         Log.d("Added RestaurantDish:", newRestDish.getRestName());
                     }
                 }
-
                 adapter.notifyDataSetChanged();
+                addPins();
             }
+
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
 
@@ -371,6 +440,67 @@ public class DishMapFragment extends Fragment implements OnMapReadyCallback, OnL
         });
     }
 
-    //
+    // Add pin to the map
+    private void addPins() {
+        for (Symbol s : symbolList) {
+            symbolManager.delete(s);
+
+        }
+        symbolList.clear();
+
+        for (RestaurantDish rest : restDishList) {
+            // If the rest is within the bounds
+            if (withinVisibleBounds(rest)) {
+                Log.d("Adding", "New Pin");
+
+                // Create new symbolManager so Pins can be added to map
+                symbolManager = new SymbolManager(mapView, mapboxMap, thisStyle);
+                symbolManager.setIconAllowOverlap(true);
+                symbolManager.setTextAllowOverlap(true);
+
+                // Set an onclick listener
+                symbolManager.addClickListener(new OnSymbolClickListener() {
+                    @Override
+                    public boolean onAnnotationClick(Symbol symbol) {
+                        if (symbol.getIconColor().equals("#FF0000")) {
+                            symbol.setIconColor("#A020F0");
+                            TextView newText = new TextView(getContext());
+                            newText.setText("IT WORKS!!!!!");
+                            markerView = new MarkerView(new LatLng(rest.getLatitude(), rest.getLongitude()), newText);
+                            markerViewManager.addMarker(markerView);
+                        } else {
+                            symbol.setIconColor("#FF0000");
+                            markerViewManager.removeMarker(markerView);
+                        }
+                        symbolManager.update(symbol);
+                        return true;
+                    }
+                });
+                // Create the symbol on the map and add to symbolList
+                Symbol symbol = symbolManager.create(new SymbolOptions()
+                        .withLatLng(new LatLng(rest.getLatitude(), rest.getLongitude()))
+                        .withIconImage(ID_ICON_PIN)
+                        .withIconColor("#FF0000")
+//                    .withTextField(rest.getRestName())
+//                    .withTextOffset(new Float[]{1.0f, 1.0f})
+                        .withIconSize(2.7f));
+                symbolList.add(symbol);
+            }
+        }
+    }
+
+    // Returns true if the restDish is within the visible bounds of the map
+    private boolean withinVisibleBounds(RestaurantDish restDish) {
+        Double northBound = mapboxMap.getLatLngBoundsZoomFromCamera(mapboxMap.getCameraPosition()).getLatLngBounds().getLatNorth();
+        Double southBound = mapboxMap.getLatLngBoundsZoomFromCamera(mapboxMap.getCameraPosition()).getLatLngBounds().getLatSouth();
+        Double eastBound = mapboxMap.getLatLngBoundsZoomFromCamera(mapboxMap.getCameraPosition()).getLatLngBounds().getLonEast();
+        Double westBound = mapboxMap.getLatLngBoundsZoomFromCamera(mapboxMap.getCameraPosition()).getLatLngBounds().getLonWest();
+        if (restDish.getLatitude() <= northBound && restDish.getLatitude() >= southBound && restDish.getLongitude() >= westBound && restDish.getLongitude() <= eastBound) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
 
 }
