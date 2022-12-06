@@ -1,12 +1,17 @@
 package edu.northeastern.team11.slurp;
 
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageButton;
+import android.widget.ImageView;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
@@ -40,11 +45,30 @@ public class MyPostsAdapter extends RecyclerView.Adapter<MyPostsViewHolder> {
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
+                AlertDialog.Builder builder = new AlertDialog.Builder(context);
+                View dialog = LayoutInflater.from(context).inflate(R.layout.voting_dialog, null);
+                ImageView dialogImage = dialog.findViewById(R.id.dishImageDialogIV);
+                ImageButton favButton = dialog.findViewById(R.id.favButtonDialog);
+                favButton.setTag("1");
+                String url = currDish.getImageUrl();
+                BackgroundThread2 thread = new BackgroundThread2(dialogImage, url);
+                thread.start();
+                TextView dishNameDialogTV = dialog.findViewById(R.id.dishNameDialogTV);
+                dishNameDialogTV.setText(currDish.getDishName());
+                favButton.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view2) {
+                        confirmMarkFavorite(view2, favButton);
+                    }
+                });
+                builder.setView(dialog)
+                        .setPositiveButton("Close", null);
+                AlertDialog alertDialog = builder.create();
+                alertDialog.show();
             }
         });
         String url = currDish.getImageUrl();
-        BackgroundThread thread = new BackgroundThread(holder, url);
+        BackgroundThread2 thread = new BackgroundThread2(holder.postImageView, url);
         thread.start();
     }
 
@@ -53,12 +77,40 @@ public class MyPostsAdapter extends RecyclerView.Adapter<MyPostsViewHolder> {
         return dishesList.size();
     }
 
-    class BackgroundThread extends Thread {
-        MyPostsViewHolder threadHolder;
+    private void confirmMarkFavorite(View currView, ImageButton favButton) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(context);
+        View favDialog = LayoutInflater.from(context).inflate(R.layout.confirm_fav_dialog, null);
+        builder.setView(favDialog)
+                .setTitle("Confirm changing your favorite restaurant?")
+                .setPositiveButton("Confirm", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        changeMarkFavState(favButton);
+                    }
+                })
+                .setNegativeButton("Cancel", null);
+        AlertDialog dialog = builder.create();
+        dialog.show();
+    }
+
+    private void changeMarkFavState(ImageButton favButton) {
+        if (favButton.getTag() == "1") {
+            Log.d("HEART ONE", "HEART ONE");
+            favButton.setBackgroundResource(R.drawable.ic_baseline_favorite_24);
+            favButton.setTag("2");
+        } else {
+            Log.d("HEART TWO", "HEART TWO");
+            favButton.setBackgroundResource(R.drawable.ic_baseline_favorite_border_24);
+            favButton.setTag("1");
+        }
+    }
+
+    class BackgroundThread2 extends Thread {
+        ImageView imageView;
         String imageUri;
 
-        BackgroundThread(MyPostsViewHolder threadHolder, String url) {
-            this.threadHolder = threadHolder;
+        BackgroundThread2(ImageView imageView, String url) {
+            this.imageView = imageView;
             this.imageUri = url;
         }
 
@@ -66,11 +118,10 @@ public class MyPostsAdapter extends RecyclerView.Adapter<MyPostsViewHolder> {
         public void run() {
             try {
                 final Bitmap bitmap = BitmapFactory.decodeStream((InputStream) new URL(imageUri.toString()).getContent());
-                threadHolder.postImageView.post(new Runnable() {
+                imageView.post(new Runnable() {
                     public void run() {
                         if (bitmap != null) {
-                            Log.d("THREAD", "image not null");
-                            threadHolder.postImageView.setImageBitmap(bitmap);
+                            imageView.setImageBitmap(bitmap);
                         }
                     }
                 });
