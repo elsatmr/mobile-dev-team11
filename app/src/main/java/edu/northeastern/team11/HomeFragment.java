@@ -117,9 +117,6 @@ public class HomeFragment extends Fragment {
         rv.setHasFixedSize(true);
         rv.setLayoutManager(new StaggeredGridLayoutManager(1, StaggeredGridLayoutManager.VERTICAL));
         rv.setAdapter(adapter);
-
-
-
     }
 
     private void getPosts() {

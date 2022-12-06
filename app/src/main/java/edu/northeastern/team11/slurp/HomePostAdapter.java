@@ -43,16 +43,15 @@ public class HomePostAdapter extends RecyclerView.Adapter<HomePostViewHolder> {
         String slurperScore = postsList.get(position).getSlurperScore();
         String author = postsList.get(position).getAuthor();
 
+        // set fields
         holder.dishNameTv.setText(dishName);
         holder.scoreTv.setText("Slurper Score: " + slurperScore);
         holder.authorTv.setText("Posted By: " + author);
 
+        // set image in separate thread
         BackgroundThread thread = new BackgroundThread(holder, imgUrl);
         thread.start();
-
     }
-
-
 
 
     class BackgroundThread extends Thread {
@@ -72,7 +71,7 @@ public class HomePostAdapter extends RecyclerView.Adapter<HomePostViewHolder> {
                     public void run() {
                         if (bitmap != null) {
                             Log.d("THREAD", "image not null");
-                            // set postIv
+                            // retrieve image url and set it
                             threadHolder.postIv.setImageBitmap(bitmap);
                         }
                     }
