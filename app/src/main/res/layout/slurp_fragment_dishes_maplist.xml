@@ -131,4 +131,19 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/mapView" />
 
+    <TextView
+        android:id="@+id/notifyNoResultsText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="50dp"
+        android:elevation="20dp"
+        android:text="No Results - Zoom Out and Search Again"
+        android:textColor="#000000"
+        android:textStyle="bold"
+        android:translationZ="10dp"
+        android:visibility="visible"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/mapView" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>

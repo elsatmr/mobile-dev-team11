@@ -98,15 +98,15 @@ public class DishMapFragment extends Fragment implements OnMapReadyCallback, OnL
     private RestaurantDishAdapter adapter;
     List<Restaurant> restList;
     ConstraintLayout mapListLayout;
-    Button reSearchMap;
+    Button reSearchMap; // Button for "search here" on map
     private Style thisStyle;
+    TextView notifyText;
 
     // Add pins to map
-    private SymbolManager symbolManager;
-    private List<Symbol> symbolList;
+    private List<MapRestaurant> mapRestaurants;
     private static final String ID_ICON_PIN = "pin";
-    MarkerViewManager markerViewManager;
-    MarkerView markerView;
+//    MarkerViewManager markerViewManager;
+//    MarkerView markerView;
 
     public DishMapFragment() {
         // Required empty public constructor
@@ -134,14 +134,16 @@ public class DishMapFragment extends Fragment implements OnMapReadyCallback, OnL
         subcategoryLabel.setText(subcategory);
         categoryButton = view.findViewById(R.id.categoryButton);
         subcategoryButton = view.findViewById(R.id.dishButton);
+        mapListLayout = view.findViewById(R.id.mapListLayout);
+        notifyText = view.findViewById(R.id.notifyNoResultsText);
         addButtonListeners();
         db = FirebaseDatabase.getInstance().getReference();
         homeFab = view.findViewById(R.id.homeFab);
         mapView = view.findViewById(R.id.mapView);
         mapView.onCreate(savedInstanceState);
         mapView.getMapAsync(this);
+        // Recycler View
         restDishList = new ArrayList<>();
-        symbolList = new ArrayList<>();
         restDishRecycler = view.findViewById(R.id.restDishListRecycler);
         adapter = new RestaurantDishAdapter(restDishList, view.getContext());
         restDishRecycler.setHasFixedSize(true);
@@ -149,13 +151,15 @@ public class DishMapFragment extends Fragment implements OnMapReadyCallback, OnL
                 1, StaggeredGridLayoutManager.VERTICAL));
         restDishRecycler.setAdapter(adapter);
 
+        // List of restaurantDishes for map
+        mapRestaurants = new ArrayList<>();
         // Create "search again" button on map
         reSearchMap = view.findViewById(R.id.searchMapButton);
         reSearchMap.setVisibility(View.INVISIBLE);
         reSearchMap.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                addPins();
+                getRestaurants();
                 reSearchMap.setVisibility(View.INVISIBLE);
             }
         });
@@ -171,7 +175,7 @@ public class DishMapFragment extends Fragment implements OnMapReadyCallback, OnL
     @Override
     public void onMapReady(@NonNull MapboxMap mapboxMap) {
         this.mapboxMap = mapboxMap;
-        markerViewManager = new MarkerViewManager(mapView, mapboxMap);
+//        markerViewManager = new MarkerViewManager(mapView, mapboxMap);
         mapboxMap.setStyle(Style.OUTDOORS, new Style.OnStyleLoaded() {
             @Override
             public void onStyleLoaded(@NonNull Style style) {
@@ -402,9 +406,11 @@ public class DishMapFragment extends Fragment implements OnMapReadyCallback, OnL
         subcategoryLabel.setOnClickListener(subcategorySelectListener);
     }
 
-    // Get the cuisines from the database
+    // Get the restaurant dishes from the database that are visible within the map frame
+    // Display 1) as cards on recycler view and 2) on the maps as pins
     private void getRestaurants() {
         db.child("slurpRestaurants").addValueEventListener(new ValueEventListener() {
+            @SuppressLint("ResourceType")
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 restDishList.clear(); // Clear the list to avoid duplication
@@ -425,9 +431,23 @@ public class DishMapFragment extends Fragment implements OnMapReadyCallback, OnL
                         Integer _reviewCount = restDish.child("dishes").child(subcategory).child("reviewCount").getValue(Integer.class);
                         String _restImageUrl = restDish.child("imageUrl").getValue(String.class);
                         RestaurantDish newRestDish = new RestaurantDish(_restName, _restId, subcategory, category, _street, _city, _state, _zip, _lat, _long, _slurpScore, _reviewCount, _restImageUrl);
-                        restDishList.add(newRestDish);
-                        Log.d("Added RestaurantDish:", newRestDish.getRestName());
+
+                        // Add to restListDish IF the restDish is within visible bounds on the map
+                        if (withinVisibleBounds(newRestDish)) {
+
+                            restDishList.add(newRestDish); // Recycler view reads restDishList
+                            Log.d("Added RestaurantDish:", newRestDish.getRestName());
+                        } else {
+                            Log.d("Not", "within Bounds");
+                        }
                     }
+                }
+                if (restDishList.size() > 0) {
+                    Log.d("text", "should be hidden");
+                    notifyText.setVisibility(View.INVISIBLE);
+                } else {
+                    Log.d("text", "should be shown");
+                    notifyText.setVisibility(View.VISIBLE);
                 }
                 adapter.notifyDataSetChanged();
                 addPins();
@@ -442,50 +462,49 @@ public class DishMapFragment extends Fragment implements OnMapReadyCallback, OnL
 
     // Add pin to the map
     private void addPins() {
-        for (Symbol s : symbolList) {
-            symbolManager.delete(s);
-
+        // Remove all pins from map
+        for (MapRestaurant mr : mapRestaurants) {
+            mr.removeFromMap();
         }
-        symbolList.clear();
+        // Clear the list
+        mapRestaurants.clear();
 
         for (RestaurantDish rest : restDishList) {
-            // If the rest is within the bounds
-            if (withinVisibleBounds(rest)) {
-                Log.d("Adding", "New Pin");
+            Integer myPosition = mapRestaurants.size() - 1;
+            Log.d("Adding", "New Pin");
+            // Create new symbolManager
+            SymbolManager symbolManager = new SymbolManager(mapView, mapboxMap, thisStyle);
+            symbolManager.setIconAllowOverlap(true);
+            symbolManager.setTextAllowOverlap(true);
 
-                // Create new symbolManager so Pins can be added to map
-                symbolManager = new SymbolManager(mapView, mapboxMap, thisStyle);
-                symbolManager.setIconAllowOverlap(true);
-                symbolManager.setTextAllowOverlap(true);
+            // Set an onclick listener
+            symbolManager.addClickListener(new OnSymbolClickListener() {
+                @Override
+                public boolean onAnnotationClick(Symbol symbol) {
+                    if (symbol.getIconColor().equals("#FF0000")) {
+                        symbol.setIconColor("#A020F0");
+                        symbol.setTextField(rest.getRestName());
+                        restDishRecycler.scrollToPosition(myPosition);
 
-                // Set an onclick listener
-                symbolManager.addClickListener(new OnSymbolClickListener() {
-                    @Override
-                    public boolean onAnnotationClick(Symbol symbol) {
-                        if (symbol.getIconColor().equals("#FF0000")) {
-                            symbol.setIconColor("#A020F0");
-                            TextView newText = new TextView(getContext());
-                            newText.setText("IT WORKS!!!!!");
-                            markerView = new MarkerView(new LatLng(rest.getLatitude(), rest.getLongitude()), newText);
-                            markerViewManager.addMarker(markerView);
-                        } else {
-                            symbol.setIconColor("#FF0000");
-                            markerViewManager.removeMarker(markerView);
-                        }
-                        symbolManager.update(symbol);
-                        return true;
+                    } else {
+                        symbol.setIconColor("#FF0000");
+                        symbol.setTextField("");
+                        restDishRecycler.scrollToPosition(0);
                     }
-                });
-                // Create the symbol on the map and add to symbolList
-                Symbol symbol = symbolManager.create(new SymbolOptions()
-                        .withLatLng(new LatLng(rest.getLatitude(), rest.getLongitude()))
-                        .withIconImage(ID_ICON_PIN)
-                        .withIconColor("#FF0000")
+                    symbolManager.update(symbol);
+                    return true;
+                }
+            });
+            // Create the symbol on the map and add to symbolList
+            Symbol symbol = symbolManager.create(new SymbolOptions()
+                    .withLatLng(new LatLng(rest.getLatitude(), rest.getLongitude()))
+                    .withIconImage(ID_ICON_PIN)
+                    .withIconColor("#FF0000")
 //                    .withTextField(rest.getRestName())
 //                    .withTextOffset(new Float[]{1.0f, 1.0f})
-                        .withIconSize(2.7f));
-                symbolList.add(symbol);
-            }
+                    .withIconSize(2.7f));
+            MapRestaurant newMapRestaurant = new MapRestaurant(rest, symbolManager, symbol);
+            mapRestaurants.add(newMapRestaurant);
         }
     }
 
