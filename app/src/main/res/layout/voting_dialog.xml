@@ -25,13 +25,6 @@
         app:layout_constraintTop_toBottomOf="@id/dishImageDialogIV"
         app:layout_constraintStart_toStartOf="parent" />
 
-    <TextView
-        android:id="@+id/currFavTVDialog"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Current Favorite: "
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/dishNameDialogTV" />
 
     <ImageButton
         android:id="@+id/favButtonDialog"
@@ -40,7 +33,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:src="@drawable/ic_baseline_favorite_border_24"
-        app:layout_constraintTop_toBottomOf="@id/currFavTVDialog"
+        app:layout_constraintTop_toBottomOf="@id/dishNameDialogTV"
         app:layout_constraintEnd_toEndOf="parent"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
