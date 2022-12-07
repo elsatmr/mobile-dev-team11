@@ -39,10 +39,18 @@
     <fragment
         android:id="@+id/dishMapFragment"
         android:name="edu.northeastern.team11.slurp.DishMapFragment"
-        android:label="DishMapFragment" />
+        android:label="DishMapFragment" >
+        <action
+            android:id="@+id/action_dishMapFragment_to_restaurantDishFragment"
+            app:destination="@id/restaurantDishFragment" />
+    </fragment>
     <fragment
         android:id="@+id/addItemFragment"
         android:name="edu.northeastern.team11.slurp.AddItemFragment"
         android:label="slurp_fragment_add_item"
         tools:layout="@layout/slurp_fragment_add_item" />
+    <fragment
+        android:id="@+id/restaurantDishFragment"
+        android:name="edu.northeastern.team11.slurp.RestaurantDishFragment"
+        android:label="RestaurantDishFragment" />
 </navigation>

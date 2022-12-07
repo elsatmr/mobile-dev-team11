@@ -12,6 +12,7 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
+import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.recyclerview.widget.StaggeredGridLayoutManager;
 
@@ -79,7 +80,7 @@ public class RestaurantDishFragment extends Fragment {
         goBackFAB.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                goBack();
+                goBack(view);
             }
         });
         if (restDish != null) {
@@ -141,11 +142,11 @@ public class RestaurantDishFragment extends Fragment {
         }
     }
 
-    public void goBack(){
+    public void goBack(View view){
         Bundle bundle = new Bundle();
         bundle.putString("category", restDish.getCategory());
         bundle.putString("subcategory", restDish.getDishName());
-        getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.flFragment, DishMapFragment.class, bundle).commit();
+        Navigation.findNavController(view).navigate(R.id.dishMapFragment, bundle);
     }
 
     private void getPosts() {
