@@ -76,13 +76,6 @@ public class RestaurantDishFragment extends Fragment {
         reviewCount = view.findViewById(R.id.reviewsChip);
         slurpScore = view.findViewById(R.id.scoreChip);
         restImageView = view.findViewById(R.id.restaurantImageView);
-        goBackFAB = view.findViewById(R.id.restDishGoBackFAB);
-        goBackFAB.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                goBack(view);
-            }
-        });
         if (restDish != null) {
             restName.setText(restDish.getRestName());
             dishName.setText(restDish.getDishName());
@@ -140,13 +133,6 @@ public class RestaurantDishFragment extends Fragment {
                 e.printStackTrace();
             }
         }
-    }
-
-    public void goBack(View view){
-        Bundle bundle = new Bundle();
-        bundle.putString("category", restDish.getCategory());
-        bundle.putString("subcategory", restDish.getDishName());
-        Navigation.findNavController(view).navigate(R.id.dishMapFragment, bundle);
     }
 
     private void getPosts() {
