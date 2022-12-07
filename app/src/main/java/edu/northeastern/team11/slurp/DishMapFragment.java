@@ -17,6 +17,7 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
+import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.recyclerview.widget.StaggeredGridLayoutManager;
 
@@ -301,15 +302,15 @@ public class DishMapFragment extends Fragment implements OnMapReadyCallback, OnL
     }
 
     // Display the category recycler view so the user can select the category
-    private void displayCategories() {
-        getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.flFragment, CategoryFragment.class, null).commit();
+    private void displayCategories(View view) {
+        Navigation.findNavController(view).navigate(R.id.categoryFragment);
     }
 
     // Display the subcategory recyclerview so the user can select the dish/subcategory
-    private void displaySubcategories() {
+    private void displaySubcategories(View view) {
         Bundle bundle = new Bundle();
         bundle.putString("category", category);
-        getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.flFragment, SubcategoryFragment.class, bundle).commit();
+        Navigation.findNavController(view).navigate(R.id.subcategoryFragment, bundle);
     }
 
     // Add listeners to the category and dish buttons on the UI
@@ -317,7 +318,7 @@ public class DishMapFragment extends Fragment implements OnMapReadyCallback, OnL
         View.OnClickListener categorySelectListener = new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                displayCategories();
+                displayCategories(view);
                 Log.d("Should be =", "select category fragment");
             }
         };
@@ -326,7 +327,7 @@ public class DishMapFragment extends Fragment implements OnMapReadyCallback, OnL
         View.OnClickListener subcategorySelectListener = new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                displaySubcategories();
+                displaySubcategories(view);
                 Log.d("Should be =", "select SUBcategory fragment");
             }
         };
