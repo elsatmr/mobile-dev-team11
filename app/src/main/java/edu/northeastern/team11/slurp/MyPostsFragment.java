@@ -20,6 +20,10 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 import edu.northeastern.team11.R;
 
@@ -45,6 +49,7 @@ public class MyPostsFragment extends Fragment {
     ArrayList<Dish> dishesList;
     RecyclerView postRecyclerView;
     MyPostsAdapter adapter;
+    Set<String> favSet;
 
     public MyPostsFragment() {
         // Required empty public constructor
@@ -97,6 +102,25 @@ public class MyPostsFragment extends Fragment {
                     }
                 }
                 Log.d("SIZEEE", String.valueOf(dishesList.size()));
+                adapter.notifyDataSetChanged();
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+
+        dbRef.child("slurpVotes").child(username).addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                String votes = snapshot.getValue().toString();
+                favSet = new HashSet<String>(Arrays.asList(votes.split(",")));
+                for (Dish dish : dishesList) {
+                    if (favSet.contains(dish.getRestaurantId())) {
+                        dish.setIsFavorite(true);
+                    }
+                }
                 adapter.notifyDataSetChanged();
             }
 

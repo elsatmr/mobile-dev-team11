@@ -3,6 +3,7 @@ package edu.northeastern.team11.slurp;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.util.Log;
@@ -16,21 +17,33 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.List;
 
 import edu.northeastern.team11.R;
 
 public class MyPostsAdapter extends RecyclerView.Adapter<MyPostsViewHolder> {
     private final ArrayList<Dish> dishesList;
     private final Context context;
+    private final List<String> favArray;
+    String username;
 
     public MyPostsAdapter(ArrayList<Dish> dishesList, Context context) {
+        favArray = new ArrayList<>();
         this.dishesList = dishesList;
         this.context = context;
+        for (Dish dish : dishesList) {
+            if (dish.isFavorite()) {
+               favArray.add(dish.getRestaurantId());
+            }
+        }
     }
 
     @NonNull
@@ -49,7 +62,13 @@ public class MyPostsAdapter extends RecyclerView.Adapter<MyPostsViewHolder> {
                 View dialog = LayoutInflater.from(context).inflate(R.layout.voting_dialog, null);
                 ImageView dialogImage = dialog.findViewById(R.id.dishImageDialogIV);
                 ImageButton favButton = dialog.findViewById(R.id.favButtonDialog);
-                favButton.setTag("1");
+                if (currDish.isFavorite()) {
+                    Log.d("game", "here");
+                    favButton.setTag("2");
+                    favButton.setBackgroundResource(R.drawable.ic_baseline_favorite_24);
+                } else {
+                    favButton.setTag("1");
+                }
                 String url = currDish.getImageUrl();
                 BackgroundThread2 thread = new BackgroundThread2(dialogImage, url);
                 thread.start();
@@ -58,7 +77,7 @@ public class MyPostsAdapter extends RecyclerView.Adapter<MyPostsViewHolder> {
                 favButton.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view2) {
-                        confirmMarkFavorite(view2, favButton);
+                        confirmMarkFavorite(view2, favButton, currDish);
                     }
                 });
                 builder.setView(dialog)
@@ -77,7 +96,7 @@ public class MyPostsAdapter extends RecyclerView.Adapter<MyPostsViewHolder> {
         return dishesList.size();
     }
 
-    private void confirmMarkFavorite(View currView, ImageButton favButton) {
+    private void confirmMarkFavorite(View currView, ImageButton favButton, Dish currDish) {
         AlertDialog.Builder builder = new AlertDialog.Builder(context);
         View favDialog = LayoutInflater.from(context).inflate(R.layout.confirm_fav_dialog, null);
         builder.setView(favDialog)
@@ -86,6 +105,14 @@ public class MyPostsAdapter extends RecyclerView.Adapter<MyPostsViewHolder> {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
                         changeMarkFavState(favButton);
+                        String old = currDish.getRestaurantId();
+                        if (currDish.isFavorite()) {
+                            favArray.remove(old);
+                        } else {
+                            favArray.add(old);
+                        }
+                        currDish.setIsFavorite(!currDish.isFavorite());
+                        changeFavorite(String.join(",", favArray));
                     }
                 })
                 .setNegativeButton("Cancel", null);
@@ -103,6 +130,17 @@ public class MyPostsAdapter extends RecyclerView.Adapter<MyPostsViewHolder> {
             favButton.setBackgroundResource(R.drawable.ic_baseline_favorite_border_24);
             favButton.setTag("1");
         }
+    }
+
+    private void changeFavorite(String newFav) {
+        DatabaseReference db = FirebaseDatabase.getInstance().getReference();
+        String username = getCurUserProfileFrag();
+        db.child("slurpVotes").child(username).setValue(newFav);
+    }
+
+    private String getCurUserProfileFrag() {
+        SharedPreferences sharedPreferences = context.getSharedPreferences("settings", 0);
+        return sharedPreferences.getString("username", null);
     }
 
     class BackgroundThread2 extends Thread {
