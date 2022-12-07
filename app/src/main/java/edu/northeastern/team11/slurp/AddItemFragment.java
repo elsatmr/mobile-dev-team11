@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.BitmapFactory;
+import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
 
@@ -26,6 +27,7 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.Toast;
 
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.textfield.TextInputEditText;
 
 import java.io.File;
@@ -54,8 +56,8 @@ public class AddItemFragment extends Fragment {
     // TODO: Rename and change types of parameters
     private String currentImagePath;
     private ImageView image;
-    private Button imageButton;
-    private Button submitButton;
+    private FloatingActionButton imageButton;
+    private FloatingActionButton submitButton;
     private TextInputEditText dishName;
     private TextInputEditText restaurantName;
 
@@ -109,17 +111,14 @@ public class AddItemFragment extends Fragment {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.slurp_fragment_add_item, container, false);
 //        String userName = getCurUserAddItemFrag();
-        imageButton = (Button) view.findViewById(R.id.captureImage);
-        submitButton = (Button) view.findViewById(R.id.submitButton);
+        imageButton = (FloatingActionButton) view.findViewById(R.id.captureImage);
+        submitButton = (FloatingActionButton) view.findViewById(R.id.submitButton);
         image = (ImageView) view.findViewById(R.id.imageView);
-        ImageView image2 = (ImageView) view.findViewById(R.id.imageView);
 //        private TextInputEditText dishName;
 //        private TextInputEditText restaurantName;
         dishName = (TextInputEditText) view.findViewById(R.id.dishName);
         restaurantName = (TextInputEditText) view.findViewById(R.id.restaurantName);
 
-        String dish = dishName.getText().toString();
-        String restaurant = restaurantName.getText().toString();
 
         imageButton.setOnClickListener(new View.OnClickListener() {
           @Override
@@ -152,6 +151,8 @@ public class AddItemFragment extends Fragment {
         submitButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                String dish = dishName.getText().toString();
+                String restaurant = restaurantName.getText().toString();
                 addToDataBase(dish, restaurant);
             }
         });
@@ -188,6 +189,7 @@ public class AddItemFragment extends Fragment {
                         imageFile
                 );
                 System.out.println("URI"+imageUri);
+                image.setBackgroundColor(Color.parseColor("#ffffff"));
                 intent.putExtra(MediaStore.EXTRA_OUTPUT, imageUri);
                 startActivityForResult(intent, REQUEST_CODE_CAPTURE_IMAGE);
             }

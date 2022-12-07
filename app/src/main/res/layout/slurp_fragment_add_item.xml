@@ -6,11 +6,10 @@
     android:layout_height="match_parent"
     tools:context=".slurp.AddItemFragment">
 
-    <!-- TODO: Update blank fragment layout -->
-
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent">
+
 
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/dishName"
@@ -25,35 +24,45 @@
 
         <ImageView
             android:id="@+id/imageView"
-            android:layout_width="match_parent"
-            android:layout_height="400dp"
+            android:layout_width="350dp"
+            android:layout_height="380dp"
+            android:background="#673AB7"
+            android:padding="3dp"
+            android:src="@color/white"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.491"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_bias="0.2" />
+            app:layout_constraintVertical_bias="0.123" />
 
-        <Button
+
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
             android:id="@+id/captureImage"
-            android:layout_width="212dp"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Take a picture"
+            android:src="@drawable/camera"
+            app:backgroundTint="@color/white"
+            android:contentDescription="Capture an image"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.497"
+            app:layout_constraintHorizontal_bias="0.245"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/imageView"
-            app:layout_constraintVertical_bias="0.663" />
+            app:layout_constraintVertical_bias="0.838" />
 
-        <Button
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
             android:id="@+id/submitButton"
-            android:layout_width="212dp"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Make a post"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintStart_toStartOf="@+id/captureImage"
-            app:layout_constraintTop_toBottomOf="@+id/captureImage"
-            app:layout_constraintVertical_bias="0.36" />
+            android:layout_marginStart="92dp"
+            android:src="@drawable/circle_right_arrow"
+            app:backgroundTint="@color/white"
+            android:contentDescription="Share the post"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.268"
+            app:layout_constraintStart_toEndOf="@+id/captureImage"
+            app:layout_constraintTop_toTopOf="@+id/captureImage" />
 
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/restaurantName"
