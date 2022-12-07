@@ -3,7 +3,8 @@
   <component name="DesignSurface">
     <option name="filePathToZoomLevelMap">
       <map>
-        <entry key="app/src/main/res/layout/slurp_fragment_add_item.xml" value="0.14492753623188406" />
+        <entry key="app/src/main/res/layout/activity_signup.xml" value="0.24427083333333333" />
+        <entry key="app/src/main/res/layout/slurp_fragment_add_item.xml" value="0.335" />
       </map>
     </option>
   </component>

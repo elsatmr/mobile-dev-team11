@@ -3,6 +3,7 @@ package edu.northeastern.team11.slurp;
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
@@ -23,18 +24,31 @@ import android.provider.MediaStore;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
+import android.widget.AutoCompleteTextView;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Toast;
 
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.textfield.TextInputEditText;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.OnProgressListener;
+import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
 
 import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.List;
 import java.util.Locale;
+import java.util.UUID;
 
 import edu.northeastern.team11.R;
 
@@ -52,14 +66,31 @@ public class AddItemFragment extends Fragment {
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
 
-
     // TODO: Rename and change types of parameters
     private String currentImagePath;
     private ImageView image;
+    private Uri imageUri;
     private FloatingActionButton imageButton;
     private FloatingActionButton submitButton;
-    private TextInputEditText dishName;
-    private TextInputEditText restaurantName;
+    private EditText dishName;
+    private EditText restaurantName;
+
+    String[] restaurantsList = {"Donut Villa Diner", "Donut Villa Diner", "Pasta Pasta", "Annie's Pizzeria Medford"};
+    String[] categoriesList = {"Italian", "Mexican", "Chinese", "Korean", "Mediterranean"};
+    Float[] slurpScoreslist = {
+            0.0f, 1.0f, 2.0f, 3.0f, 4.0f, 5.0f, 6.0f, 7.0f, 8.0f, 9.0f, 10.0f
+    };
+
+
+    // Database
+    private DatabaseReference dbRef;
+    private FirebaseDatabase firebaseDb;
+    // Storage
+    private FirebaseStorage storage;
+    private StorageReference storageReference;
+    private String storageURI;
+    private Post post;
+    private String username;
 
     private String mParam1;
     private String mParam2;
@@ -108,17 +139,42 @@ public class AddItemFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+        username = getCurUserProfileFrag();
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.slurp_fragment_add_item, container, false);
 //        String userName = getCurUserAddItemFrag();
         imageButton = (FloatingActionButton) view.findViewById(R.id.captureImage);
         submitButton = (FloatingActionButton) view.findViewById(R.id.submitButton);
         image = (ImageView) view.findViewById(R.id.imageView);
-//        private TextInputEditText dishName;
-//        private TextInputEditText restaurantName;
-        dishName = (TextInputEditText) view.findViewById(R.id.dishName);
-        restaurantName = (TextInputEditText) view.findViewById(R.id.restaurantName);
+        image.setBackgroundColor(Color.parseColor("#673AB7"));
+        dishName = (EditText) view.findViewById(R.id.dishName);
+        //restaurantName = (EditText) view.findViewById(R.id.restaurantName);
 
+
+        AutoCompleteTextView autoComplete = (AutoCompleteTextView) view.findViewById(R.id.restaurantName);
+        ArrayAdapter<String> adapter = new ArrayAdapter<String>(getActivity(), android.R.layout.simple_list_item_1, restaurantsList);
+        autoComplete.setAdapter(adapter);
+
+
+        //Request for permission
+        if (ContextCompat.checkSelfPermission(
+                getActivity().getApplicationContext(),
+                Manifest.permission.CAMERA
+        ) != PackageManager.PERMISSION_GRANTED ||
+                ContextCompat.checkSelfPermission(
+                        getActivity().getApplicationContext(),
+                        Manifest.permission.WRITE_EXTERNAL_STORAGE
+                ) != PackageManager.PERMISSION_GRANTED) {
+
+            ActivityCompat.requestPermissions(
+                    getActivity(),
+                    new String[] {
+                            Manifest.permission.CAMERA,
+                            Manifest.permission.WRITE_EXTERNAL_STORAGE
+                    },
+                    REQUEST_CODE_PERMISSIONS
+            );
+        }
 
         imageButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -147,26 +203,116 @@ public class AddItemFragment extends Fragment {
                 }
             }
         });
-
+        
         submitButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 String dish = dishName.getText().toString();
-                String restaurant = restaurantName.getText().toString();
-                addToDataBase(dish, restaurant);
+                //String restaurant = restaurantName.getText().toString();
+                addToDataBase();
             }
         });
-
-
 //        TextView tv = (TextView) view.findViewById(R.id.addItem_frag_user);
 //        tv.setText("ADD ITEM FRAG, Current User: " + userName);
 
         return view;
     }
 
-    private void addToDataBase(String dish, String restaurant) {
-        System.out.println("Dish: " + dish);
-        System.out.println("Restaurant: " + restaurant);
+    private void addToDataBase() {
+        // get the Firebase  storage reference
+        storage = FirebaseStorage.getInstance();
+        storageReference = storage.getReference();
+        if (imageUri != null) {
+            ProgressDialog progressDialog
+                    = new ProgressDialog(this.getActivity());
+            progressDialog.setTitle("Uploading...");
+            progressDialog.show();
+
+            // Defining the child of storageReference
+            StorageReference ref
+                    = storageReference
+                    .child(
+                            "slurpPosts/"
+                                    + UUID.randomUUID().toString());
+
+            // adding listeners on upload
+            // or failure of image
+            ref.putFile(imageUri)
+                    .addOnSuccessListener(
+                            new OnSuccessListener<UploadTask.TaskSnapshot>() {
+
+                                @Override
+                                public void onSuccess(
+                                        UploadTask.TaskSnapshot taskSnapshot)
+                                {
+                                    ref.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+                                        @Override
+                                        public void onSuccess(Uri uri) {
+                                            storageURI = uri.toString();
+                                        }
+                                    });
+
+                                    // Image uploaded successfully
+                                    // Dismiss dialog
+                                    progressDialog.dismiss();
+                                    Toast
+                                            .makeText(getActivity(),
+                                                    "Image Uploaded!!",
+                                                    Toast.LENGTH_SHORT)
+                                            .show();
+                                }
+                            })
+                    .addOnFailureListener(new OnFailureListener() {
+                        @Override
+                        public void onFailure(@NonNull Exception e)
+                        {
+
+                            // Error, Image not uploaded
+                            progressDialog.dismiss();
+                            Toast
+                                    .makeText(getActivity(),
+                                            "Failed " + e.getMessage(),
+                                            Toast.LENGTH_SHORT)
+                                    .show();
+                        }
+                    })
+                    .addOnProgressListener(
+                            new OnProgressListener<UploadTask.TaskSnapshot>() {
+
+                                // Progress Listener for loading
+                                // percentage on the dialog box
+                                @Override
+                                public void onProgress(
+                                        UploadTask.TaskSnapshot taskSnapshot)
+                                {
+                                    double progress
+                                            = (100.0
+                                            * taskSnapshot.getBytesTransferred()
+                                            / taskSnapshot.getTotalByteCount());
+                                    progressDialog.setMessage(
+                                            "Uploaded "
+                                                    + (int)progress + "%");
+                                }
+                            });
+        }
+
+//        username
+//        storageURi
+//        dish
+//        restaurant
+
+//        private String dishName;
+//        private String restId;
+//        private Float slurpScore;
+//        private Integer timestamp;
+
+        YelpRestaurants restaurants = new YelpRestaurants(getActivity());
+        List<Restaurant> restaurantsList = restaurants.getNearbyRestaurants();
+        System.out.println("nearby restaurants count" + restaurantsList.size());
+        System.out.println("nearby restaurants: ");
+        for (int i = 0; i < 50 && i < restaurantsList.size(); i++) {
+            System.out.println(restaurantsList.get(i));
+        }
     }
 
     private void dispatchCaptureImageIntent() {
@@ -183,13 +329,12 @@ public class AddItemFragment extends Fragment {
         }
         if (imageFile != null) {
             System.out.println("createImageFile");
-            Uri imageUri = FileProvider.getUriForFile(
+            imageUri = FileProvider.getUriForFile(
                     requireActivity(),
                     "edu.northeastern.team11.fileprovider",
                     imageFile
             );
             System.out.println("URI"+imageUri);
-            image.setBackgroundColor(Color.parseColor("#ffffff"));
             intent.putExtra(MediaStore.EXTRA_OUTPUT, imageUri);
             startActivityForResult(intent, REQUEST_CODE_CAPTURE_IMAGE);
         }
@@ -205,6 +350,7 @@ public class AddItemFragment extends Fragment {
                 fileName, ".jpg", directory
         );
         currentImagePath = imageFile.getAbsolutePath();
+        System.out.println("Image path" + currentImagePath);
         return imageFile;
     }
 
@@ -227,6 +373,7 @@ public class AddItemFragment extends Fragment {
         if (requestCode == REQUEST_CODE_CAPTURE_IMAGE && resultCode == Activity.RESULT_OK) {
             try {
                 image.setImageBitmap(BitmapFactory.decodeFile(currentImagePath));
+                image.setBackgroundColor(Color.parseColor("#ffffff"));
             }
             catch (Exception exception) {
                 Toast.makeText(getActivity().getApplicationContext(), exception.getMessage(), Toast.LENGTH_SHORT).show();
@@ -236,7 +383,7 @@ public class AddItemFragment extends Fragment {
     }
 
     // get the current user from shared preferences
-    private String getCurUserAddItemFrag() {
+    private String getCurUserProfileFrag() {
         SharedPreferences sharedPreferences = getActivity().getSharedPreferences("settings", 0);
         return sharedPreferences.getString("username", null);
     }
