@@ -97,6 +97,19 @@ public class SlurperRewardFragment extends Fragment {
 
             }
         });
+        dbRef.child("slurpVotes").child(username).addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                String votes = snapshot.getValue().toString();
+                long count = votes.split(",").length;
+                setNumVotes(view, count);
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
         return view;
     }
 
