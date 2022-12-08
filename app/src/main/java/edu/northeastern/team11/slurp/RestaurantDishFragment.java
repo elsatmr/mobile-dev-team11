@@ -154,7 +154,7 @@ public class RestaurantDishFragment extends Fragment {
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 postList.clear();
                 for (DataSnapshot post: snapshot.getChildren()) {
-                    if (restDish.getDishName().equals(post.child("dishName").getValue(String.class)) &&
+                    if (restDish.getDishName().toLowerCase().equals(post.child("dishName").getValue(String.class).toLowerCase()) &&
                             restDish.getRestaurantId().equals(post.child("restaurantId").getValue(String.class))) {
                         String imageUrl = post.child("imageUrl").getValue(String.class);
                         Float slurpScore = post.child("slurpScore").getValue(Float.class);
