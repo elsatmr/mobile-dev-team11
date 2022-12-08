@@ -16,6 +16,7 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.FragmentController;
 import androidx.fragment.app.FragmentTransaction;
+import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.RecyclerView;
 
 import java.io.IOException;
@@ -76,7 +77,7 @@ public class RestaurantDishAdapter extends RecyclerView.Adapter<RestaurantDishVi
             Bundle bundle = new Bundle();
 
             bundle.putParcelable("restDish", (Parcelable) r1);
-            activity.getSupportFragmentManager().beginTransaction().replace(R.id.flFragment, RestaurantDishFragment.class, bundle).commit();
+            Navigation.findNavController(view).navigate(R.id.restaurantDishFragment, bundle);
         });
     }
 

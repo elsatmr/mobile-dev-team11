@@ -1,16 +1,98 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:id="@+id/slurp_fragment_add"
     tools:context=".slurp.AddItemFragment">
 
-    <!-- TODO: Update blank fragment layout -->
-    <TextView
-        android:id="@+id/addItem_frag_user"
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        />
+        android:layout_height="match_parent">
+
+
+        <EditText
+            android:id="@+id/dishName"
+            android:layout_width="207dp"
+            android:layout_height="48dp"
+            android:layout_marginBottom="12dp"
+            android:hint="@string/dish_name"
+            app:layout_constraintBottom_toTopOf="@+id/restaurantName"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.485"
+            app:layout_constraintStart_toStartOf="parent" />
+
+        <ImageView
+            android:id="@+id/imageView"
+            android:layout_width="350dp"
+            android:layout_height="380dp"
+            android:background="#673AB7"
+            android:padding="3dp"
+            android:src="@color/white"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.491"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="0.099" />
+
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/captureImage"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:contentDescription="@string/capture_an_image"
+            android:src="@drawable/camera"
+            app:backgroundTint="@color/white"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.245"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/imageView"
+            app:layout_constraintVertical_bias="0.936" />
+
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/submitButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="92dp"
+            android:contentDescription="@string/share_the_post"
+            android:src="@drawable/circle_right_arrow"
+            app:backgroundTint="@color/white"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.268"
+            app:layout_constraintStart_toEndOf="@+id/captureImage"
+            app:layout_constraintTop_toTopOf="@+id/captureImage" />
+
+        <AutoCompleteTextView
+            android:id="@+id/restaurantName"
+            android:layout_width="207dp"
+            android:layout_height="48dp"
+            android:hint="@string/restaurant_name"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.485"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/imageView"
+            app:layout_constraintVertical_bias="0.25" />
+
+        <EditText
+            android:id="@+id/categorySelection"
+            android:layout_width="207dp"
+            android:layout_height="48dp"
+            android:layout_marginTop="12dp"
+            android:hint="Select the category"
+            app:layout_constraintStart_toStartOf="@+id/restaurantName"
+            app:layout_constraintTop_toBottomOf="@+id/restaurantName" />
+
+        <EditText
+            android:id="@+id/SlurpScore"
+            android:layout_width="207dp"
+            android:layout_height="48dp"
+            android:layout_marginTop="12dp"
+            android:hint="Score the dish"
+            app:layout_constraintStart_toStartOf="@+id/categorySelection"
+            app:layout_constraintTop_toBottomOf="@+id/categorySelection" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
 </FrameLayout>

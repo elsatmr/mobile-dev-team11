@@ -12,6 +12,7 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
+import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.recyclerview.widget.StaggeredGridLayoutManager;
 
@@ -75,13 +76,6 @@ public class RestaurantDishFragment extends Fragment {
         reviewCount = view.findViewById(R.id.reviewsChip);
         slurpScore = view.findViewById(R.id.scoreChip);
         restImageView = view.findViewById(R.id.restaurantImageView);
-        goBackFAB = view.findViewById(R.id.restDishGoBackFAB);
-        goBackFAB.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                goBack();
-            }
-        });
         if (restDish != null) {
             restName.setText(restDish.getRestName());
             dishName.setText(restDish.getDishName());
@@ -139,13 +133,6 @@ public class RestaurantDishFragment extends Fragment {
                 e.printStackTrace();
             }
         }
-    }
-
-    public void goBack(){
-        Bundle bundle = new Bundle();
-        bundle.putString("category", restDish.getCategory());
-        bundle.putString("subcategory", restDish.getDishName());
-        getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.flFragment, DishMapFragment.class, bundle).commit();
     }
 
     private void getPosts() {
