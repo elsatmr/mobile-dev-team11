@@ -71,16 +71,15 @@ public class OtherSlurperRewardFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_slurper_reward, container, false);
-        userClickedOn = this.getUserClickedOn();
-        Log.i("userClickedOn75", userClickedOn);
 
-        totalSlurperPoints = 0;
+        // get user that was clicked on
+        SharedPreferences prefs = getActivity().getSharedPreferences("userClickedOn", Context.MODE_PRIVATE);
+        userClickedOn = prefs.getString("userClickedOn", null);
 
         getSlurperStatusPoints(view);
         getNumVotes();
         getNumPosts();
 
-//        setSlurperStatus(view);
         return view;
     }
 
@@ -92,29 +91,15 @@ public class OtherSlurperRewardFragment extends Fragment {
         // read from db here to get numPosts once this is set up in db
     }
 
+    // get slurper status points for the user, evaluate the points to determine slurper status
     private void getSlurperStatusPoints(View view) {
         DatabaseReference db = FirebaseDatabase.getInstance().getReference();
-//        db.child("slurperStatusPoints").child(userClickedOn).get().addOnCompleteListener(new OnCompleteListener<DataSnapshot>() {
-//            @Override
-//            public void onComplete(@NonNull Task<DataSnapshot> task) {
-//                if (task.isSuccessful()) {
-////                    totalSlurperPoints = Integer.parseInt(task.getResult().getValue().toString());
-//                    String s = String.valueOf(task.getResult().getValue());
-//                    totalSlurperPoints = Integer.parseInt(s);
-//                }
-//            }
-//        });
         db.child("slurperStatusPoints").child(userClickedOn).addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 String s = String.valueOf(snapshot.child("count").getValue());
                 totalSlurperPoints = Integer.parseInt(s);
-//                for (DataSnapshot count : snapshot.getChildren()) {
-//                    String s = String.valueOf(count.getValue());
-//                    totalSlurperPoints = Integer.parseInt(s);
-//                }
-                Log.i("totalStr",s);
-                Log.i("totalInt", String.valueOf(totalSlurperPoints));
+
                 TextView slurperNumFriendsTV = view.findViewById(R.id.numFriendsTextView);
                 slurperNumFriendsTV.setText("Number of friends: " + totalSlurperPoints + " \uD83D\uDE0E");
 
@@ -146,39 +131,34 @@ public class OtherSlurperRewardFragment extends Fragment {
         });
     }
 
-    private String getUserClickedOn() {
-        SharedPreferences prefs = getActivity().getSharedPreferences("settings", Context.MODE_PRIVATE);
-        return prefs.getString("userClickedOn", null);
-    }
-
-    private void setSlurperStatus(View view) {
-        TextView slurperStatusTextView = view.findViewById(R.id.slurperStatusTextView);
-        TextView slurperNumFriendsTV = view.findViewById(R.id.numFriendsTextView);
-        TextView slurperNumVotesTV = view.findViewById(R.id.numVotesTextView);
-        TextView slurperNumPostsTV = view.findViewById(R.id.numPostsTextView);
-        ImageView slurperStatusImageView = view.findViewById(R.id.slurperStatusEmblem);
-        if (totalSlurperPoints < 5) {
-            slurperStatusTextView.setText("Baby Slurper \uD83C\uDF7C");
-            slurperStatusImageView.setImageResource(R.drawable.baby);
-        } else if (totalSlurperPoints >= 5 && totalSlurperPoints < 10) {
-            slurperStatusTextView.setText("Slurper Jr. ✨");
-            slurperStatusImageView.setImageResource(R.drawable.junior);
-        } else if (totalSlurperPoints >= 10 && totalSlurperPoints < 20) {
-            slurperStatusTextView.setText("Slurper Sr. \uD83D\uDCAA");
-            slurperStatusImageView.setImageResource(R.drawable.senior);
-        } else if (totalSlurperPoints >= 20 && totalSlurperPoints < 100) {
-            slurperStatusTextView.setText("Slurper Elite Force \uD83D\uDC6E");
-            slurperStatusImageView.setImageResource(R.drawable.elite);
-        } else {
-            slurperStatusTextView.setText("Chief of Slurper \uD83E\uDDB9");
-            slurperStatusImageView.setImageResource(R.drawable.chief);
-        }
-        slurperNumFriendsTV.setText("Number of friends: " + totalSlurperPoints + " \uD83D\uDE0E");
-        Log.i("totalhere", String.valueOf(totalSlurperPoints));
-        // update these two once numPosts and numVotes has been configured in db
-        slurperNumPostsTV.setText("Number of posts: " + "N/A" + " \uD83E\uDD73");
-        slurperNumVotesTV.setText("Number of votes: " + "N/A" + " ❤️");
-    }
+//    private void setSlurperStatus(View view) {
+//        TextView slurperStatusTextView = view.findViewById(R.id.slurperStatusTextView);
+//        TextView slurperNumFriendsTV = view.findViewById(R.id.numFriendsTextView);
+//        TextView slurperNumVotesTV = view.findViewById(R.id.numVotesTextView);
+//        TextView slurperNumPostsTV = view.findViewById(R.id.numPostsTextView);
+//        ImageView slurperStatusImageView = view.findViewById(R.id.slurperStatusEmblem);
+//        if (totalSlurperPoints < 5) {
+//            slurperStatusTextView.setText("Baby Slurper \uD83C\uDF7C");
+//            slurperStatusImageView.setImageResource(R.drawable.baby);
+//        } else if (totalSlurperPoints >= 5 && totalSlurperPoints < 10) {
+//            slurperStatusTextView.setText("Slurper Jr. ✨");
+//            slurperStatusImageView.setImageResource(R.drawable.junior);
+//        } else if (totalSlurperPoints >= 10 && totalSlurperPoints < 20) {
+//            slurperStatusTextView.setText("Slurper Sr. \uD83D\uDCAA");
+//            slurperStatusImageView.setImageResource(R.drawable.senior);
+//        } else if (totalSlurperPoints >= 20 && totalSlurperPoints < 100) {
+//            slurperStatusTextView.setText("Slurper Elite Force \uD83D\uDC6E");
+//            slurperStatusImageView.setImageResource(R.drawable.elite);
+//        } else {
+//            slurperStatusTextView.setText("Chief of Slurper \uD83E\uDDB9");
+//            slurperStatusImageView.setImageResource(R.drawable.chief);
+//        }
+//        slurperNumFriendsTV.setText("Number of friends: " + totalSlurperPoints + " \uD83D\uDE0E");
+//        Log.i("totalhere", String.valueOf(totalSlurperPoints));
+//        // update these two once numPosts and numVotes has been configured in db
+//        slurperNumPostsTV.setText("Number of posts: " + "N/A" + " \uD83E\uDD73");
+//        slurperNumVotesTV.setText("Number of votes: " + "N/A" + " ❤️");
+//    }
 
 
 }
