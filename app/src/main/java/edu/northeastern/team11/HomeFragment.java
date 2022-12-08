@@ -4,14 +4,34 @@ import android.annotation.SuppressLint;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.RecyclerView;
+import androidx.recyclerview.widget.StaggeredGridLayoutManager;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AbsListView;
 import android.widget.TextView;
 import android.content.SharedPreferences;
 
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
+import com.google.firebase.database.ValueEventListener;
+import com.mapbox.mapboxsdk.maps.Value;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+
+import edu.northeastern.team11.slurp.HomePostAdapter;
+import edu.northeastern.team11.slurp.HomePostItem;
 import edu.northeastern.team11.slurp.MainSlurpActivity;
 
 /**
@@ -25,8 +45,12 @@ public class HomeFragment extends Fragment {
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
-    private TextView curUser;
-    private String username;
+//    private TextView curUser;
+    private String curUser;
+    DatabaseReference db;
+    RecyclerView rv;
+    HomePostAdapter adapter;
+    private List<HomePostItem> postsItemList;
 
 
     // TODO: Rename and change types of parameters
@@ -71,13 +95,55 @@ public class HomeFragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.slurp_fragment_home, container, false);
-
-        // get current username and display it in the current fragment
-        String userName = getCurUserHomeFrag();
-        TextView tv = (TextView) view.findViewById(R.id.home_frag_user);
-        tv.setText("HOME FRAG, Current User: " + userName);
-
         return view;
+    }
+
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        // get the user that's logged in
+        curUser = getCurUserHomeFrag();
+
+        // get ref to db
+        db = FirebaseDatabase.getInstance().getReference();
+        getPosts();
+
+        // initialize postItem list
+        postsItemList = new ArrayList<>();
+
+        // set up rv logic
+        rv = view.findViewById(R.id.all_posts_rv);
+        adapter = new HomePostAdapter(postsItemList, view.getContext());
+        rv.setHasFixedSize(true);
+        rv.setLayoutManager(new StaggeredGridLayoutManager(1, StaggeredGridLayoutManager.VERTICAL));
+        rv.setAdapter(adapter);
+    }
+
+    private void getPosts() {
+        db.child("slurpPosts").addValueEventListener(new ValueEventListener() {
+            @SuppressLint("NotifyDataSetChanged")
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                for (DataSnapshot post : snapshot.getChildren()) {
+                    String author = post.child("userName").getValue().toString();
+                    // don't add postItems that were created by the loggedInUser
+                    if (!Objects.equals(author, curUser)) {
+                        String imgUrl = post.child("imageUrl").getValue().toString();
+                        String dishName = post.child("dishName").getValue().toString();
+                        String slurpScore = post.child("slurpScore").getValue().toString();
+                        HomePostItem homePostItem = new HomePostItem(imgUrl, dishName, slurpScore, author);
+                        postsItemList.add(homePostItem);
+                    }
+                }
+                adapter.notifyDataSetChanged();
+                Log.i("size", String.valueOf(postsItemList.size()));
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
     }
 
     // get the current user from shared preferences
