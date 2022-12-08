@@ -53,4 +53,9 @@
         android:id="@+id/restaurantDishFragment"
         android:name="edu.northeastern.team11.slurp.RestaurantDishFragment"
         android:label="RestaurantDishFragment" />
+
+    <fragment
+        android:id="@+id/otherUserProfileFragment"
+        android:name="edu.northeastern.team11.slurp.OtherUserProfile"
+        android:label="OtherUserProfileFragment" />
 </navigation>
