@@ -28,19 +28,12 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@id/userProfilePicture" />
     <TextView
-        android:id="@+id/slurperStatusTextView"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/slurpUsernameTextView" />
-    <TextView
         android:id="@+id/slurpUserLocationTextView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/slurperStatusTextView" />
+        app:layout_constraintTop_toBottomOf="@id/slurpUsernameTextView" />
 
     <com.google.android.material.tabs.TabLayout
         android:id="@+id/userProfileTabLayout"
