@@ -4,11 +4,14 @@ import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
+import android.location.Location;
+import android.location.LocationManager;
 import android.net.Uri;
 import android.os.Bundle;
 
@@ -20,7 +23,10 @@ import androidx.core.content.FileProvider;
 import androidx.fragment.app.Fragment;
 
 import android.os.Environment;
+import android.os.Looper;
 import android.provider.MediaStore;
+import android.provider.Settings;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -31,12 +37,22 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Toast;
 
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationCallback;
+import com.google.android.gms.location.LocationRequest;
+import com.google.android.gms.location.LocationResult;
+import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.textfield.TextInputEditText;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.OnProgressListener;
 import com.google.firebase.storage.StorageReference;
@@ -45,7 +61,9 @@ import com.google.firebase.storage.UploadTask;
 import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
@@ -74,13 +92,21 @@ public class AddItemFragment extends Fragment {
     private FloatingActionButton submitButton;
     private EditText dishName;
     private EditText restaurantName;
+    private List<String> dishesFromDb;
+    private List<Restaurant> restaurantListFromAPI;
 
-    String[] restaurantsList = {"Donut Villa Diner", "Donut Villa Diner", "Pasta Pasta", "Annie's Pizzeria Medford"};
+    //Location
+    private Location myLocation = null;
+    private Double myLatitude = 42.31295765423661;
+    private Double myLongitude = -71.1015306291878;
+    FusedLocationProviderClient client;
+
+
+    HashMap<String, String> restaurantsListNEUFromDB;
     String[] categoriesList = {"Italian", "Mexican", "Chinese", "Korean", "Mediterranean"};
     Float[] slurpScoreslist = {
             0.0f, 1.0f, 2.0f, 3.0f, 4.0f, 5.0f, 6.0f, 7.0f, 8.0f, 9.0f, 10.0f
     };
-
 
     // Database
     private DatabaseReference dbRef;
@@ -139,6 +165,31 @@ public class AddItemFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+        client = LocationServices
+                .getFusedLocationProviderClient(
+                        getActivity());
+        firebaseDb = FirebaseDatabase.getInstance();
+        dbRef = firebaseDb.getReference();
+        dishesFromDb = new ArrayList<>();
+        restaurantListFromAPI = new ArrayList<>();
+        getDishes();
+
+        // To-Do: location
+
+//        if (myLocation != null) {
+//            getRestaurants();
+//        }
+//        else {
+//            getRestaurantsFromDB();
+//        }
+
+        //Restaurants from API
+        getRestaurants();
+
+        //Restaurants from DB
+//        restaurantsListNEUFromDB = new HashMap<>();
+//        getRestaurantsFromDB();
+
         username = getCurUserProfileFrag();
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.slurp_fragment_add_item, container, false);
@@ -150,11 +201,9 @@ public class AddItemFragment extends Fragment {
         dishName = (EditText) view.findViewById(R.id.dishName);
         //restaurantName = (EditText) view.findViewById(R.id.restaurantName);
 
-
-        AutoCompleteTextView autoComplete = (AutoCompleteTextView) view.findViewById(R.id.restaurantName);
-        ArrayAdapter<String> adapter = new ArrayAdapter<String>(getActivity(), android.R.layout.simple_list_item_1, restaurantsList);
-        autoComplete.setAdapter(adapter);
-
+//        AutoCompleteTextView autoComplete = (AutoCompleteTextView) view.findViewById(R.id.restaurantName);
+//        ArrayAdapter<String> adapter = new ArrayAdapter<String>(getActivity(), android.R.layout.simple_list_item_1, restaurantsList);
+//        autoComplete.setAdapter(adapter);
 
         //Request for permission
         if (ContextCompat.checkSelfPermission(
@@ -168,7 +217,7 @@ public class AddItemFragment extends Fragment {
 
             ActivityCompat.requestPermissions(
                     getActivity(),
-                    new String[] {
+                    new String[]{
                             Manifest.permission.CAMERA,
                             Manifest.permission.WRITE_EXTERNAL_STORAGE
                     },
@@ -190,20 +239,19 @@ public class AddItemFragment extends Fragment {
 
                     ActivityCompat.requestPermissions(
                             getActivity(),
-                            new String[] {
+                            new String[]{
                                     Manifest.permission.CAMERA,
                                     Manifest.permission.WRITE_EXTERNAL_STORAGE
                             },
                             REQUEST_CODE_PERMISSIONS
                     );
-                }
-                else {
+                } else {
                     System.out.println("dispatchCaptureImageIntent called");
                     dispatchCaptureImageIntent();
                 }
             }
         });
-        
+
         submitButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -216,6 +264,54 @@ public class AddItemFragment extends Fragment {
 //        tv.setText("ADD ITEM FRAG, Current User: " + userName);
 
         return view;
+    }
+
+    private void getRestaurantsFromDB() {
+        dbRef.child("slurpRestaurants").addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                for (DataSnapshot restaurant : snapshot.getChildren()) {
+                    //RestaurantDish restaurant1 = restaurant.getValue(RestaurantDish.class);
+                    //restaurantsListNEUFromDB.put(restaurant["name"], restaurant1.getRestaurantId());
+                    //System.out.println("Restaurant +" +restaurant + ", ");
+                }
+                Log.i("restaurantsFromDB", restaurantsListNEUFromDB.toString());
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+    }
+
+    private void getDishes() {
+        dbRef.child("categoryTest").addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                for (DataSnapshot category : snapshot.getChildren()) {
+                    for (DataSnapshot dishes : category.getChildren()) {
+                        for (DataSnapshot dish : dishes.getChildren()) {
+                            dishesFromDb.add(dish.getKey() + "");
+                        }
+                    }
+
+                }
+                Log.i("dishesFromDB", dishesFromDb.toString());
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+    }
+
+    private void getRestaurants() {
+        YelpRestaurantsForPost restaurantsForPost = new YelpRestaurantsForPost(getActivity(), myLongitude, myLatitude);
+        restaurantListFromAPI = restaurantsForPost.getNearbyRestaurants();
+        System.out.println("restaurantListFromAPI");
+        System.out.println(restaurantListFromAPI.toString());
     }
 
     private void addToDataBase() {
@@ -306,13 +402,13 @@ public class AddItemFragment extends Fragment {
 //        private Float slurpScore;
 //        private Integer timestamp;
 
-        YelpRestaurants restaurants = new YelpRestaurants(getActivity());
-        List<Restaurant> restaurantsList = restaurants.getNearbyRestaurants();
-        System.out.println("nearby restaurants count" + restaurantsList.size());
-        System.out.println("nearby restaurants: ");
-        for (int i = 0; i < 50 && i < restaurantsList.size(); i++) {
-            System.out.println(restaurantsList.get(i));
-        }
+//        YelpRestaurants restaurants = new YelpRestaurants(getActivity());
+//        List<Restaurant> restaurantsList = restaurants.getNearbyRestaurants();
+//        System.out.println("nearby restaurants count" + restaurantsList.size());
+//        System.out.println("nearby restaurants: ");
+//        for (int i = 0; i < 50 && i < restaurantsList.size(); i++) {
+//            System.out.println(restaurantsList.get(i));
+//        }
     }
 
     private void dispatchCaptureImageIntent() {

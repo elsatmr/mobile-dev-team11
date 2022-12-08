@@ -20,7 +20,6 @@ public class Post implements Parcelable {
         this.userName = userName;
     }
 
-
     protected Post(Parcel in) {
         imageUrl = in.readString();
         dishName = in.readString();

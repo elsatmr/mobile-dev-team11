@@ -14,8 +14,6 @@ public class Restaurant {
     private Long latitude;
     private Long longitude;
 
-
-
     public String getId() {
         return id;
     }

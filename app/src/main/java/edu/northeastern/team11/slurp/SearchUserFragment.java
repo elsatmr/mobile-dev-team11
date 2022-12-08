@@ -295,7 +295,7 @@ public class SearchUserFragment extends Fragment {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 for (DataSnapshot friend : snapshot.getChildren()) {
-                    friendsList.add(friend.getKey());
+                    friendsList.add(friend.toString());
                 }
                 Log.i("friendsList", friendsList.toString());
             }
