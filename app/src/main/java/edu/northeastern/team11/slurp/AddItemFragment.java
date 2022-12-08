@@ -26,15 +26,20 @@ import android.os.Environment;
 import android.os.Looper;
 import android.provider.MediaStore;
 import android.provider.Settings;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.Spinner;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
@@ -61,7 +66,10 @@ import com.google.firebase.storage.UploadTask;
 import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -90,10 +98,16 @@ public class AddItemFragment extends Fragment {
     private Uri imageUri;
     private FloatingActionButton imageButton;
     private FloatingActionButton submitButton;
-    private EditText dishName;
-    private EditText restaurantName;
+    private AutoCompleteTextView dishName;
+    private Spinner restaurantName;
+    private Spinner categorySpinner;
+    private Spinner scoreSpinner;
     private List<String> dishesFromDb;
+    private List<String> restaurantsToShow;
+    private List<String> categoriesFromDb;
     private List<Restaurant> restaurantListFromAPI;
+    ArrayAdapter adapter1;
+    ArrayAdapter adapter2;
 
     //Location
     private Location myLocation = null;
@@ -104,8 +118,8 @@ public class AddItemFragment extends Fragment {
 
     HashMap<String, String> restaurantsListNEUFromDB;
     String[] categoriesList = {"Italian", "Mexican", "Chinese", "Korean", "Mediterranean"};
-    Float[] slurpScoreslist = {
-            0.0f, 1.0f, 2.0f, 3.0f, 4.0f, 5.0f, 6.0f, 7.0f, 8.0f, 9.0f, 10.0f
+    String[] slurpScoreslist = {
+            "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10"
     };
 
     // Database
@@ -117,6 +131,13 @@ public class AddItemFragment extends Fragment {
     private String storageURI;
     private Post post;
     private String username;
+
+    private String restaurantSelected;
+    private Float slurpScoreSelected;
+    private String dishNameSelected;
+    private String categorySelected;
+    private boolean restaurantNew;
+    String restaurantID;
 
     private String mParam1;
     private String mParam2;
@@ -165,6 +186,7 @@ public class AddItemFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+
         client = LocationServices
                 .getFusedLocationProviderClient(
                         getActivity());
@@ -172,38 +194,110 @@ public class AddItemFragment extends Fragment {
         dbRef = firebaseDb.getReference();
         dishesFromDb = new ArrayList<>();
         restaurantListFromAPI = new ArrayList<>();
+        restaurantsListNEUFromDB = new HashMap<>();
+        restaurantsToShow = new ArrayList<>();
+        categoriesFromDb = new ArrayList<>();
         getDishes();
+        getCategories();
+        getDefaultRestaurantsFromDB();
 
-        // To-Do: location
+        // TODO: get location
 
-//        if (myLocation != null) {
-//            getRestaurants();
-//        }
-//        else {
-//            getRestaurantsFromDB();
-//        }
-
-        //Restaurants from API
-        getRestaurants();
-
-        //Restaurants from DB
-//        restaurantsListNEUFromDB = new HashMap<>();
-//        getRestaurantsFromDB();
+        if (myLocation != null) {
+            //Restaurants from API
+            getRestaurants();
+        }
+        else {
+            //Restaurants from DB
+            getRestaurantsFromDB();
+        }
 
         username = getCurUserProfileFrag();
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.slurp_fragment_add_item, container, false);
-//        String userName = getCurUserAddItemFrag();
+//      String userName = getCurUserAddItemFrag();
         imageButton = (FloatingActionButton) view.findViewById(R.id.captureImage);
         submitButton = (FloatingActionButton) view.findViewById(R.id.submitButton);
         image = (ImageView) view.findViewById(R.id.imageView);
         image.setBackgroundColor(Color.parseColor("#673AB7"));
-        dishName = (EditText) view.findViewById(R.id.dishName);
-        //restaurantName = (EditText) view.findViewById(R.id.restaurantName);
+        dishName = (AutoCompleteTextView) view.findViewById(R.id.dishName);
+        restaurantName = (Spinner) view.findViewById(R.id.restaurantName);
+        categorySpinner = (Spinner) view.findViewById(R.id.categorySelection);
+        categorySpinner.setEnabled(false);
+        scoreSpinner = (Spinner) view.findViewById(R.id.SlurpScoreSpinner);
 
-//        AutoCompleteTextView autoComplete = (AutoCompleteTextView) view.findViewById(R.id.restaurantName);
-//        ArrayAdapter<String> adapter = new ArrayAdapter<String>(getActivity(), android.R.layout.simple_list_item_1, restaurantsList);
-//        autoComplete.setAdapter(adapter);
+        ArrayAdapter<String> adapter = new ArrayAdapter<String>(getActivity(), android.R.layout.simple_list_item_1, dishesFromDb);
+        dishName.setAdapter(adapter);
+
+
+        adapter1 = new ArrayAdapter<String>(getActivity(),
+                android.R.layout.simple_spinner_item, restaurantsToShow);
+        adapter1.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        restaurantName.setAdapter(adapter1);
+
+
+        adapter2 = new ArrayAdapter<String>(getActivity(),
+                android.R.layout.simple_spinner_item, categoriesFromDb);
+        adapter2.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        categorySpinner.setAdapter(adapter2);
+
+
+        ArrayAdapter adapter3 = new ArrayAdapter<String>(getActivity(),
+                android.R.layout.simple_spinner_item, slurpScoreslist);
+        adapter3.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        scoreSpinner.setAdapter(adapter3);
+
+        dishName.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                if(s.toString().trim().length() > 0) {
+                   dishNameSelected = dishName.getText().toString();
+                }
+            }
+        });
+
+        restaurantName.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+
+            @Override
+            public void onItemSelected(AdapterView<?> parentView, View selectedItemView, int position, long id) {
+                restaurantSelected = restaurantName.getSelectedItem().toString();
+                if (restaurantsListNEUFromDB.containsKey(restaurantSelected)) {
+                    restaurantNew = false;
+                    restaurantID = restaurantsListNEUFromDB.get(restaurantSelected);
+                }
+                else {
+                    restaurantNew = true;
+                    categorySpinner.setEnabled(true);
+                }
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parentView) {
+                // your code here
+            }
+        });
+
+        scoreSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+
+            @Override
+            public void onItemSelected(AdapterView<?> parentView, View selectedItemView, int position, long id) {
+                slurpScoreSelected = Float.parseFloat(scoreSpinner.getSelectedItem().toString());
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parentView) {
+                // your code here
+            }
+        });
 
         //Request for permission
         if (ContextCompat.checkSelfPermission(
@@ -255,9 +349,34 @@ public class AddItemFragment extends Fragment {
         submitButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                String dish = dishName.getText().toString();
-                //String restaurant = restaurantName.getText().toString();
-                addToDataBase();
+                if (restaurantNew) {
+                    if (categorySelected != null && restaurantSelected != null && dishNameSelected != null && slurpScoreSelected != null && imageUri != null ) {
+                        addToDataBase();
+                    }
+                    else {
+                        Toast
+                                .makeText(getActivity(),
+                                        "Please fill out all fields",
+                                        Toast.LENGTH_SHORT)
+                                .show();
+                    }
+                }
+                else {
+                    if (restaurantSelected != null && dishNameSelected != null && slurpScoreSelected != null && imageUri != null) {
+                        dishNameSelected = dishName.getText().toString();
+                        //String restaurant = restaurantName.getText().toString();
+                        addToDataBase();
+                    }
+                    else {
+                        Toast
+                                .makeText(getActivity(),
+                                        "Please fill out all fields",
+                                        Toast.LENGTH_SHORT)
+                                .show();
+                    }
+
+                }
+
             }
         });
 //        TextView tv = (TextView) view.findViewById(R.id.addItem_frag_user);
@@ -266,16 +385,39 @@ public class AddItemFragment extends Fragment {
         return view;
     }
 
+    private void getDefaultRestaurantsFromDB() {
+        dbRef.child("slurpRestaurants").addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                for (DataSnapshot restaurant : snapshot.getChildren()) {
+                    String name = restaurant.child("name").getValue(String.class);
+                    restaurantsListNEUFromDB.put(name, restaurant.getKey());
+                }
+
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+    }
+
     private void getRestaurantsFromDB() {
         dbRef.child("slurpRestaurants").addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 for (DataSnapshot restaurant : snapshot.getChildren()) {
+                    String name = restaurant.child("name").getValue(String.class);
                     //RestaurantDish restaurant1 = restaurant.getValue(RestaurantDish.class);
-                    //restaurantsListNEUFromDB.put(restaurant["name"], restaurant1.getRestaurantId());
+                    restaurantsToShow.add(name);
+                    adapter1.notifyDataSetChanged();
                     //System.out.println("Restaurant +" +restaurant + ", ");
                 }
-                Log.i("restaurantsFromDB", restaurantsListNEUFromDB.toString());
+//                for (int i = 0; i < restaurantsToShow.size(); i++) {
+//                    System.out.println(restaurantsToShow.get(i));
+//                }
+                //Log.i("restaurantsFromDB", restaurantsListNEUFromDB.toString());
             }
 
             @Override
@@ -307,11 +449,33 @@ public class AddItemFragment extends Fragment {
         });
     }
 
+    private void getCategories() {
+        dbRef.child("categoryTest").addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                for (DataSnapshot category : snapshot.getChildren()) {
+                        categoriesFromDb.add(category.getKey() + "");
+                }
+                adapter2.notifyDataSetChanged();
+//                System.out.println("categoriesFromDb");
+//                System.out.println(categoriesFromDb.toString());
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+    }
+
     private void getRestaurants() {
         YelpRestaurantsForPost restaurantsForPost = new YelpRestaurantsForPost(getActivity(), myLongitude, myLatitude);
         restaurantListFromAPI = restaurantsForPost.getNearbyRestaurants();
         System.out.println("restaurantListFromAPI");
-        System.out.println(restaurantListFromAPI.toString());
+//         for (int i = 0; i < restaurantListFromAPI.size(); i++) {
+//             System.out.println(restaurantListFromAPI.toString());
+//         }
+//        System.out.println(restaurantListFromAPI.toString());
     }
 
     private void addToDataBase() {
@@ -351,11 +515,11 @@ public class AddItemFragment extends Fragment {
                                     // Image uploaded successfully
                                     // Dismiss dialog
                                     progressDialog.dismiss();
-                                    Toast
-                                            .makeText(getActivity(),
-                                                    "Image Uploaded!!",
-                                                    Toast.LENGTH_SHORT)
-                                            .show();
+//                                    Toast
+//                                            .makeText(getActivity(),
+//                                                    "Image Uploaded!!",
+//                                                    Toast.LENGTH_SHORT)
+//                                            .show();
                                 }
                             })
                     .addOnFailureListener(new OnFailureListener() {
@@ -365,11 +529,11 @@ public class AddItemFragment extends Fragment {
 
                             // Error, Image not uploaded
                             progressDialog.dismiss();
-                            Toast
-                                    .makeText(getActivity(),
-                                            "Failed " + e.getMessage(),
-                                            Toast.LENGTH_SHORT)
-                                    .show();
+//                            Toast
+//                                    .makeText(getActivity(),
+//                                            "Failed " + e.getMessage(),
+//                                            Toast.LENGTH_SHORT)
+//                                    .show();
                         }
                     })
                     .addOnProgressListener(
@@ -385,9 +549,7 @@ public class AddItemFragment extends Fragment {
                                             = (100.0
                                             * taskSnapshot.getBytesTransferred()
                                             / taskSnapshot.getTotalByteCount());
-                                    progressDialog.setMessage(
-                                            "Uploaded "
-                                                    + (int)progress + "%");
+                                    progressDialog.dismiss();
                                 }
                             });
         }
@@ -397,10 +559,27 @@ public class AddItemFragment extends Fragment {
 //        dish
 //        restaurant
 
+            Date date = new Date(System.currentTimeMillis());
+            Post postToAdd = new Post(storageURI, dishNameSelected, restaurantID, slurpScoreSelected, (int)date.getTime(), username);
+        DatabaseReference postsRef = dbRef.child("slurpPosts");
+        DatabaseReference newPostRef = postsRef.push();
+        newPostRef.setValue(postToAdd);
+        Toast.makeText(getActivity(),
+                        "Post Uploaded!!",
+                        Toast.LENGTH_SHORT)
+                .show();
+
 //        private String dishName;
 //        private String restId;
 //        private Float slurpScore;
 //        private Integer timestamp;
+
+//        private String imageUrl;
+//        private String dishName;
+//        private String restId;
+//        private Float slurpScore;
+//        private Integer timestamp;
+//        private String userName;
 
 //        YelpRestaurants restaurants = new YelpRestaurants(getActivity());
 //        List<Restaurant> restaurantsList = restaurants.getNearbyRestaurants();

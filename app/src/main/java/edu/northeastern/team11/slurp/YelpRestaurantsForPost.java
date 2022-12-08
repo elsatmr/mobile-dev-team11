@@ -90,7 +90,6 @@ public class YelpRestaurantsForPost {
         }
 
 
-
     // GET request from API
     private void requestRestaurantsFromAPI(Double latitude, Double longitude, Long radius) {
         Log.d("restzzz", "called requestRestaurantsfromAPI");

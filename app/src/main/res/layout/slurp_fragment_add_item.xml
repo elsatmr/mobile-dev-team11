@@ -11,21 +11,19 @@
         android:layout_height="match_parent">
 
 
-        <EditText
+        <AutoCompleteTextView
             android:id="@+id/dishName"
-            android:layout_width="207dp"
+            android:layout_width="280dp"
             android:layout_height="48dp"
-            android:layout_marginBottom="12dp"
+            android:layout_marginTop="16dp"
             android:hint="@string/dish_name"
-            app:layout_constraintBottom_toTopOf="@+id/restaurantName"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.485"
-            app:layout_constraintStart_toStartOf="parent" />
+            app:layout_constraintStart_toStartOf="@+id/imageView"
+            app:layout_constraintTop_toBottomOf="@+id/imageView" />
 
         <ImageView
             android:id="@+id/imageView"
-            android:layout_width="350dp"
-            android:layout_height="380dp"
+            android:layout_width="280dp"
+            android:layout_height="300dp"
             android:background="#673AB7"
             android:padding="3dp"
             android:src="@color/white"
@@ -47,8 +45,7 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.245"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/imageView"
-            app:layout_constraintVertical_bias="0.936" />
+            app:layout_constraintTop_toBottomOf="@+id/SlurpScoreSpinner" />
 
         <com.google.android.material.floatingactionbutton.FloatingActionButton
             android:id="@+id/submitButton"
@@ -63,35 +60,57 @@
             app:layout_constraintStart_toEndOf="@+id/captureImage"
             app:layout_constraintTop_toTopOf="@+id/captureImage" />
 
-        <AutoCompleteTextView
-            android:id="@+id/restaurantName"
-            android:layout_width="207dp"
-            android:layout_height="48dp"
-            android:hint="@string/restaurant_name"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.485"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/imageView"
-            app:layout_constraintVertical_bias="0.25" />
 
-        <EditText
-            android:id="@+id/categorySelection"
-            android:layout_width="207dp"
-            android:layout_height="48dp"
+        <TextView
+            android:id="@+id/restaurant"
+            android:layout_width="280dp"
+            android:layout_height="wrap_content"
             android:layout_marginTop="12dp"
-            android:hint="Select the category"
+            android:text="@string/restaurant"
+            app:layout_constraintStart_toStartOf="@+id/dishName"
+            app:layout_constraintTop_toBottomOf="@+id/dishName" />
+
+        <Spinner
+            android:id="@+id/restaurantName"
+            android:layout_width="280dp"
+            android:layout_height="30dp"
+            android:layout_marginTop="12dp"
+            app:layout_constraintStart_toStartOf="@+id/restaurant"
+            app:layout_constraintTop_toBottomOf="@+id/restaurant" />
+
+        <TextView
+            android:id="@+id/category"
+            android:layout_width="280dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:text="@string/category"
             app:layout_constraintStart_toStartOf="@+id/restaurantName"
             app:layout_constraintTop_toBottomOf="@+id/restaurantName" />
 
-        <EditText
-            android:id="@+id/SlurpScore"
-            android:layout_width="207dp"
-            android:layout_height="48dp"
+        <Spinner
+            android:id="@+id/categorySelection"
+            android:layout_width="280dp"
+            android:layout_height="30dp"
             android:layout_marginTop="12dp"
-            android:hint="Score the dish"
+            app:layout_constraintStart_toStartOf="@+id/restaurantName"
+            app:layout_constraintTop_toBottomOf="@+id/category" />
+
+        <TextView
+            android:id="@+id/slurpScore"
+            android:layout_width="280dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:text="@string/slurp_score"
             app:layout_constraintStart_toStartOf="@+id/categorySelection"
             app:layout_constraintTop_toBottomOf="@+id/categorySelection" />
+
+        <Spinner
+            android:id="@+id/SlurpScoreSpinner"
+            android:layout_width="280dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            app:layout_constraintStart_toStartOf="@+id/slurpScore"
+            app:layout_constraintTop_toBottomOf="@+id/slurpScore" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
