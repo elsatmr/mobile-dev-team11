@@ -53,7 +53,6 @@ public class OtherUserProfile extends Fragment {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
             userClickedOn = getArguments().getString("userClickedOn");
-            Log.i("setArgs: ", userClickedOn);
         }
     }
 
@@ -72,7 +71,6 @@ public class OtherUserProfile extends Fragment {
         editor.apply();
 
         TextView usernameTv = view.findViewById(R.id.slurpUsernameTextView);
-        Log.i("viewingArgs: ", userClickedOn);
         usernameTv.setText(userClickedOn);
         this.populateTopFragment(userClickedOn);
         this.manageTabLayout();
@@ -80,7 +78,6 @@ public class OtherUserProfile extends Fragment {
     }
 
     private void populateTopFragment(String username) {
-//        Log.i("line76", username);
         firebaseDb = FirebaseDatabase.getInstance();
         dbRef = firebaseDb.getReferenceFromUrl("https://stickers-19c0f-default-rtdb.firebaseio.com/");
         userQuery = dbRef.child("users_slurp").child(username);
