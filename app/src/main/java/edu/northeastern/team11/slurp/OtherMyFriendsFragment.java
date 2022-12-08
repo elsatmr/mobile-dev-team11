@@ -1,17 +1,24 @@
 package edu.northeastern.team11.slurp;
 
+import android.annotation.SuppressLint;
+import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 
@@ -69,11 +76,37 @@ public class OtherMyFriendsFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_my_friends, container, false);
-//        String username = this.getCurUserProfileFrag();
         friendList = new ArrayList<>();
         firebaseDb = FirebaseDatabase.getInstance();
         dbRef = firebaseDb.getReferenceFromUrl("https://stickers-19c0f-default-rtdb.firebaseio.com/");
         myFriendsRecyclerView = view.findViewById(R.id.myFriends_recycler_view);
+
+        SharedPreferences prefs = getActivity().getSharedPreferences("userClickedOn", Context.MODE_PRIVATE);
+        String username = prefs.getString("userClickedOn", null);
+
+        dbRef.child("friends").child(username).addValueEventListener(new ValueEventListener() {
+            @SuppressLint("NotifyDataSetChanged")
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                friendList.clear();
+                for (DataSnapshot friend : snapshot.getChildren()) {
+                    String friendUsername = friend.getKey();
+                    // don't add initial placeholder in db as a friend
+                    if (!friendUsername.equals("init")) {
+                        friendList.add(friendUsername);
+                    }
+                }
+                myFriendsAdapter.notifyDataSetChanged();
+
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+
+        // original read implementation with old db structure
 //        dbRef.child("users_slurp").child(username).child("friends").addValueEventListener(new ValueEventListener() {
 //            @Override
 //            public void onDataChange(@NonNull DataSnapshot snapshot) {
@@ -90,15 +123,11 @@ public class OtherMyFriendsFragment extends Fragment {
 //
 //            }
 //        });
+        Log.i("friendList size: ", String.valueOf(friendList.size()));
         myFriendsAdapter = new MyFriendsAdapter(friendList, getActivity());
         myFriendsRecyclerView.setAdapter(myFriendsAdapter);
         myFriendsRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
         myFriendsRecyclerView.setHasFixedSize(true);
         return view;
     }
-
-//    private String getCurUserProfileFrag() {
-//        SharedPreferences sharedPreferences = getActivity().getSharedPreferences("settings", 0);
-//        return sharedPreferences.getString("username", null);
-//    }
 }
