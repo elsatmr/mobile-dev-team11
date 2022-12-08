@@ -10,12 +10,14 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.fragment.app.Fragment;
 import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.RecyclerView;
@@ -45,6 +47,11 @@ import com.mapbox.mapboxsdk.maps.MapView;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
 import com.mapbox.mapboxsdk.maps.Style;
+import com.mapbox.mapboxsdk.plugins.annotation.OnSymbolClickListener;
+import com.mapbox.mapboxsdk.plugins.annotation.Symbol;
+import com.mapbox.mapboxsdk.plugins.annotation.SymbolManager;
+import com.mapbox.mapboxsdk.plugins.annotation.SymbolOptions;
+import com.mapbox.mapboxsdk.utils.BitmapUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -73,6 +80,14 @@ public class DishMapFragment extends Fragment implements OnMapReadyCallback, OnL
     private RecyclerView restDishRecycler;
     private RestaurantDishAdapter adapter;
     List<Restaurant> restList;
+    ConstraintLayout mapListLayout;
+    Button reSearchMap; // Button for "search here" on map
+    private Style thisStyle;
+    TextView notifyText;
+
+    // Add pins to map
+    private List<MapRestaurant> mapRestaurants;
+    private static final String ID_ICON_PIN = "pin";
 
     public DishMapFragment() {
         // Required empty public constructor
@@ -100,6 +115,8 @@ public class DishMapFragment extends Fragment implements OnMapReadyCallback, OnL
         subcategoryLabel.setText(subcategory);
         categoryButton = view.findViewById(R.id.categoryButton);
         subcategoryButton = view.findViewById(R.id.dishButton);
+        mapListLayout = view.findViewById(R.id.mapListLayout);
+        notifyText = view.findViewById(R.id.notifyNoResultsText);
         addButtonListeners();
         db = FirebaseDatabase.getInstance().getReference();
         homeFab = view.findViewById(R.id.homeFab);
@@ -107,7 +124,6 @@ public class DishMapFragment extends Fragment implements OnMapReadyCallback, OnL
         mapView.onCreate(savedInstanceState);
         mapView.getMapAsync(this);
         restDishList = new ArrayList<>();
-        getRestaurants();
         restDishRecycler = view.findViewById(R.id.restDishListRecycler);
         adapter = new RestaurantDishAdapter(restDishList, view.getContext());
         restDishRecycler.setHasFixedSize(true);
@@ -115,8 +131,21 @@ public class DishMapFragment extends Fragment implements OnMapReadyCallback, OnL
                 1, StaggeredGridLayoutManager.VERTICAL));
         restDishRecycler.setAdapter(adapter);
 
-        YelpRestaurants rest = new YelpRestaurants(getContext());
-        restList = rest.getNearbyRestaurants();
+        // List of restaurantDishes for map
+        mapRestaurants = new ArrayList<>();
+        // Create "search again" button on map
+        reSearchMap = view.findViewById(R.id.searchMapButton);
+        reSearchMap.setVisibility(View.INVISIBLE);
+        reSearchMap.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                getRestaurants();
+                reSearchMap.setVisibility(View.INVISIBLE);
+            }
+        });
+        // YELP restaurants nearby current position
+//        YelpRestaurants rest = new YelpRestaurants(getContext());
+//        restList = rest.getNearbyRestaurants();
 
 
         return view;
@@ -128,18 +157,37 @@ public class DishMapFragment extends Fragment implements OnMapReadyCallback, OnL
         mapboxMap.setStyle(Style.OUTDOORS, new Style.OnStyleLoaded() {
             @Override
             public void onStyleLoaded(@NonNull Style style) {
+
                 enableLocationComponent(style);
+                addPinImageToStyle(style);
+                thisStyle = style;
+                // Get the restaurants and add pins to the map
+                getRestaurants();
             }
         });
-        mapboxMap.getUiSettings().setCompassMargins(0,560,20,0);
+        mapboxMap.getUiSettings().setCompassMargins(0, 560, 20, 0);
+        // When the map moves, allow the user to research the map
+        mapboxMap.addOnCameraMoveListener(new MapboxMap.OnCameraMoveListener() {
+            @Override
+            public void onCameraMove() {
+                reSearchMap.setVisibility(View.VISIBLE);
+            }
+        });
+        reSearchMap.setVisibility(View.INVISIBLE);
     }
+
+    private void addPinImageToStyle(Style style) {
+        style.addImage(ID_ICON_PIN,
+                BitmapUtils.getBitmapFromDrawable(getContext().getDrawable(R.drawable.red_push_pin_10)), true);
+    }
+
 
     @SuppressWarnings( {"MissingPermission"})
     private void enableLocationComponent(@NonNull Style loadedMapStyle) {
 // Check if permissions are enabled and if not request
         if (PermissionsManager.areLocationPermissionsGranted(getContext())) {
 
-// Create and customize the LocationComponent's options
+            // Create and customize the LocationComponent's options
             LocationComponentOptions customLocationComponentOptions = LocationComponentOptions.builder(getContext())
                     .elevation(5)
                     .accuracyAlpha(.2f)
@@ -335,9 +383,11 @@ public class DishMapFragment extends Fragment implements OnMapReadyCallback, OnL
         subcategoryLabel.setOnClickListener(subcategorySelectListener);
     }
 
-    // Get the cuisines from the database
+    // Get the restaurant dishes from the database that are visible within the map frame
+    // Display 1) as cards on recycler view and 2) on the maps as pins
     private void getRestaurants() {
         db.child("slurpRestaurants").addValueEventListener(new ValueEventListener() {
+            @SuppressLint("ResourceType")
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 restDishList.clear(); // Clear the list to avoid duplication
@@ -358,12 +408,25 @@ public class DishMapFragment extends Fragment implements OnMapReadyCallback, OnL
                         Integer _reviewCount = restDish.child("dishes").child(subcategory).child("reviewCount").getValue(Integer.class);
                         String _restImageUrl = restDish.child("imageUrl").getValue(String.class);
                         RestaurantDish newRestDish = new RestaurantDish(_restName, _restId, subcategory, category, _street, _city, _state, _zip, _lat, _long, _slurpScore, _reviewCount, _restImageUrl);
-                        restDishList.add(newRestDish);
-                        Log.d("Added RestaurantDish:", newRestDish.getRestName());
+                        // Add to restListDish IF the restDish is within visible bounds on the map
+                        if (withinVisibleBounds(newRestDish)) {
+
+                            restDishList.add(newRestDish); // Recycler view reads restDishList
+                            Log.d("Added RestaurantDish:", newRestDish.getRestName());
+                        } else {
+                            Log.d("Not", "within Bounds");
+                        }
                     }
                 }
-
+                if (restDishList.size() > 0) {
+                    Log.d("text", "should be hidden");
+                    notifyText.setVisibility(View.INVISIBLE);
+                } else {
+                    Log.d("text", "should be shown");
+                    notifyText.setVisibility(View.VISIBLE);
+                }
                 adapter.notifyDataSetChanged();
+                addPins();
             }
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
@@ -372,6 +435,65 @@ public class DishMapFragment extends Fragment implements OnMapReadyCallback, OnL
         });
     }
 
-    //
+    // Add pin to the map
+    private void addPins() {
+        // Remove all pins from map
+        for (MapRestaurant mr : mapRestaurants) {
+            mr.removeFromMap();
+        }
+        // Clear the list
+        mapRestaurants.clear();
+
+        for (RestaurantDish rest : restDishList) {
+            Integer myPosition = mapRestaurants.size() - 1;
+            Log.d("Adding", "New Pin");
+            // Create new symbolManager
+            SymbolManager symbolManager = new SymbolManager(mapView, mapboxMap, thisStyle);
+            symbolManager.setIconAllowOverlap(true);
+            symbolManager.setTextAllowOverlap(true);
+
+            // Set an onclick listener
+            symbolManager.addClickListener(new OnSymbolClickListener() {
+                @Override
+                public boolean onAnnotationClick(Symbol symbol) {
+                    if (symbol.getIconColor().equals("#FF0000")) {
+                        symbol.setIconColor("#A020F0");
+                        symbol.setTextField(rest.getRestName());
+                        restDishRecycler.scrollToPosition(myPosition);
+
+                    } else {
+                        symbol.setIconColor("#FF0000");
+                        symbol.setTextField("");
+                        restDishRecycler.scrollToPosition(0);
+                    }
+                    symbolManager.update(symbol);
+                    return true;
+                }
+            });
+            // Create the symbol on the map and add to symbolList
+            Symbol symbol = symbolManager.create(new SymbolOptions()
+                    .withLatLng(new LatLng(rest.getLatitude(), rest.getLongitude()))
+                    .withIconImage(ID_ICON_PIN)
+                    .withIconColor("#FF0000")
+//                    .withTextField(rest.getRestName())
+//                    .withTextOffset(new Float[]{1.0f, 1.0f})
+                    .withIconSize(2.7f));
+            MapRestaurant newMapRestaurant = new MapRestaurant(rest, symbolManager, symbol);
+            mapRestaurants.add(newMapRestaurant);
+        }
+    }
+
+    // Returns true if the restDish is within the visible bounds of the map
+    private boolean withinVisibleBounds(RestaurantDish restDish) {
+        Double northBound = mapboxMap.getLatLngBoundsZoomFromCamera(mapboxMap.getCameraPosition()).getLatLngBounds().getLatNorth();
+        Double southBound = mapboxMap.getLatLngBoundsZoomFromCamera(mapboxMap.getCameraPosition()).getLatLngBounds().getLatSouth();
+        Double eastBound = mapboxMap.getLatLngBoundsZoomFromCamera(mapboxMap.getCameraPosition()).getLatLngBounds().getLonEast();
+        Double westBound = mapboxMap.getLatLngBoundsZoomFromCamera(mapboxMap.getCameraPosition()).getLatLngBounds().getLonWest();
+        if (restDish.getLatitude() <= northBound && restDish.getLatitude() >= southBound && restDish.getLongitude() >= westBound && restDish.getLongitude() <= eastBound) {
+            return true;
+        } else {
+            return false;
+        }
+    }
 
 }
