@@ -494,40 +494,40 @@ public class AddItemFragment extends Fragment {
     }
 
     private void addToDataBase() {
-        // get the Firebase  storage reference
-//        storage = FirebaseStorage.getInstance();
-//        storageReference = storage.getReference();
-//
-//        if (imageUri != null) {
-//        final StorageReference ref
-//                = storageReference
-//                .child(
-//                        "slurpPosts/"
-//                                + UUID.randomUUID().toString());
-//        UploadTask uploadTask = ref.putFile(imageUri);
-//
-//        Task<Uri> urlTask = uploadTask.continueWithTask(new Continuation<UploadTask.TaskSnapshot, Task<Uri>>() {
-//            @Override
-//            public Task<Uri> then(@NonNull Task<UploadTask.TaskSnapshot> task) throws Exception {
-//                if (!task.isSuccessful()) {
-//                    throw task.getException();
-//                }
-//
-//                // Continue with the task to get the download URL
-//                return ref.getDownloadUrl();
-//            }
-//        }).addOnCompleteListener(new OnCompleteListener<Uri>() {
-//            @Override
-//            public void onComplete(@NonNull Task<Uri> task) {
-//                if (task.isSuccessful()) {
-//                    storageURI = task.getResult().toString();
-//                } else {
-//                    // Handle failures
-//                    // ...
-//                }
-//            }
-//        });
-//        }
+//         get the Firebase  storage reference
+        storage = FirebaseStorage.getInstance();
+        storageReference = storage.getReference();
+
+        if (imageUri != null) {
+        final StorageReference ref
+                = storageReference
+                .child(
+                        "slurpPosts/"
+                                + UUID.randomUUID().toString());
+        UploadTask uploadTask = ref.putFile(imageUri);
+
+        Task<Uri> urlTask = uploadTask.continueWithTask(new Continuation<UploadTask.TaskSnapshot, Task<Uri>>() {
+            @Override
+            public Task<Uri> then(@NonNull Task<UploadTask.TaskSnapshot> task) throws Exception {
+                if (!task.isSuccessful()) {
+                    throw task.getException();
+                }
+
+                // Continue with the task to get the download URL
+                return ref.getDownloadUrl();
+            }
+        }).addOnCompleteListener(new OnCompleteListener<Uri>() {
+            @Override
+            public void onComplete(@NonNull Task<Uri> task) {
+                if (task.isSuccessful()) {
+                    storageURI = task.getResult().toString();
+                } else {
+                    // Handle failures
+                    // ...
+                }
+            }
+        });
+        }
         System.out.println("Storage URI: " + storageURI);
         Date date = new Date(System.currentTimeMillis());
         Post postToAdd = new Post(storageURI, dishNameSelected, restaurantID, slurpScoreSelected, (int)date.getTime(), username);
