@@ -95,7 +95,7 @@ public class SlurpSignUpActivity extends AppCompatActivity {
         // set up new user with initially 0 numPosts
         ref.child("numPosts").child(username).child("count").setValue(0);
         // set up new user with initially 0 numVotes
-        ref.child("slurpVotes").child(username).setValue("0");
+        ref.child("slurpVotes").child(username).setValue("");
 
 
     }

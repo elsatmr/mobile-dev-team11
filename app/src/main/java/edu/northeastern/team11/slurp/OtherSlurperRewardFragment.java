@@ -112,6 +112,7 @@ public class OtherSlurperRewardFragment extends Fragment {
         db.child("slurpVotes").child(userClickedOn).addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
+                // count length of nums to get number of votes
                 String votes = snapshot.getValue().toString();
                 long count = votes.split(",").length;
                 slurperNumVotesTV.setText("Number of votes: " + count + " ❤️");
