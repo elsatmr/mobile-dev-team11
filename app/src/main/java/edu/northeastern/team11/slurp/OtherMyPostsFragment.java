@@ -38,7 +38,7 @@ public class OtherMyPostsFragment extends Fragment {
     private FirebaseDatabase firebaseDb;
     ArrayList<Dish> dishesList;
     RecyclerView postRecyclerView;
-    MyPostsAdapter adapter;
+    OtherMyPostsAdapter adapter;
 
     public OtherMyPostsFragment() {
         // Required empty public constructor
@@ -107,14 +107,10 @@ public class OtherMyPostsFragment extends Fragment {
         postRecyclerView = view.findViewById(R.id.posts_recycler_view);
         postRecyclerView.setHasFixedSize(true);
         postRecyclerView.setLayoutManager(new GridLayoutManager(getActivity(), 3));
-        adapter = new MyPostsAdapter(dishesList, getActivity());
+        adapter = new OtherMyPostsAdapter(dishesList, getActivity());
         postRecyclerView.setAdapter(adapter);
 
         return view;
     }
 
-//    private String getUserClickedOn() {
-//        SharedPreferences prefs = getActivity().getSharedPreferences("settings", Context.MODE_PRIVATE);
-//        return prefs.getString("userClickedOn", null);
-//    }
 }
