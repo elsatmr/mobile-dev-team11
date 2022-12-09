@@ -47,6 +47,7 @@ import com.google.android.gms.location.LocationCallback;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.tasks.Continuation;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -101,7 +102,6 @@ public class AddItemFragment extends Fragment {
     private FloatingActionButton submitButton;
     private AutoCompleteTextView dishName;
     private Spinner restaurantName;
-//    private Spinner categorySpinner;
     private Spinner scoreSpinner;
     private List<String> dishesFromDb;
     private List<String> restaurantsToShow;
@@ -109,7 +109,6 @@ public class AddItemFragment extends Fragment {
     private List<Restaurant> restaurantListFromAPI;
     private ArrayList<String> dishesForRest;
     ArrayAdapter adapter1;
-    ArrayAdapter adapter2;
 
     //Location
     private Location myLocation = null;
@@ -117,10 +116,9 @@ public class AddItemFragment extends Fragment {
     private Double myLongitude = -71.1015306291878;
     FusedLocationProviderClient client;
 
-
     HashMap<String, String> restaurantsListNEUFromDB;
     HashMap<String, String> restaurantCategoryMap;
-    String[] categoriesList = {"Italian", "Mexican", "Chinese", "Korean", "Mediterranean"};
+    HashMap<String, List<String>> restaurantDishesMap;
     String[] slurpScoreslist = {
             "Score", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10"
     };
@@ -134,11 +132,9 @@ public class AddItemFragment extends Fragment {
     private String storageURI;
     private Post post;
     private String username;
-
     private String restaurantSelected;
     private Float slurpScoreSelected;
     private String dishNameSelected;
-//    private String categorySelected;
     private boolean restaurantNew;
     String restaurantID;
     String categoryOfDishAdded;
@@ -200,12 +196,13 @@ public class AddItemFragment extends Fragment {
         restaurantListFromAPI = new ArrayList<>();
         restaurantsListNEUFromDB = new HashMap<>();
         restaurantCategoryMap  = new HashMap<>();
+        restaurantDishesMap = new HashMap<>();
         restaurantsToShow = new ArrayList<>();
         categoriesFromDb = new ArrayList<>();
         dishesForRest = new ArrayList<>();
         getDishes();
-//        getCategories();
         getDefaultRestaurantsFromDB();
+        getRestaurantDishesFromDB();
 
         if (myLocation != null) {
             //Restaurants from API
@@ -225,8 +222,6 @@ public class AddItemFragment extends Fragment {
         image.setBackgroundColor(Color.parseColor("#673AB7"));
         dishName = (AutoCompleteTextView) view.findViewById(R.id.dishName);
         restaurantName = (Spinner) view.findViewById(R.id.restaurantName);
-//        categorySpinner = (Spinner) view.findViewById(R.id.categorySelection);
-//        categorySpinner.setEnabled(false);
         scoreSpinner = (Spinner) view.findViewById(R.id.SlurpScoreSpinner);
 
         ArrayAdapter<String> adapter = new ArrayAdapter<String>(getActivity(), android.R.layout.simple_list_item_1, dishesFromDb);
@@ -238,10 +233,6 @@ public class AddItemFragment extends Fragment {
         adapter1.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         restaurantName.setAdapter(adapter1);
 
-//        adapter2 = new ArrayAdapter<String>(getActivity(),
-//                android.R.layout.simple_spinner_item, categoriesFromDb);
-//        adapter2.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-//        categorySpinner.setAdapter(adapter2);
 
         ArrayAdapter adapter3 = new ArrayAdapter<String>(getActivity(),
                 android.R.layout.simple_spinner_item, slurpScoreslist);
@@ -262,6 +253,39 @@ public class AddItemFragment extends Fragment {
             public void afterTextChanged(Editable s) {
                 if(s.toString().trim().length() > 0) {
                    dishNameSelected = dishName.getText().toString();
+                }
+                storage = FirebaseStorage.getInstance();
+                storageReference = storage.getReference();
+
+                if (imageUri != null) {
+                    final StorageReference ref
+                            = storageReference
+                            .child(
+                                    "slurpPosts/"
+                                            + UUID.randomUUID().toString());
+                    UploadTask uploadTask = ref.putFile(imageUri);
+
+                    Task<Uri> urlTask = uploadTask.continueWithTask(new Continuation<UploadTask.TaskSnapshot, Task<Uri>>() {
+                        @Override
+                        public Task<Uri> then(@NonNull Task<UploadTask.TaskSnapshot> task) throws Exception {
+                            if (!task.isSuccessful()) {
+                                throw task.getException();
+                            }
+
+                            // Continue with the task to get the download URL
+                            return ref.getDownloadUrl();
+                        }
+                    }).addOnCompleteListener(new OnCompleteListener<Uri>() {
+                        @Override
+                        public void onComplete(@NonNull Task<Uri> task) {
+                            if (task.isSuccessful()) {
+                                storageURI = task.getResult().toString();
+                            } else {
+                                // Handle failures
+                                // ...
+                            }
+                        }
+                    });
                 }
             }
         });
@@ -374,7 +398,6 @@ public class AddItemFragment extends Fragment {
                     restaurantsListNEUFromDB.put(name, restaurant.getKey());
                     restaurantCategoryMap.put(restaurant.getKey(), restaurant.child("category").getValue(String.class));
                 }
-
             }
 
             @Override
@@ -390,17 +413,33 @@ public class AddItemFragment extends Fragment {
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 for (DataSnapshot restaurant : snapshot.getChildren()) {
                     String name = restaurant.child("name").getValue(String.class);
-                    //RestaurantDish restaurant1 = restaurant.getValue(RestaurantDish.class);
                     restaurantsToShow.add(name);
                     adapter1.notifyDataSetChanged();
-                    //System.out.println("Restaurant +" +restaurant + ", ");
                 }
-//                for (int i = 0; i < restaurantsToShow.size(); i++) {
-//                    System.out.println(restaurantsToShow.get(i));
-//                }
-                //Log.i("restaurantsFromDB", restaurantsListNEUFromDB.toString());
             }
 
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+    }
+
+    private void getRestaurantDishesFromDB() {
+        dbRef.child("slurpRestaurants").addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                for (DataSnapshot restaurant : snapshot.getChildren()) {
+                        List<String> dishList = new ArrayList<>();
+                    String id = restaurant.getKey();
+                    for (DataSnapshot dishes : restaurant.getChildren()) {
+                        for (DataSnapshot dish : dishes.getChildren()) {
+                            dishList.add(dish.getKey());
+                        }
+                    }
+                    restaurantDishesMap.put(id, dishList);
+                }
+            }
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
 
@@ -456,122 +495,193 @@ public class AddItemFragment extends Fragment {
 
     private void addToDataBase() {
         // get the Firebase  storage reference
-        storage = FirebaseStorage.getInstance();
-        storageReference = storage.getReference();
-        if (imageUri != null) {
-            ProgressDialog progressDialog
-                    = new ProgressDialog(this.getActivity());
-            progressDialog.setTitle("Uploading...");
-            progressDialog.show();
+//        storage = FirebaseStorage.getInstance();
+//        storageReference = storage.getReference();
+//
+//        if (imageUri != null) {
+//        final StorageReference ref
+//                = storageReference
+//                .child(
+//                        "slurpPosts/"
+//                                + UUID.randomUUID().toString());
+//        UploadTask uploadTask = ref.putFile(imageUri);
+//
+//        Task<Uri> urlTask = uploadTask.continueWithTask(new Continuation<UploadTask.TaskSnapshot, Task<Uri>>() {
+//            @Override
+//            public Task<Uri> then(@NonNull Task<UploadTask.TaskSnapshot> task) throws Exception {
+//                if (!task.isSuccessful()) {
+//                    throw task.getException();
+//                }
+//
+//                // Continue with the task to get the download URL
+//                return ref.getDownloadUrl();
+//            }
+//        }).addOnCompleteListener(new OnCompleteListener<Uri>() {
+//            @Override
+//            public void onComplete(@NonNull Task<Uri> task) {
+//                if (task.isSuccessful()) {
+//                    storageURI = task.getResult().toString();
+//                } else {
+//                    // Handle failures
+//                    // ...
+//                }
+//            }
+//        });
+//        }
+        System.out.println("Storage URI: " + storageURI);
+        Date date = new Date(System.currentTimeMillis());
+        Post postToAdd = new Post(storageURI, dishNameSelected, restaurantID, slurpScoreSelected, (int)date.getTime(), username);
+        DatabaseReference postsRef = dbRef.child("slurpPosts");
+        DatabaseReference newPostRef = postsRef.push();
+        newPostRef.setValue(postToAdd);
 
-            // Defining the child of storageReference
-            StorageReference ref
-                    = storageReference
-                    .child(
-                            "slurpPosts/"
-                                    + UUID.randomUUID().toString());
-
-            // adding listeners on upload
-            // or failure of image
-            ref.putFile(imageUri)
-                    .addOnSuccessListener(
-                            new OnSuccessListener<UploadTask.TaskSnapshot>() {
-
-                                @Override
-                                public void onSuccess(
-                                        UploadTask.TaskSnapshot taskSnapshot)
-                                {
-                                    ref.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
-                                        @Override
-                                        public void onSuccess(Uri uri) {
-                                            storageURI = uri.toString();
-                                        }
-                                    });
-
-                                    // Image uploaded successfully
-                                    // Dismiss dialog
-                                    progressDialog.dismiss();
-//                                    Toast
-//                                            .makeText(getActivity(),
-//                                                    "Image Uploaded!!",
-//                                                    Toast.LENGTH_SHORT)
-//                                            .show();
-                                }
-                            })
-                    .addOnFailureListener(new OnFailureListener() {
-                        @Override
-                        public void onFailure(@NonNull Exception e)
-                        {
-
-                            // Error, Image not uploaded
-                            progressDialog.dismiss();
-//                            Toast
-//                                    .makeText(getActivity(),
-//                                            "Failed " + e.getMessage(),
-//                                            Toast.LENGTH_SHORT)
-//                                    .show();
-                        }
-                    })
-                    .addOnProgressListener(
-                            new OnProgressListener<UploadTask.TaskSnapshot>() {
-
-                                // Progress Listener for loading
-                                // percentage on the dialog box
-                                @Override
-                                public void onProgress(
-                                        UploadTask.TaskSnapshot taskSnapshot)
-                                {
-                                    double progress
-                                            = (100.0
-                                            * taskSnapshot.getBytesTransferred()
-                                            / taskSnapshot.getTotalByteCount());
-                                    progressDialog.dismiss();
-                                }
-                            });
-        }
-
-        //Adding post
-            Date date = new Date(System.currentTimeMillis());
-            Post postToAdd = new Post(storageURI, dishNameSelected, restaurantID, slurpScoreSelected, (int)date.getTime(), username);
-            DatabaseReference postsRef = dbRef.child("slurpPosts");
-            DatabaseReference newPostRef = postsRef.push();
-            newPostRef.setValue(postToAdd);
-
-        //Adding a dish to CategoryTest table
-        if (!dishesFromDb.contains(dishNameSelected)) {
-            categoryOfDishAdded = restaurantCategoryMap.get(restaurantID);
-            System.out.println("Category: "+categoryOfDishAdded);
-            System.out.println("Dish name: "+dishNameSelected);
-            addADishToDishCategoryTestTable(dishNameSelected, categoryOfDishAdded, storageURI);
-        }
-
-        //Adding a dish to Restaurant table
-//        get dishes per restaurant
-//        if not there add a new dish
-
-        getDishesForRestaurant(restaurantID);
-
-        System.out.println("Dishes For Restaurant");
-        System.out.println(dishesForRest.size());
-
-        addADishToRestaurantTable(dishNameSelected);
+        addADishToRestaurantTable(dishNameSelected, restaurantID);
 
         //Updating slurper status point
         updateSlurperStatus();
 
 
         //Updating Restaurant table slurpScore
-        updateSlurpScore(dishNameSelected, restaurantID, slurpScoreSelected);
+        updateSlurpScore(dishNameSelected, restaurantID, slurpScoreSelected, storageURI);
 
         Toast.makeText(getActivity(),
                         "Post Uploaded!!",
                         Toast.LENGTH_SHORT)
                 .show();
+
+//            ProgressDialog progressDialog
+//                    = new ProgressDialog(this.getActivity());
+//            progressDialog.setTitle("Uploading...");
+//            progressDialog.show();
+//
+//            // Defining the child of storageReference
+//            StorageReference ref
+//                    = storageReference
+//                    .child(
+//                            "slurpPosts/"
+//                                    + UUID.randomUUID().toString());
+//
+//            // adding listeners on upload
+//            // or failure of image
+//            ref.putFile(imageUri)
+//                    .addOnSuccessListener(
+//                            new OnSuccessListener<UploadTask.TaskSnapshot>() {
+//                                @Override
+//                                public void onSuccess(
+//                                        UploadTask.TaskSnapshot taskSnapshot)
+//                                {
+//                                    ref.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+//                                        @Override
+//                                        public void onSuccess(Uri uri) {
+//                                            storageURI = uri.toString();
+//                                        }
+//                                    });
+//                                    // Image uploaded successfully
+//                                    // Dismiss dialog
+//                                    progressDialog.dismiss();
+////                                    Toast
+////                                            .makeText(getActivity(),
+////                                                    "Image Uploaded!!",
+////                                                    Toast.LENGTH_SHORT)
+////                                            .show();
+//                                }
+//                            })
+//                    .addOnFailureListener(new OnFailureListener() {
+//                        @Override
+//                        public void onFailure(@NonNull Exception e)
+//                        {
+//                            // Error, Image not uploaded
+//                            progressDialog.dismiss();
+//                            System.out.println("Error to load image");
+////                            Toast
+////                                    .makeText(getActivity(),
+////                                            "Failed " + e.getMessage(),
+////                                            Toast.LENGTH_SHORT)
+////                                    .show();
+//                        }
+//                    })
+//                    .addOnProgressListener(
+//                            new OnProgressListener<UploadTask.TaskSnapshot>() {
+//
+//                                // Progress Listener for loading
+//                                // percentage on the dialog box
+//                                @Override
+//                                public void onProgress(
+//                                        UploadTask.TaskSnapshot taskSnapshot)
+//                                {
+//                                    double progress
+//                                            = (300.0
+//                                            * taskSnapshot.getBytesTransferred()
+//                                            / taskSnapshot.getTotalByteCount());
+//                                    progressDialog.dismiss();
+//                                }
+//                            }).addOnCompleteListener(new OnCompleteListener<UploadTask.TaskSnapshot>() {
+//                        @Override
+//                        public void onComplete(@NonNull Task<UploadTask.TaskSnapshot> task) {
+//
+//
+//                            System.out.println("Storage URI: " + storageURI);
+//                            Date date = new Date(System.currentTimeMillis());
+//                            Post postToAdd = new Post(storageURI, dishNameSelected, restaurantID, slurpScoreSelected, (int)date.getTime(), username);
+//                            DatabaseReference postsRef = dbRef.child("slurpPosts");
+//                            DatabaseReference newPostRef = postsRef.push();
+//                            newPostRef.setValue(postToAdd);
+//
+//                            addADishToRestaurantTable(dishNameSelected, restaurantID);
+//
+//                            //Updating slurper status point
+//                            updateSlurperStatus();
+//
+//
+//                            //Updating Restaurant table slurpScore
+//                            updateSlurpScore(dishNameSelected, restaurantID, slurpScoreSelected, storageURI);
+//
+//                            Toast.makeText(getActivity(),
+//                                            "Post Uploaded!!",
+//                                            Toast.LENGTH_SHORT)
+//                                    .show();
+//                        }
+//                    });
+
+        //Adding post
+//            Date date = new Date(System.currentTimeMillis());
+//            Post postToAdd = new Post(storageURI, dishNameSelected, restaurantID, slurpScoreSelected, (int)date.getTime(), username);
+//            DatabaseReference postsRef = dbRef.child("slurpPosts");
+//            DatabaseReference newPostRef = postsRef.push();
+//            newPostRef.setValue(postToAdd);
+
+        //Adding a dish to CategoryTest table
+//        if (!dishesFromDb.contains(dishNameSelected)) {
+//            categoryOfDishAdded = restaurantCategoryMap.get(restaurantID);
+//            System.out.println("Category: "+categoryOfDishAdded);
+//            System.out.println("Dish name: "+dishNameSelected);
+//            addADishToDishCategoryTestTable(dishNameSelected, categoryOfDishAdded, storageURI);
+//        }
+
+        //Adding a dish to Restaurant table
+//        get dishes per restaurant
+//        if not there add a new dish
+
+//        addADishToRestaurantTable(dishNameSelected, restaurantID);
+//
+//        //Updating slurper status point
+//        updateSlurperStatus();
+//
+//
+//        //Updating Restaurant table slurpScore
+//        updateSlurpScore(dishNameSelected, restaurantID, slurpScoreSelected, storageURI);
+//
+//        Toast.makeText(getActivity(),
+//                        "Post Uploaded!!",
+//                        Toast.LENGTH_SHORT)
+//                .show();
     }
 
-    private void updateSlurpScore(String dishNameSelected, String restaurantID, Float givenScore) {
+    private void updateSlurpScore(String dishNameSelected, String restaurantID, Float givenScore,
+                                  String url) {
 
-        dbRef.child("slurpRestaurants").child(restaurantID).child("dishes").child(dishNameSelected).addListenerForSingleValueEvent(new ValueEventListener() {
+        dbRef.child("slurpRestaurants").child(restaurantID).child("dishes").
+                child(dishNameSelected).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 Integer count = 0;
@@ -580,7 +690,6 @@ public class AddItemFragment extends Fragment {
                 for (DataSnapshot user: snapshot.getChildren()) {
                     count = snapshot.child("reviewCount").getValue(Integer.class);
                     score = snapshot.child("slurpScore").getValue(Integer.class);
-                    System.out.println("Count Tomi" + count);
                 }
                 count =  count + 1;
                 newScore = score + ((givenScore - score)/count);
@@ -588,6 +697,17 @@ public class AddItemFragment extends Fragment {
                         child(dishNameSelected).child("reviewCount").setValue(count);
                 dbRef.child("slurpRestaurants").child(restaurantID).child("dishes").
                         child(dishNameSelected).child("slurpScore").setValue(newScore);
+
+                if (!dishesFromDb.contains(dishNameSelected)) {
+                    categoryOfDishAdded = restaurantCategoryMap.get(restaurantID);
+                    System.out.println("Category: "+categoryOfDishAdded);
+                    System.out.println("Dish name: "+dishNameSelected);
+//                    addADishToDishCategoryTestTable(dishNameSelected, categoryOfDishAdded, storageURI);
+                    System.out.println("Category: " + categoryOfDishAdded);
+                    System.out.println("URL: " + url);
+                    dbRef.child("categoryTest").child(categoryOfDishAdded).child("dishes").child(dishNameSelected).push();
+                    dbRef.child("categoryTest").child(categoryOfDishAdded).child("dishes").child(dishNameSelected).setValue(url);
+                }
             }
 
             @Override
@@ -597,25 +717,50 @@ public class AddItemFragment extends Fragment {
         });
     }
 
-    private void addADishToRestaurantTable(String dishNameSelected) {
-//        dbRef.child("categoryTest")
+    private void addADishToRestaurantTable(String dishNameSelected, String restId) {
+        List<String> dishForRest = restaurantDishesMap.get(restId);
+        if(!dishForRest.contains(dishNameSelected)) {
+
+
+                dbRef.child("slurpRestaurants").addValueEventListener(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+                        for (DataSnapshot restaurant : snapshot.getChildren()) {
+                            List<String> dishList = new ArrayList<>();
+                            String id = restaurant.getKey();
+                            for (DataSnapshot dishes : restaurant.getChildren()) {
+                                for (DataSnapshot dish : dishes.getChildren()) {
+                                    dishList.add(dish.getKey());
+                                }
+                            }
+                            restaurantDishesMap.put(id, dishList);
+                        }
+                    }
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError error) {
+
+                    }
+                });
+
+
+        }
     }
 
     // TODO: Fix
-    private void addADishToDishCategoryTestTable(String dishNameSelected, String category, String url) {
-        dbRef.child("slurpPosts").addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                dbRef.child("categoryTest").child(category).child("dishes").child(dishNameSelected).push();
-                dbRef.child("categoryTest").child(category).child("dishes").child(dishNameSelected).setValue(url);
-            }
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-
-            }
-        });
-
-    }
+//    private void addADishToDishCategoryTestTable(String dishNameSelected, String category, String url) {
+//        dbRef.child("slurpPosts").addListenerForSingleValueEvent(new ValueEventListener() {
+//            @Override
+//            public void onDataChange(@NonNull DataSnapshot snapshot) {
+//                dbRef.child("categoryTest").child(category).child("dishes").child(dishNameSelected).push();
+//                dbRef.child("categoryTest").child(category).child("dishes").child(dishNameSelected).setValue(url);
+//            }
+//            @Override
+//            public void onCancelled(@NonNull DatabaseError error) {
+//
+//            }
+//        });
+//
+//    }
 
     private void updateSlurperStatus() {
 
@@ -638,37 +783,22 @@ public class AddItemFragment extends Fragment {
         });
     }
 
-    private void getDishesForRestaurant(String restID) {
-
-        dbRef.child("slurpRestaurants").child(restID).child("dishes").addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                for (DataSnapshot dish: snapshot.getChildren()) {
-                    String strDish = dish.getKey();
-                    dishesForRest.add(strDish);
-                }
-            }
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-            }
-        });
-
-        dbRef.child("slurpRestaurants").addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                for (DataSnapshot restaurant : snapshot.getChildren()) {
-                    String name = restaurant.child("name").getValue(String.class);
-                    restaurantsListNEUFromDB.put(name, restaurant.getKey());
-                    restaurantCategoryMap.put(restaurant.getKey(), restaurant.child("category").getValue(String.class));
-                }
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-
-            }
-        });
-    }
+//    private void getDishesForRestaurant(String restID) {
+//
+//        dbRef.child("slurpRestaurants").child(restID).child("dishes").addValueEventListener(new ValueEventListener() {
+//            @Override
+//            public void onDataChange(@NonNull DataSnapshot snapshot) {
+//                for (DataSnapshot dish: snapshot.getChildren()) {
+//                    String strDish = dish.getKey();
+//                    System.out.println(strDish);
+//                    dishesForRest.add(strDish);
+//                }
+//            }
+//            @Override
+//            public void onCancelled(@NonNull DatabaseError error) {
+//            }
+//        });
+//    }
 
     private void dispatchCaptureImageIntent() {
         Intent intent = new Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE);
