@@ -92,6 +92,8 @@ public class SlurpSignUpActivity extends AppCompatActivity {
         ref.child("friends").child(username).child("init").setValue("init");
         // set up new user with initially 0 slurper status points
         ref.child("slurperStatusPoints").child(username).child("count").setValue(0);
+        // set up new user with initially 0 numPosts
+        ref.child("numPosts").child(username).child("count").setValue(0);
 
     }
 
