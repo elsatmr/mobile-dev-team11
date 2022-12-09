@@ -37,6 +37,7 @@ public class OtherSlurperRewardFragment extends Fragment {
     private String userClickedOn;
     private int totalSlurperPoints;
     private int numPosts;
+    private int numVotes;
     public OtherSlurperRewardFragment() {
         // Required empty public constructor
     }
@@ -107,6 +108,22 @@ public class OtherSlurperRewardFragment extends Fragment {
 
     private void getNumVotes(View view) {
         // read from db here to get numPosts once this is set up in db
+        TextView slurperNumVotesTV = view.findViewById(R.id.numVotesTextView);
+        db.child("slurpVotes").child(userClickedOn).addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                String s = String.valueOf(snapshot.getValue());
+                Log.i("s116", s);
+                numVotes = Integer.parseInt(s);
+                slurperNumVotesTV.setText("Number of votes: " + numVotes + " ❤️");
+
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
     }
 
     // get slurper status points for the user, evaluate the points to determine slurper status
