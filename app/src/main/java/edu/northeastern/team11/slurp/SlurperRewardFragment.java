@@ -110,6 +110,18 @@ public class SlurperRewardFragment extends Fragment {
 
             }
         });
+
+        dbRef.child("numPosts").child(username).addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                setNumPosts(view, (Long) snapshot.child("count").getValue());
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
         return view;
     }
 

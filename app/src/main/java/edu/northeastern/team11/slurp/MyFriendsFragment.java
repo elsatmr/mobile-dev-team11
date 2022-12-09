@@ -87,7 +87,7 @@ public class MyFriendsFragment extends Fragment {
         firebaseDb = FirebaseDatabase.getInstance();
         dbRef = firebaseDb.getReferenceFromUrl("https://stickers-19c0f-default-rtdb.firebaseio.com/");
         myFriendsRecyclerView = view.findViewById(R.id.myFriends_recycler_view);
-        dbRef.child("friends").addValueEventListener(new ValueEventListener() {
+        dbRef.child("friends").child(username).addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 friendList.clear();
