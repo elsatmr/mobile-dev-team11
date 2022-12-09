@@ -469,25 +469,6 @@ public class AddItemFragment extends Fragment {
         });
     }
 
-//    private void getCategories() {
-//        dbRef.child("categoryTest").addValueEventListener(new ValueEventListener() {
-//            @Override
-//            public void onDataChange(@NonNull DataSnapshot snapshot) {
-//                for (DataSnapshot category : snapshot.getChildren()) {
-//                        categoriesFromDb.add(category.getKey() + "");
-//                }
-//                adapter2.notifyDataSetChanged();
-////                System.out.println("categoriesFromDb");
-////                System.out.println(categoriesFromDb.toString());
-//            }
-//
-//            @Override
-//            public void onCancelled(@NonNull DatabaseError error) {
-//
-//            }
-//        });
-//    }
-
     private void getRestaurants() {
         YelpRestaurantsForPost restaurantsForPost = new YelpRestaurantsForPost(getActivity(), myLongitude, myLatitude);
         restaurantListFromAPI = restaurantsForPost.getNearbyRestaurants();
@@ -536,6 +517,9 @@ public class AddItemFragment extends Fragment {
         newPostRef.setValue(postToAdd);
 
         addADishToRestaurantTable(dishNameSelected, restaurantID);
+
+        //Updating number of posts
+        updateNumberOfPosts();
 
         //Updating slurper status point
         updateSlurperStatus();
@@ -774,6 +758,25 @@ public class AddItemFragment extends Fragment {
                 }
                 count =  count + 1;
                 dbRef.child("slurperStatusPoints").child(username).child("count").setValue(count);
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+    }
+
+    private void updateNumberOfPosts() {
+        dbRef.child("numPosts").child(username).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                Integer count = 0;
+                for (DataSnapshot user: snapshot.getChildren()) {
+                    count = snapshot.child("count").getValue(Integer.class);
+                }
+                count =  count + 1;
+                dbRef.child("numPosts").child(username).child("count").setValue(count);
             }
 
             @Override
