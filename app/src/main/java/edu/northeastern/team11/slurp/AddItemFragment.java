@@ -107,6 +107,7 @@ public class AddItemFragment extends Fragment {
     private List<String> restaurantsToShow;
     private List<String> categoriesFromDb;
     private List<Restaurant> restaurantListFromAPI;
+    private ArrayList<String> dishesForRest;
     ArrayAdapter adapter1;
     ArrayAdapter adapter2;
 
@@ -121,7 +122,7 @@ public class AddItemFragment extends Fragment {
     HashMap<String, String> restaurantCategoryMap;
     String[] categoriesList = {"Italian", "Mexican", "Chinese", "Korean", "Mediterranean"};
     String[] slurpScoreslist = {
-            "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10"
+            "Score", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10"
     };
 
     // Database
@@ -201,11 +202,10 @@ public class AddItemFragment extends Fragment {
         restaurantCategoryMap  = new HashMap<>();
         restaurantsToShow = new ArrayList<>();
         categoriesFromDb = new ArrayList<>();
+        dishesForRest = new ArrayList<>();
         getDishes();
 //        getCategories();
         getDefaultRestaurantsFromDB();
-
-        // TODO: get location
 
         if (myLocation != null) {
             //Restaurants from API
@@ -219,7 +219,6 @@ public class AddItemFragment extends Fragment {
         username = getCurUserProfileFrag();
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.slurp_fragment_add_item, container, false);
-//      String userName = getCurUserAddItemFrag();
         imageButton = (FloatingActionButton) view.findViewById(R.id.captureImage);
         submitButton = (FloatingActionButton) view.findViewById(R.id.submitButton);
         image = (ImageView) view.findViewById(R.id.imageView);
@@ -233,18 +232,16 @@ public class AddItemFragment extends Fragment {
         ArrayAdapter<String> adapter = new ArrayAdapter<String>(getActivity(), android.R.layout.simple_list_item_1, dishesFromDb);
         dishName.setAdapter(adapter);
 
-
+        restaurantsToShow.add(0, "Restaurant");
         adapter1 = new ArrayAdapter<String>(getActivity(),
                 android.R.layout.simple_spinner_item, restaurantsToShow);
         adapter1.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         restaurantName.setAdapter(adapter1);
 
-
 //        adapter2 = new ArrayAdapter<String>(getActivity(),
 //                android.R.layout.simple_spinner_item, categoriesFromDb);
 //        adapter2.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 //        categorySpinner.setAdapter(adapter2);
-
 
         ArrayAdapter adapter3 = new ArrayAdapter<String>(getActivity(),
                 android.R.layout.simple_spinner_item, slurpScoreslist);
@@ -273,8 +270,10 @@ public class AddItemFragment extends Fragment {
 
             @Override
             public void onItemSelected(AdapterView<?> parentView, View selectedItemView, int position, long id) {
-                restaurantSelected = restaurantName.getSelectedItem().toString();
-                restaurantID = restaurantsListNEUFromDB.get(restaurantSelected);
+                if (!restaurantName.getSelectedItem().toString().equals("Restaurant")) {
+                    restaurantSelected = restaurantName.getSelectedItem().toString();
+                    restaurantID = restaurantsListNEUFromDB.get(restaurantSelected);
+                }
             }
 
             @Override
@@ -287,7 +286,9 @@ public class AddItemFragment extends Fragment {
 
             @Override
             public void onItemSelected(AdapterView<?> parentView, View selectedItemView, int position, long id) {
-                slurpScoreSelected = Float.parseFloat(scoreSpinner.getSelectedItem().toString());
+                if (!scoreSpinner.getSelectedItem().toString().equals("Score")) {
+                    slurpScoreSelected = Float.parseFloat(scoreSpinner.getSelectedItem().toString());
+                }
             }
 
             @Override
@@ -346,7 +347,6 @@ public class AddItemFragment extends Fragment {
         submitButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (restaurantNew) {
                     if (restaurantSelected != null && dishNameSelected != null && slurpScoreSelected != null && imageUri != null ) {
                         addToDataBase();
                     }
@@ -357,23 +357,6 @@ public class AddItemFragment extends Fragment {
                                         Toast.LENGTH_SHORT)
                                 .show();
                     }
-                }
-                else {
-                    if (restaurantSelected != null && dishNameSelected != null && slurpScoreSelected != null && imageUri != null) {
-                        dishNameSelected = dishName.getText().toString();
-                        //String restaurant = restaurantName.getText().toString();
-                        addToDataBase();
-                    }
-                    else {
-                        Toast
-                                .makeText(getActivity(),
-                                        "Please fill out all fields",
-                                        Toast.LENGTH_SHORT)
-                                .show();
-                    }
-
-                }
-
             }
         });
 //        TextView tv = (TextView) view.findViewById(R.id.addItem_frag_user);
@@ -469,11 +452,6 @@ public class AddItemFragment extends Fragment {
     private void getRestaurants() {
         YelpRestaurantsForPost restaurantsForPost = new YelpRestaurantsForPost(getActivity(), myLongitude, myLatitude);
         restaurantListFromAPI = restaurantsForPost.getNearbyRestaurants();
-        System.out.println("restaurantListFromAPI");
-//         for (int i = 0; i < restaurantListFromAPI.size(); i++) {
-//             System.out.println(restaurantListFromAPI.toString());
-//         }
-//        System.out.println(restaurantListFromAPI.toString());
     }
 
     private void addToDataBase() {
@@ -552,17 +530,12 @@ public class AddItemFragment extends Fragment {
                             });
         }
 
-//        username
-//        storageURi
-//        dish
-//        restaurant
-
         //Adding post
             Date date = new Date(System.currentTimeMillis());
             Post postToAdd = new Post(storageURI, dishNameSelected, restaurantID, slurpScoreSelected, (int)date.getTime(), username);
-        DatabaseReference postsRef = dbRef.child("slurpPosts");
-        DatabaseReference newPostRef = postsRef.push();
-        newPostRef.setValue(postToAdd);
+            DatabaseReference postsRef = dbRef.child("slurpPosts");
+            DatabaseReference newPostRef = postsRef.push();
+            newPostRef.setValue(postToAdd);
 
         //Adding a dish to CategoryTest table
         if (!dishesFromDb.contains(dishNameSelected)) {
@@ -573,6 +546,14 @@ public class AddItemFragment extends Fragment {
         }
 
         //Adding a dish to Restaurant table
+//        get dishes per restaurant
+//        if not there add a new dish
+
+        getDishesForRestaurant(restaurantID);
+
+        System.out.println("Dishes For Restaurant");
+        System.out.println(dishesForRest.size());
+
         addADishToRestaurantTable(dishNameSelected);
 
         //Updating slurper status point
@@ -586,27 +567,6 @@ public class AddItemFragment extends Fragment {
                         "Post Uploaded!!",
                         Toast.LENGTH_SHORT)
                 .show();
-
-
-//        private String dishName;
-//        private String restId;
-//        private Float slurpScore;
-//        private Integer timestamp;
-
-//        private String imageUrl;
-//        private String dishName;
-//        private String restId;
-//        private Float slurpScore;
-//        private Integer timestamp;
-//        private String userName;
-
-//        YelpRestaurants restaurants = new YelpRestaurants(getActivity());
-//        List<Restaurant> restaurantsList = restaurants.getNearbyRestaurants();
-//        System.out.println("nearby restaurants count" + restaurantsList.size());
-//        System.out.println("nearby restaurants: ");
-//        for (int i = 0; i < 50 && i < restaurantsList.size(); i++) {
-//            System.out.println(restaurantsList.get(i));
-//        }
     }
 
     private void updateSlurpScore(String dishNameSelected, String restaurantID, Float givenScore) {
@@ -678,6 +638,38 @@ public class AddItemFragment extends Fragment {
         });
     }
 
+    private void getDishesForRestaurant(String restID) {
+
+        dbRef.child("slurpRestaurants").child(restID).child("dishes").addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                for (DataSnapshot dish: snapshot.getChildren()) {
+                    String strDish = dish.getKey();
+                    dishesForRest.add(strDish);
+                }
+            }
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+            }
+        });
+
+        dbRef.child("slurpRestaurants").addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                for (DataSnapshot restaurant : snapshot.getChildren()) {
+                    String name = restaurant.child("name").getValue(String.class);
+                    restaurantsListNEUFromDB.put(name, restaurant.getKey());
+                    restaurantCategoryMap.put(restaurant.getKey(), restaurant.child("category").getValue(String.class));
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+    }
+
     private void dispatchCaptureImageIntent() {
         Intent intent = new Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE);
         System.out.println("dispatchCaptureImageIntent started");
@@ -739,7 +731,7 @@ public class AddItemFragment extends Fragment {
                 image.setBackgroundColor(Color.parseColor("#ffffff"));
             }
             catch (Exception exception) {
-                Toast.makeText(getActivity().getApplicationContext(), exception.getMessage(), Toast.LENGTH_SHORT).show();
+//                Toast.makeText(getActivity().getApplicationContext(), exception.getMessage(), Toast.LENGTH_SHORT).show();
             }
         }
 //        super.onActivityResult(requestCode, resultCode, data);
