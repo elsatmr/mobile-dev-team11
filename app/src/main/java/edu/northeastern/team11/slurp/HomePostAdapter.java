@@ -4,11 +4,14 @@ import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.View;
 import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
+import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.RecyclerView;
 
 import java.io.IOException;
@@ -51,6 +54,15 @@ public class HomePostAdapter extends RecyclerView.Adapter<HomePostViewHolder> {
         // set image in separate thread
         BackgroundThread thread = new BackgroundThread(holder, imgUrl);
         thread.start();
+
+        holder.itemView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Bundle bundle = new Bundle();
+                bundle.putString("userClickedOn", author);
+                Navigation.findNavController(view).navigate(R.id.otherUserProfileFragment, bundle);
+            }
+        });
     }
 
 

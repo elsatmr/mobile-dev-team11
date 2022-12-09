@@ -3,6 +3,9 @@ package edu.northeastern.team11.slurp;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.icu.lang.UScript;
+import android.os.Bundle;
+import android.util.Log;
 import android.util.Range;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -11,6 +14,7 @@ import android.widget.Button;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -83,6 +87,16 @@ public class UsersAdapter  extends RecyclerView.Adapter<UsersViewHolder>{
                         }
                     }
                 });
+            }
+        });
+
+        holder.itemView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Bundle bundle = new Bundle();
+                bundle.putString("userClickedOn", username);
+                Log.i("line96", username);
+                Navigation.findNavController(view).navigate(R.id.otherUserProfileFragment, bundle);
             }
         });
 
