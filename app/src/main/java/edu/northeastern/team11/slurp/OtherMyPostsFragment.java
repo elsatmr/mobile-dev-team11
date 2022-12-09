@@ -104,6 +104,7 @@ public class OtherMyPostsFragment extends Fragment {
 
             }
         });
+        // set up recyclerView and adapter
         postRecyclerView = view.findViewById(R.id.posts_recycler_view);
         postRecyclerView.setHasFixedSize(true);
         postRecyclerView.setLayoutManager(new GridLayoutManager(getActivity(), 3));
