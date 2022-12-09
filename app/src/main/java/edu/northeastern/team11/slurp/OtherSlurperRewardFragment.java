@@ -31,11 +31,12 @@ public class OtherSlurperRewardFragment extends Fragment {
     private static final String ARG_PARAM2 = "param2";
 
     // TODO: Rename and change types of parameters
+    DatabaseReference db;
     private String mParam1;
     private String mParam2;
     private String userClickedOn;
     private int totalSlurperPoints;
-
+    private int numPosts;
     public OtherSlurperRewardFragment() {
         // Required empty public constructor
     }
@@ -76,24 +77,40 @@ public class OtherSlurperRewardFragment extends Fragment {
         SharedPreferences prefs = getActivity().getSharedPreferences("userClickedOn", Context.MODE_PRIVATE);
         userClickedOn = prefs.getString("userClickedOn", null);
 
+        db = FirebaseDatabase.getInstance().getReference();
+
         getSlurperStatusPoints(view);
-        getNumVotes();
-        getNumPosts();
+        getNumVotes(view);
+        getNumPosts(view);
 
         return view;
     }
 
-    private void getNumPosts() {
+    private void getNumPosts(View view) {
         // read from db here to get numPoints once this is set up in db
+        TextView slurperNumPostsTV = view.findViewById(R.id.numPostsTextView);
+        db.child("numPosts").child(userClickedOn).addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                String s = String.valueOf(snapshot.child("count").getValue());
+                numPosts = Integer.parseInt(s);
+                slurperNumPostsTV.setText("Number of posts: " + numPosts + " \uD83E\uDD73");
+
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
     }
 
-    private void getNumVotes() {
+    private void getNumVotes(View view) {
         // read from db here to get numPosts once this is set up in db
     }
 
     // get slurper status points for the user, evaluate the points to determine slurper status
     private void getSlurperStatusPoints(View view) {
-        DatabaseReference db = FirebaseDatabase.getInstance().getReference();
         db.child("slurperStatusPoints").child(userClickedOn).addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
