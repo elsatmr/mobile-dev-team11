@@ -8,7 +8,7 @@ import retrofit2.http.Query;
 
 
 public interface YelpAPI  {
-
+    //
     @GET("search")
     Call<JsonElement> getRestaurants(@Query("latitude") String latitude,
                                      @Query("longitude") String longitude,

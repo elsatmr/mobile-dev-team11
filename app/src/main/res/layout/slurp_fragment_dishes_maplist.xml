@@ -2,8 +2,10 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/mapListLayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
+
     <TextView
         android:id="@+id/textView"
         android:layout_width="wrap_content"
@@ -91,7 +93,9 @@
         app:layout_constraintTop_toBottomOf="@id/categoryValue"
         app:mapbox_cameraTargetLat="40.7128"
         app:mapbox_cameraTargetLng="-74.0060"
-        app:mapbox_cameraZoom="13.0" />
+        app:mapbox_cameraZoom="13.0" >
+
+    </com.mapbox.mapboxsdk.maps.MapView>
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/homeFab"
@@ -107,12 +111,37 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:srcCompat="@android:drawable/ic_menu_compass" />
 
+    <Button
+        android:id="@+id/searchMapButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Search Here"
+        android:visibility="invisible"
+        app:layout_constraintBottom_toBottomOf="@+id/mapView"
+        app:layout_constraintEnd_toEndOf="@+id/mapView"
+        app:layout_constraintStart_toStartOf="@+id/mapView" />
+
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/restDishListRecycler"
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:layout_marginTop="1dp"
         app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/mapView" />
+
+    <TextView
+        android:id="@+id/notifyNoResultsText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="50dp"
+        android:elevation="20dp"
+        android:text="No Results - Zoom Out and Search Again"
+        android:textColor="#000000"
+        android:textStyle="bold"
+        android:translationZ="10dp"
+        android:visibility="visible"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/mapView" />
