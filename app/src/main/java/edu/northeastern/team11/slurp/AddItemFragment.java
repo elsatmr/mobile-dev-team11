@@ -579,6 +579,9 @@ public class AddItemFragment extends Fragment {
         updateSlurperStatus();
 
 
+        //Updating Restaurant table slurpScore
+        updateSlurpScore(dishNameSelected, restaurantID, slurpScoreSelected);
+
         Toast.makeText(getActivity(),
                         "Post Uploaded!!",
                         Toast.LENGTH_SHORT)
@@ -606,6 +609,34 @@ public class AddItemFragment extends Fragment {
 //        }
     }
 
+    private void updateSlurpScore(String dishNameSelected, String restaurantID, Float givenScore) {
+
+        dbRef.child("slurpRestaurants").child(restaurantID).child("dishes").child(dishNameSelected).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                Integer count = 0;
+                Float newScore = 0.0f;
+                Integer score = 0;
+                for (DataSnapshot user: snapshot.getChildren()) {
+                    count = snapshot.child("reviewCount").getValue(Integer.class);
+                    score = snapshot.child("slurpScore").getValue(Integer.class);
+                    System.out.println("Count Tomi" + count);
+                }
+                count =  count + 1;
+                newScore = score + ((givenScore - score)/count);
+                dbRef.child("slurpRestaurants").child(restaurantID).child("dishes").
+                        child(dishNameSelected).child("reviewCount").setValue(count);
+                dbRef.child("slurpRestaurants").child(restaurantID).child("dishes").
+                        child(dishNameSelected).child("slurpScore").setValue(newScore);
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+    }
+
     private void addADishToRestaurantTable(String dishNameSelected) {
 //        dbRef.child("categoryTest")
     }
@@ -625,22 +656,6 @@ public class AddItemFragment extends Fragment {
         });
 
     }
-
-//    private void getCategoryFromDB(String restaurantID) {
-//        dbRef.child("slurpRestaurants").child(restaurantID).addListenerForSingleValueEvent(new ValueEventListener() {
-//            @Override
-//            public void onDataChange(@NonNull DataSnapshot snapshot) {
-//                for (DataSnapshot category: snapshot.getChildren()) {
-//                    categoryOfDishAdded = snapshot.child("category").getValue(String.class);
-//                }
-//            }
-//
-//            @Override
-//            public void onCancelled(@NonNull DatabaseError error) {
-//
-//            }
-//        });
-//    }
 
     private void updateSlurperStatus() {
 
