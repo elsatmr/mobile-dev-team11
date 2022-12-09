@@ -87,22 +87,23 @@ public class MyFriendsFragment extends Fragment {
         firebaseDb = FirebaseDatabase.getInstance();
         dbRef = firebaseDb.getReferenceFromUrl("https://stickers-19c0f-default-rtdb.firebaseio.com/");
         myFriendsRecyclerView = view.findViewById(R.id.myFriends_recycler_view);
-//        dbRef.child("users_slurp").child(username).child("friends").addValueEventListener(new ValueEventListener() {
-//            @Override
-//            public void onDataChange(@NonNull DataSnapshot snapshot) {
-//                friendList.clear();
-//                for (DataSnapshot s : snapshot.getChildren()) {
-//                    String friend = String.valueOf(s.getKey());
-//                    friendList.add(friend);
-//                }
-//                myFriendsAdapter.notifyDataSetChanged();
-//            }
-//
-//            @Override
-//            public void onCancelled(@NonNull DatabaseError error) {
-//
-//            }
-//        });
+        dbRef.child("friends").addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                friendList.clear();
+                for (DataSnapshot s : snapshot.getChildren()) {
+                    String friend = String.valueOf(s.getKey());
+                    friendList.add(friend);
+                }
+                friendList.remove("init");
+                myFriendsAdapter.notifyDataSetChanged();
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
         myFriendsAdapter = new MyFriendsAdapter(friendList, getActivity());
         myFriendsRecyclerView.setAdapter(myFriendsAdapter);
         myFriendsRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
