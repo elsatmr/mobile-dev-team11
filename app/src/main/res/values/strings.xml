@@ -18,4 +18,10 @@
     <string name="share_the_post">Share the post</string>
     <string name="capture_an_image">Capture an image</string>
     <string name="dish_name">Dish name</string>
+    <string name="slurp_score">Slurp score</string>
+    <string name="category">Category</string>
+    <string name="restaurant">Restaurant</string>
+    <string name="choose_restaurant_name">Choose restaurant name</string>
+    <string name="score_the_dish">Score the dish</string>
+    <string name="give_your_score">Give your score</string>
 </resources>
