@@ -23,6 +23,7 @@ import java.util.ArrayList;
 
 import edu.northeastern.team11.R;
 
+// separate adapter when viewing another user's profile
 public class OtherMyPostsAdapter extends RecyclerView.Adapter<OtherMyPostsViewHolder> {
     private final ArrayList<Dish> dishesList;
     private final Context context;
@@ -41,6 +42,7 @@ public class OtherMyPostsAdapter extends RecyclerView.Adapter<OtherMyPostsViewHo
 
     @Override
     public void onBindViewHolder(@NonNull OtherMyPostsViewHolder holder, int position) {
+        // get image for the dishes, but don't allow a user to vote for a post on someone else's profile
         Dish currDish = dishesList.get(position);
         String url = currDish.getImageUrl();
         OtherMyPostsAdapter.BackgroundThread2 thread = new OtherMyPostsAdapter.BackgroundThread2(holder.postImageView, url);
@@ -53,6 +55,7 @@ public class OtherMyPostsAdapter extends RecyclerView.Adapter<OtherMyPostsViewHo
         return dishesList.size();
     }
 
+    // get image for dish
     class BackgroundThread2 extends Thread {
         ImageView imageView;
         String imageUri;

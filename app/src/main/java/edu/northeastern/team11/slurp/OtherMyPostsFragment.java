@@ -113,4 +113,11 @@ public class OtherMyPostsFragment extends Fragment {
         return view;
     }
 
+//    private String getUserClickedOn() {
+//        SharedPreferences preferences = getActivity().getSharedPreferences("settings", Context.MODE_PRIVATE);
+//        return preferences.getString("userClickedOn", null);
+//
+//
+//    }
+
 }
