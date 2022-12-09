@@ -6,28 +6,27 @@ import android.os.Parcelable;
 public class Post implements Parcelable {
     private String imageUrl;
     private String dishName;
-    private String restId;
+    private String restaurantId;
     private Float slurpScore;
     private Integer timestamp;
     private String userName;
 
-    public Post(String imageUrl, String dishName, String restId, Float slurpScore, Integer timestamp, String userName) {
+    public Post(String imageUrl, String dishName, String restaurantId, Float slurpScore, Integer timestamp, String userName) {
         this.imageUrl = imageUrl;
         this.dishName = dishName;
-        this.restId = restId;
+        this.restaurantId = restaurantId;
         this.slurpScore = slurpScore;
         this.timestamp = timestamp;
         this.userName = userName;
     }
 
-
     protected Post(Parcel in) {
         imageUrl = in.readString();
         dishName = in.readString();
         if (in.readByte() == 0) {
-            restId = null;
+            restaurantId = null;
         } else {
-            restId = in.readString();
+            restaurantId = in.readString();
         }
         if (in.readByte() == 0) {
             slurpScore = null;
@@ -63,11 +62,11 @@ public class Post implements Parcelable {
     public void writeToParcel(Parcel parcel, int i) {
         parcel.writeString(imageUrl);
         parcel.writeString(dishName);
-        if (restId == null) {
+        if (restaurantId == null) {
             parcel.writeByte((byte) 0);
         } else {
             parcel.writeByte((byte) 1);
-            parcel.writeString(restId);
+            parcel.writeString(restaurantId);
         }
         if (slurpScore == null) {
             parcel.writeByte((byte) 0);
@@ -100,12 +99,12 @@ public class Post implements Parcelable {
         this.dishName = dishName;
     }
 
-    public String getRestId() {
-        return restId;
+    public String getRestaurantId() {
+        return restaurantId;
     }
 
-    public void setRestId(String restId) {
-        this.restId = restId;
+    public void setRestaurantId(String restaurantId) {
+        this.restaurantId = restaurantId;
     }
 
     public Float getSlurpScore() {
