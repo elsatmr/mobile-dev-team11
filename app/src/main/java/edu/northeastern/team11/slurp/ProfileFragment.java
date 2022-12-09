@@ -116,9 +116,7 @@ public class ProfileFragment extends Fragment {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 User user = snapshot.getValue(User.class);
-                TextView statusTv = view.findViewById(R.id.slurperStatusTextView);
                 TextView locationTv = view.findViewById(R.id.slurpUserLocationTextView);
-                statusTv.setText(String.valueOf(user.getSlurperStatusPoints()));
                 locationTv.setText(user.getCityState());
                 if (user.getProfilePhotoLink() != "no_profile_pic_set") {
                     ImageView profilePicture = view.findViewById(R.id.userProfilePicture);
